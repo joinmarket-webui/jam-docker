@@ -15,14 +15,16 @@ server {
 
     location /api/ {
         include /etc/nginx/snippets/proxy-params.conf;
-        proxy_pass https://127.0.0.1:28183;
+        # Proxy API calls to another destination; the default for the variable is set in docker-defaults.sh
+        proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
     }
 
     location /ws/ {
         include /etc/nginx/snippets/proxy-params.conf;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $http_connection;
-        proxy_pass https://127.0.0.1:28183;
+        # Proxy API calls to another destination; the default for the variable is set in docker-defaults.sh
+        proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
     }
 
     location / {
