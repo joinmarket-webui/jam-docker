@@ -8,14 +8,14 @@ services:
     restart: on-failure
     stop_grace_period: 1m
     environment:
-      JMWEBUI_JM_WALLETD_HOST: 'joinmarketclientserver'
+      JMWEBUI_JM_WALLETD_HOST: joinmarket-clientserver
       JMWEBUI_JM_WALLETD_PORT: 28183
     ports:
       - "8080:80"
     depends_on:
-      - joinmarketclientserver
+      - joinmarket-clientserver
 
-  joinmarketclientserver:
+  joinmarket-clientserver:
     build:
       context: ./joinmarket-clientserver/v0.9.3
       dockerfile: Dockerfile
