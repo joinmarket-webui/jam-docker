@@ -13,9 +13,15 @@ server {
     root /app;
     index index.html;
 
+    location / {
+        include /etc/nginx/snippets/proxy-params.conf;
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control no-cache;
+    }
+
     location /api/ {
         include /etc/nginx/snippets/proxy-params.conf;
-        # Proxy API calls to another destination; the default for the variable is set in docker-defaults.sh
+        # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
         proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
     }
 
@@ -23,13 +29,7 @@ server {
         include /etc/nginx/snippets/proxy-params.conf;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $http_connection;
-        # Proxy API calls to another destination; the default for the variable is set in docker-defaults.sh
+        # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
         proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
-    }
-
-    location / {
-        include /etc/nginx/snippets/proxy-params.conf;
-        try_files $uri $uri/ /index.html;
-        add_header Cache-Control no-cache;
     }
 }
