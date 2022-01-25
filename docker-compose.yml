@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  joinmarket-webui-umbrel:
+    build:
+      context: .
+      dockerfile: Dockerfile.umbrel
+    #user: "1000:1000" also needs root for nginx -_-
+    init: true
+    restart: on-failure
+    stop_grace_period: 1m
+    ports:
+      - 8080:80
+    environment:
+      foo: 'bar'
+
+  joinmarket-webui-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: on-failure
+    stop_grace_period: 1m
+    ports:
+      - "3000:3000"
+    environment:
+      foo: 'bar'
+
+

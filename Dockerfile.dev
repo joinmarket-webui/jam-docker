@@ -2,7 +2,6 @@ FROM alpine:3.14 AS builder-base
 # install build dependencies
 RUN apk add --no-cache --update git nodejs npm
 
-
 # ---
 FROM builder-base AS builder
 ENV REPO https://github.com/joinmarket-webui/joinmarket-webui
