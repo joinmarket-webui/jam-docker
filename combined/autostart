@@ -1,8 +1,8 @@
 # Remove comments in from of the service you want to automatically restart
 # when the container restart.
 
-#ob-watcher
-#jmwalletd
-webui
-# yg-privacyenhanced
-# yield-generator-basic
+nginx
+ob-watcher
+jmwalletd
+#yg-privacyenhanced
+#yield-generator-basic
