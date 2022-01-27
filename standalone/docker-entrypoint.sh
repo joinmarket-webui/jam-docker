@@ -50,6 +50,11 @@ done < <(env -0)
 # ensure a wallet name is present
 jmenv['rpc_wallet_file']=${jmenv['rpc_wallet_file']:-'jm_webui_default'}
 
+# adapt 'blockchain_source' is missing and we're in regtest mode
+if [ "${jmenv['network']}" == "regtest" ] && [ "${jmenv['blockchain_source']}" == "" ]; then
+    jmenv['blockchain_source']='regtest'
+fi
+
 # there is no 'regtest' value for config 'network': make sure to use "testnet" in regtest mode
 if [ "${jmenv['network']}" == "regtest" ]; then
     jmenv['network']='testnet'
