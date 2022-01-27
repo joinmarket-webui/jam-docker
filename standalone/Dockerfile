@@ -68,12 +68,6 @@ RUN . jmvenv/bin/activate && cd /src/scripts \
     && (python wallet-tool.py generate || true) \
     && cp "${CONFIG}" "${DEFAULT_CONFIG}"
 
-# generate ssl certificates for jmwalletd
-RUN mkdir -p "${DATADIR}/ssl/" \
-    && cd "${DATADIR}/ssl/" \
-    && openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes -out cert.pem -keyout key.pem \
-    -subj "/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
-
 WORKDIR /src/scripts
 
 COPY docker-entrypoint.sh .
