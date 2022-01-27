@@ -41,8 +41,18 @@ RUN apt-get update && \
     build-essential automake pkg-config libtool libgmp-dev libltdl-dev python3-dev virtualenv python3-pip supervisor && \
     rm -rf /var/lib/apt/lists/*
 
-ENV REPO https://github.com/JoinMarket-Org/joinmarket-clientserver
-ENV REPO_REF master
+# install nginx
+RUN apt-get update \
+    && apt-get install -qq gnupg
+
+RUN sh -c "echo 'deb http://nginx.org/packages/mainline/debian/ bullseye nginx' > /etc/apt/sources.list.d/nginx.list" \
+    && curl -s https://nginx.org/keys/nginx_signing.key | \
+    gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/nginx.gpg --import \
+    && chmod 644 /etc/apt/trusted.gpg.d/nginx.gpg
+
+RUN apt-get update \
+    && apt-get install -qq nginx
+# install nginx - end
 
 WORKDIR /src
 
@@ -70,9 +80,13 @@ COPY *.sh ./
 COPY autostart /root/
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 
+COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
+# nginx
+EXPOSE 80
 # jmwallet daemon
-EXPOSE 28183
+#EXPOSE 28183
 
 #EXPOSE 8080 # payjoin server
 #EXPOSE 27183 # joinmarketd daemon
