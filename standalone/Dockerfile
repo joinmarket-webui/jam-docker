@@ -1,12 +1,12 @@
 # --- Builder base 
-FROM alpine:3.14 AS builder-base
+FROM alpine:3.15 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base 
 
 # --- UI builder 
 FROM builder-base AS ui-builder
 # install build dependencies
-RUN apk add --no-cache --update git nodejs npm
+RUN apk add --no-cache --update nodejs npm
 
 ENV REPO https://github.com/joinmarket-webui/joinmarket-webui
 ENV REPO_BRANCH master
@@ -16,7 +16,7 @@ WORKDIR /usr/src/joinmarket-webui
 
 # checkout and build project
 RUN git clone "$REPO" . --depth=10 --branch "$REPO_BRANCH" && git checkout "$REPO_REF"
-RUN npm install
+RUN npm install --no-fund --no-audit
 RUN npm run build
 # --- UI builder - end
 
@@ -86,8 +86,7 @@ COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # nginx
 EXPOSE 80
-# jmwallet daemon
-EXPOSE 28183
+#EXPOSE 28183 # jmwallet daemon
 #EXPOSE 8080  # payjoin server
 #EXPOSE 27183 # joinmarketd daemon
 #EXPOSE 62601 # obwatch

@@ -1,4 +1,4 @@
-FROM alpine:3.14 AS builder-base
+FROM alpine:3.15 AS builder-base
 # install build dependencies
 RUN apk add --no-cache --update git nodejs npm
 
@@ -12,11 +12,11 @@ WORKDIR /usr/src/app
 
 # checkout and build project
 RUN git clone "$REPO" . --depth=10 --branch "$REPO_BRANCH" && git checkout "$REPO_REF"
-RUN npm install
+RUN npm install --no-fund --no-audit
 RUN npm run build
 
 # ---
-FROM nginx:1.21.5-alpine as runtime
+FROM nginx:1.21.6-alpine as runtime
 
 # ---
 FROM runtime
