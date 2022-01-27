@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
 
+  # the ui-only container will connect to the second instance
   joinmarket-webui-ui-only:
     build:
       context: ./ui-only
@@ -9,7 +10,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m
     environment:
-      JMWEBUI_JM_WALLETD_HOST: joinmarket-webui-standalone
+      JMWEBUI_JM_WALLETD_HOST: joinmarket-webui-standalone2
       JMWEBUI_JM_WALLETD_PORT: 28183
     ports:
       - "8081:80"
@@ -42,17 +43,51 @@ services:
       jm_socks5_host: tor
       jm_socks5_port: 9050
     expose:
-      - 80 # ui
-      - 8080 # payjoin server
-      - 62601 # obwatch
-      - 27183 # joinmarketd
       - 28183 # jmwalletd
+      #- 62601 # obwatch
     ports:
       - "8080:80"
-      - "62601:62601"
-      - "28183:28183"
     volumes:
       - "joinmarket_datadir:/root/.joinmarket"
+      - "nbxplorer_datadir:/root/.nbxplorer"
+      - "tor_datadir:/home/tor/.tor"
+    depends_on:
+      - bitcoind
+      - nbxplorer
+      - tor
+
+  joinmarket-webui-standalone2:
+    build:
+      context: ./standalone
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      READY_FILE: /root/.nbxplorer/btc_fully_synched
+      ENSURE_WALLET: 1
+      jm_gaplimit: 2000
+      jm_max_cj_fee_abs: 42000000 # 0.42 btc
+      jm_max_cj_fee_rel: 0.1337 # 13.37%
+      jm_minimum_makers: 1
+      jm_taker_utxo_age: 1
+      jm_taker_utxo_retries: 10
+      jm_tx_broadcast: self
+      jm_blockchain_source: regtest
+      jm_network: testnet
+      jm_rpc_host: bitcoind
+      jm_rpc_port: 43782
+      jm_rpc_user: joinmarket2
+      jm_rpc_password: joinmarket2
+      jm_tor_control_host: tor
+      jm_tor_control_port: 9051
+      jm_onion_socks5_host: tor
+      jm_onion_socks5_port: 9050
+      jm_socks5_host: tor
+      jm_socks5_port: 9050
+    expose:
+      - 28183 # jmwalletd
+      #- 62601 # obwatch
+    volumes:
+      - "joinmarket2_datadir:/root/.joinmarket"
       - "nbxplorer_datadir:/root/.nbxplorer"
       - "tor_datadir:/home/tor/.tor"
     depends_on:
@@ -159,6 +194,7 @@ services:
 
 volumes:
   joinmarket_datadir:
+  joinmarket2_datadir:
   bitcoin_datadir:
   bitcoin_wallet_datadir:
   nbxplorer_datadir:
