@@ -47,7 +47,13 @@ while IFS='=' read -r -d '' envkey parsedval; do
     fi
 done < <(env -0)
 
+# ensure a wallet name is present
 jmenv['rpc_wallet_file']=${jmenv['rpc_wallet_file']:-'jm_webui_default'}
+
+# there is no 'regtest' value for config 'network': make sure to use "testnet" in regtest mode
+if [ "${jmenv['network']}" == "regtest" ]; then
+    jmenv['network']='testnet'
+fi
 
 # For every env variable JM_FOO=BAR, replace the default configuration value of 'foo' by 'BAR'
 for key in ${!jmenv[@]}; do
