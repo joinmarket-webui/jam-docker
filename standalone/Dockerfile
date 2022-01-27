@@ -83,6 +83,12 @@ COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
+# generate ssl certificates for jmwalletd
+RUN mkdir -p "${DATADIR}/ssl/" && \
+    cd "${DATADIR}/ssl/" && \
+    openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes -out cert.pem -keyout key.pem \
+    -subj "/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
+
 # nginx
 EXPOSE 80
 # jmwallet daemon
