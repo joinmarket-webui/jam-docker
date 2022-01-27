@@ -1,23 +1,22 @@
 version: "3.7"
 
 services:
-  joinmarket-webui-umbrel:
+
+  joinmarket-webui-ui-only:
     build:
-      context: .
-      dockerfile: Dockerfile.umbrel
+      context: ./ui-only
+      dockerfile: Dockerfile
     restart: on-failure
     stop_grace_period: 1m
     environment:
-      JMWEBUI_JM_WALLETD_HOST: joinmarket-clientserver
+      JMWEBUI_JM_WALLETD_HOST: joinmarket-webui-standalone
       JMWEBUI_JM_WALLETD_PORT: 28183
     ports:
-      - "8080:80"
-    depends_on:
-      - joinmarket-clientserver
+      - "8081:80"
 
-  joinmarket-clientserver:
+  joinmarket-webui-standalone:
     build:
-      context: ./joinmarket-clientserver/v0.9.3
+      context: ./standalone
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
@@ -44,11 +43,13 @@ services:
       jm_socks5_host: tor
       jm_socks5_port: 9050
     expose:
+      - 80 # ui
       - 8080 # payjoin server
       - 62601 # obwatch
       - 27183 # joinmarketd
       - 28183 # jmwalletd
     ports:
+      - "8080:80"
       - "62601:62601"
       - "28183:28183"
     volumes:

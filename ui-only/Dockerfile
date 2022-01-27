@@ -23,13 +23,13 @@ FROM runtime
 WORKDIR /
 COPY --from=builder /usr/src/app/build /app
 
-COPY ./umbrel/nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 # each time nginx is started it will perform variable substition in all template
 # files found in `/etc/nginx/templates/*.template`, and copy the results (without
 # the `.template` suffix) into `/etc/nginx/conf.d/`.
-COPY ./umbrel/nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
+COPY ./nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
-COPY ./umbrel/jmwebui-entrypoint.sh .
+COPY ./jmwebui-entrypoint.sh .
 RUN chmod +x ./jmwebui-entrypoint.sh
 
 ENTRYPOINT  [ "./jmwebui-entrypoint.sh" ]
