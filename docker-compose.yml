@@ -1,26 +1,14 @@
 version: "3.7"
 
 services:
-  joinmarket-webui-umbrel:
+  joinmarket-webui-standalone:
     build:
-      context: .
-      dockerfile: Dockerfile.umbrel
-    restart: on-failure
-    stop_grace_period: 1m
-    environment:
-      JMWEBUI_JM_WALLETD_HOST: 127.0.0.1 # replace with your host ip
-      JMWEBUI_JM_WALLETD_PORT: 28183
-    ports:
-      - "8081:80"
-
-  joinmarket-webui-combined:
-    build:
-      context: ./combined
+      context: ./standalone
       dockerfile: Dockerfile
     restart: on-failure
     stop_grace_period: 1m
     environment:
-      JMWEBUI_JM_WALLETD_HOST: 127.0.0.1 # replace with your host ip
-      JMWEBUI_JM_WALLETD_PORT: 28183
+      jm_blockchain_source: regtest
+      jm_network: testnet
     ports:
       - "8080:80"
