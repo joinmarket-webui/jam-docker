@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
+      ENSURE_WALLET: 1
       READY_FILE: /root/.nbxplorer/btc_fully_synched
       jm_gaplimit: 2000
       jm_max_cj_fee_abs: 42000000 # 0.42 btc
@@ -35,6 +36,7 @@ services:
       jm_rpc_port: 43782
       jm_rpc_user: joinmarket
       jm_rpc_password: joinmarket
+      jm_rpc_wallet_file: jm_webui_1
       jm_tor_control_host: tor
       jm_tor_control_port: 9051
       jm_onion_socks5_host: tor
@@ -58,6 +60,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
+      ENSURE_WALLET: 1
       READY_FILE: /root/.nbxplorer/btc_fully_synched
       jm_gaplimit: 2000
       jm_max_cj_fee_abs: 42000000 # 0.42 btc
@@ -72,6 +75,7 @@ services:
       jm_rpc_port: 43782
       jm_rpc_user: joinmarket2
       jm_rpc_password: joinmarket2
+      jm_rpc_wallet_file: jm_webui_2
       jm_tor_control_host: tor
       jm_tor_control_port: 9051
       jm_onion_socks5_host: tor
