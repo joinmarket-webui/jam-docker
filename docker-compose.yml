@@ -31,7 +31,6 @@ services:
       jm_taker_utxo_retries: 10
       jm_tx_broadcast: self
       jm_network: regtest
-      jm_blockchain_source: regtest
       jm_rpc_host: bitcoind
       jm_rpc_port: 43782
       jm_rpc_user: joinmarket
@@ -73,7 +72,6 @@ services:
       jm_taker_utxo_retries: 10
       jm_tx_broadcast: self
       jm_network: regtest
-      jm_blockchain_source: regtest
       jm_rpc_host: bitcoind
       jm_rpc_port: 43782
       jm_rpc_user: joinmarket2
