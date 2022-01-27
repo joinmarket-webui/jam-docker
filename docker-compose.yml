@@ -11,4 +11,16 @@ services:
       JMWEBUI_JM_WALLETD_HOST: 127.0.0.1 # replace with your host ip
       JMWEBUI_JM_WALLETD_PORT: 28183
     ports:
+      - "8081:80"
+
+  joinmarket-webui-combined:
+    build:
+      context: ./combined
+      dockerfile: Dockerfile
+    restart: on-failure
+    stop_grace_period: 1m
+    environment:
+      JMWEBUI_JM_WALLETD_HOST: 127.0.0.1 # replace with your host ip
+      JMWEBUI_JM_WALLETD_PORT: 28183
+    ports:
       - "8080:80"
