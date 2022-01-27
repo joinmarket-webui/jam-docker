@@ -25,6 +25,9 @@ if ! [ -f "${DATADIR}/ssl/key.pem" ]; then
       && popd
 fi
 
+# ensure 'logs' directory exists
+mkdir -p "${DATADIR}/logs"
+
 # auto start services
 while read p; do
     [[ "$p" == "" ]] && continue
