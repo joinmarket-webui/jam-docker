@@ -23,7 +23,6 @@ services:
       READY_FILE: /root/.nbxplorer/btc_fully_synched
       ENSURE_WALLET: 1
       jm_gaplimit: 2000
-      jm_rpc_wallet_file: jm_primary
       jm_max_cj_fee_abs: 42000000 # 0.42 btc
       jm_max_cj_fee_rel: 0.1337 # 13.37%
       jm_minimum_makers: 1
@@ -53,11 +52,11 @@ services:
       - "62601:62601"
       - "28183:28183"
     volumes:
+      - "joinmarket_datadir:/root/.joinmarket"
       - "nbxplorer_datadir:/root/.nbxplorer"
       - "tor_datadir:/home/tor/.tor"
     depends_on:
       - bitcoind
-      - irc
       - nbxplorer
       - tor
 
@@ -141,14 +140,6 @@ services:
       - bitcoind
       - tor
 
-  irc:
-    image: ghcr.io/ergochat/ergo:stable
-    restart: unless-stopped
-    expose:
-      - 6667
-    volumes:
-      - "irc_datadir:/ircd"
-
   tor:
     image: btcpayserver/tor:0.4.6.5
     restart: unless-stopped
@@ -167,10 +158,10 @@ services:
 
 
 volumes:
+  joinmarket_datadir:
   bitcoin_datadir:
   bitcoin_wallet_datadir:
   nbxplorer_datadir:
-  irc_datadir:
   tor_datadir:
   tor_torrcdir:
   tor_servicesdir:
