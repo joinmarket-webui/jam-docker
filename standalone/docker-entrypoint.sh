@@ -37,6 +37,7 @@ while IFS='=' read -r -d '' envkey parsedval; do
         v=${!envkey} # reread environment variable - characters might have been dropped (e.g 'ending in =')
         n="${n:3}" # drop jm_
         sed -i "s/^$n =.*/$n = $v/g" "$CONFIG" || echo "Couldn't set : $n = $v, please modify $CONFIG manually"
+        sed -i "s/^#$n =.*/$n = $v/g" "$CONFIG" || echo "Couldn't set : $n = $v, please modify $CONFIG manually"
     fi
 done < <(env -0)
 #####################################
