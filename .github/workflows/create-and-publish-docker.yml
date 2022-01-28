@@ -14,8 +14,6 @@ env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
   IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
-  JM_UI_REPO_BRANCH: master
-  JM_UI_REPO_REF: v0.0.2
 
 jobs:
   build-and-push-image:
@@ -29,6 +27,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Read .env file
+        id: dotenv
+        uses: falti/dotenv-action@v0.2.7
+        with:
+          log-variables: true
 
       - name: Log in to the Container registry
         uses: docker/login-action@v1.12.0
@@ -52,5 +56,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JM_UI_REPO_BRANCH=${{ env.JM_UI_REPO_BRANCH }}
-            JM_UI_REPO_REF=${{ env.JM_UI_REPO_REF }}
+            JM_UI_REPO_BRANCH=${{ steps.dotenv.outputs.jm_ui_repo_branch }}
+            JM_UI_REPO_REF=${{ steps.dotenv.outputs.jm_ui_repo_ref }}
+            JM_SERVER_REPO_BRANCH=${{ steps.dotenv.outputs.jm_server_repo_branch }}
+            JM_SERVER_REPO_REF=${{ steps.dotenv.outputs.jm_server_repo_ref }}
