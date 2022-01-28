@@ -70,21 +70,24 @@ for key in ${!jmenv[@]}; do
     sed -i "s/^#$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
 done
 
-if [[ "${READY_FILE}" ]]; then
+if [ "${READY_FILE}" ] && [ "${READY_FILE}" != false ]; then
     echo "Waiting $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
     echo "The chain is fully synched"
 fi
 
-if [[ "${ENSURE_WALLET}" ]]; then
-    btchost="http://${jm_rpc_user}:${jm_rpc_password}@${jm_rpc_host}:${jm_rpc_port}"
+if [ "${ENSURE_WALLET}" ] && [ "${ENSURE_WALLET}" != false ]; then
+    btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
+    btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
     wallet_name="${jmenv['rpc_wallet_file']}"
 
+    echo "Creating wallet $wallet_name if missing..."
     create_payload="{\"jsonrpc\":\"1.0\",\"id\":\"curl\",\"method\":\"createwallet\",\"params\":[\"${wallet_name}\"]}"
-    curl --data-binary "$create_payload" $btchost || true
+    curl --silent --user "${btcuser}" --data-binary "${create_payload}" "${btchost}" > /dev/null || true
 
+    echo "Loading wallet $wallet_name..."
     load_payload="{\"jsonrpc\":\"1.0\",\"id\":\"curl\",\"method\":\"loadwallet\",\"params\":[\"${wallet_name}\"]}"
-    curl --data-binary "$load_payload" $btchost || true
+    curl --silent --user "${btcuser}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
 fi
 
 
