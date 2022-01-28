@@ -88,8 +88,11 @@ ENV ENV_FILE "${DATADIR}/.env"
 ENV PATH /src/scripts:$PATH
 
 RUN ./install.sh --disable-secp-check --without-qt
-RUN . jmvenv/bin/activate && cd /src/scripts \
-    && pip install matplotlib \
+
+RUN . jmvenv/bin/activate \
+    && cd /src/scripts \
+    # without `matplotlib` charts won't be available - not important for the ui (enable on demand)
+    # && pip install matplotlib \
     && (python wallet-tool.py generate || true) \
     && cp "${CONFIG}" "${DEFAULT_CONFIG}"
 
