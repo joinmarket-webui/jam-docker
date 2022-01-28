@@ -1,12 +1,19 @@
+
+
+# global arguments
+ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
+ARG JM_UI_REPO_BRANCH=master
+ARG JM_UI_REPO_REF=master
+
 FROM alpine:3.15 AS builder-base
 # install build dependencies
 RUN apk add --no-cache --update git nodejs npm
 
 # ---
 FROM builder-base AS builder
-ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
-ARG JM_UI_REPO_BRANCH=master
-ARG JM_UI_REPO_REF=master
+ARG JM_UI_REPO
+ARG JM_UI_REPO_BRANCH
+ARG JM_UI_REPO_REF
 
 WORKDIR /usr/src/app
 
@@ -22,6 +29,10 @@ FROM nginx:1.21.6-alpine as runtime
 
 # ---
 FROM runtime
+ARG JM_UI_REPO_REF
+
+LABEL ui_version=$JM_UI_REPO_REF
+
 WORKDIR /
 COPY --from=builder /usr/src/app/build /app
 

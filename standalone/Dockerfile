@@ -1,3 +1,14 @@
+
+
+# global arguments
+ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
+ARG JM_UI_REPO_BRANCH=master
+ARG JM_UI_REPO_REF=master
+
+ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
+ARG JM_SERVER_REPO_BRANCH=master
+ARG JM_SERVER_REPO_REF=master
+
 # --- Builder base 
 FROM alpine:3.15 AS builder-base
 RUN apk add --no-cache --update git
@@ -5,12 +16,12 @@ RUN apk add --no-cache --update git
 
 # --- UI builder 
 FROM builder-base AS ui-builder
+ARG JM_UI_REPO
+ARG JM_UI_REPO_BRANCH
+ARG JM_UI_REPO_REF
+
 # install build dependencies
 RUN apk add --no-cache --update nodejs npm
-
-ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
-ARG JM_UI_REPO_BRANCH=master
-ARG JM_UI_REPO_REF=master
 
 WORKDIR /usr/src/joinmarket-webui
 
@@ -24,10 +35,9 @@ RUN npm run build
 
 # --- SERVER builder
 FROM builder-base AS server-builder
-
-ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
-ARG JM_SERVER_REPO_BRANCH=master
-ARG JM_SERVER_REPO_REF=master
+ARG JM_SERVER_REPO
+ARG JM_SERVER_REPO_BRANCH
+ARG JM_SERVER_REPO_REF
 
 WORKDIR /usr/src/joinmarket-clientserver
 
@@ -38,6 +48,11 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 
 # --- RUNTIME builder
 FROM python:3.9.10-slim-bullseye
+ARG JM_SERVER_REPO_REF
+ARG JM_UI_REPO_REF
+
+LABEL ui_version=$JM_UI_REPO_REF
+LABEL server_version=$JM_SERVER_REPO_REF
 
 RUN apt-get update \
     && apt-get install -qq --no-install-recommends gnupg curl
@@ -48,8 +63,9 @@ RUN sh -c "echo 'deb http://nginx.org/packages/mainline/debian/ bullseye nginx' 
     && chmod 644 /etc/apt/trusted.gpg.d/nginx.gpg
 
 RUN apt-get update \
-    && apt-get install -qq --no-install-recommends tini sudo procps vim iproute2 nginx \
+    && apt-get install -qq --no-install-recommends tini sudo procps vim iproute2 \
     build-essential automake pkg-config libtool libgmp-dev libltdl-dev python3-dev virtualenv python3-pip supervisor \
+    && apt-get install -qq --no-install-recommends nginx \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src

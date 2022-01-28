@@ -71,11 +71,11 @@ services:
     build:
       context: ./standalone
       dockerfile: Dockerfile
-    restart: unless-stopped
       args: 
         JM_SERVER_REPO: ${JM_SERVER_REPO?err}
         JM_SERVER_REPO_BRANCH: ${JM_SERVER_REPO_BRANCH?err}
         JM_SERVER_REPO_REF: ${JM_SERVER_REPO_REF?err}
+    restart: unless-stopped
     environment:
       ENSURE_WALLET: 1
       READY_FILE: /root/.nbxplorer/btc_fully_synched
