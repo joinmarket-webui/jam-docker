@@ -1,14 +1,14 @@
 
 name: Create and publish Docker image
 
-#on:
-#  workflow_dispatch:
-#    inputs:
-#      release_tag:
-#        description: 'The release tag (preview or x.y.z)'
-#        required: true
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'The release tag (preview or x.y.z)'
+        required: true
 
-on: [push, pull_request]
+#on: [push, pull_request]
 
 env:
   REGISTRY: ghcr.io
