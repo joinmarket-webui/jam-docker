@@ -4,14 +4,16 @@ RUN apk add --no-cache --update git nodejs npm
 
 # ---
 FROM builder-base AS builder
-ENV REPO https://github.com/joinmarket-webui/joinmarket-webui
-ENV REPO_BRANCH master
-ENV REPO_REF master
+ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
+ARG JM_UI_REPO_BRANCH=master
+ARG JM_UI_REPO_REF=master
 
 WORKDIR /usr/src/app
 
 # checkout and build project
-RUN git clone "$REPO" . --depth=10 --branch "$REPO_BRANCH" && git checkout "$REPO_REF"
+RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
+    && git fetch --all --tags \
+    && git checkout "$JM_UI_REPO_REF"
 RUN npm install --no-fund --no-audit
 RUN npm run build
 

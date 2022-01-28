@@ -8,14 +8,16 @@ FROM builder-base AS ui-builder
 # install build dependencies
 RUN apk add --no-cache --update nodejs npm
 
-ENV REPO https://github.com/joinmarket-webui/joinmarket-webui
-ENV REPO_BRANCH master
-ENV REPO_REF master
+ENV JM_UI_REPO https://github.com/joinmarket-webui/joinmarket-webui
+ENV JM_UI_REPO_BRANCH master
+ENV JM_UI_REPO_REF master
 
 WORKDIR /usr/src/joinmarket-webui
 
 # checkout and build project
-RUN git clone "$REPO" . --depth=10 --branch "$REPO_BRANCH" && git checkout "$REPO_REF"
+RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
+    && git fetch --all --tags \
+    && git checkout "$JM_UI_REPO_REF"
 RUN npm install --no-fund --no-audit
 RUN npm run build
 # --- UI builder - end
@@ -23,14 +25,15 @@ RUN npm run build
 # --- SERVER builder
 FROM builder-base AS server-builder
 
-ENV REPO https://github.com/JoinMarket-Org/joinmarket-clientserver
-ENV REPO_BRANCH master
-ENV REPO_REF master
+ENV JM_SERVER_REPO https://github.com/JoinMarket-Org/joinmarket-clientserver
+ENV JM_SERVER_REPO_BRANCH master
+ENV JM_SERVER_REPO_REF master
 
 WORKDIR /usr/src/joinmarket-clientserver
 
-RUN git clone "$REPO" . --depth=10 --branch "$REPO_REF" && git checkout "$REPO_REF"
-
+RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
+    && git fetch --all --tags \
+    && git checkout "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
