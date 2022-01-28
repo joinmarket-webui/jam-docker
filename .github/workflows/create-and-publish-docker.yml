@@ -4,11 +4,17 @@ name: Create and publish Docker image
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'The release tag (preview or x.y.z)'
+      version_ref:
+        description: 'docker app version (e.g. v21.0.0)'
         required: true
-
-#on: [push, pull_request]
+      ui_version_ref:
+        description: 'web-ui version/branch (e.g. v1.2.3, master, etc.)'
+        required: true
+        default: 'v0.2.0'
+      server_version_ref:
+        description: 'server version/branch (e.g. v1.2.3, master, etc.)'
+        required: true
+        default: 'v0.9.4'
 
 env:
   REGISTRY: ghcr.io
