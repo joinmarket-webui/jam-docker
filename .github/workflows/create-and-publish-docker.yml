@@ -14,6 +14,8 @@ env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
   IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
+  JM_UI_REPO_BRANCH: master
+  JM_UI_REPO_REF: v0.0.2
 
 jobs:
   build-and-push-image:
@@ -49,3 +51,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            JM_UI_REPO_BRANCH=${{ env.JM_UI_REPO_BRANCH }}
+            JM_UI_REPO_REF=${{ env.JM_UI_REPO_REF }}

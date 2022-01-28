@@ -7,6 +7,8 @@ services:
     build:
       context: ./ui-only
       dockerfile: Dockerfile
+      args: 
+        JM_UI_REPO_REF: ${JM_UI_REGRESSION_TEST_REPO_REF:-v0.0.2}
     restart: on-failure
     stop_grace_period: 1m
     environment:
@@ -19,6 +21,8 @@ services:
     build:
       context: ./standalone
       dockerfile: Dockerfile
+      args: 
+        JM_UI_REPO_REF: master
     restart: unless-stopped
     environment:
       ENSURE_WALLET: 1
