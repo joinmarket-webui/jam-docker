@@ -58,18 +58,23 @@ LABEL ui_version=$JM_UI_REPO_REF
 LABEL server_version=$JM_SERVER_REPO_REF
 
 RUN apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl
-
-RUN sh -c "echo 'deb http://nginx.org/packages/mainline/debian/ bullseye nginx' > /etc/apt/sources.list.d/nginx.list" \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl \
+    && sh -c "echo 'deb http://nginx.org/packages/mainline/debian/ bullseye nginx' > /etc/apt/sources.list.d/nginx.list" \
     && curl -s https://nginx.org/keys/nginx_signing.key | \
     gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/nginx.gpg --import \
     && chmod 644 /etc/apt/trusted.gpg.d/nginx.gpg \
     && apt-get remove --purge --auto-remove -y gnupg
 
 RUN apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y tini sudo procps vim iproute2 \
-    build-essential automake pkg-config libtool libgmp-dev libltdl-dev python3-dev virtualenv python3-pip supervisor \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y nginx \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y \
+    # ---
+    # image dependencies
+    tini supervisor iproute2 \
+    # servers dependencies (see `install.sh`)
+    sudo build-essential automake pkg-config libtool libltdl-dev python3-dev virtualenv python3-pip \
+    # ui dependencies
+    nginx \
+    # ---
     && apt-get remove --purge --auto-remove -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /etc/apt/sources.list.d/nginx.list
