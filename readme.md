@@ -21,4 +21,9 @@ Generate coins:
 ```
 
 ## TODO
-- Make irc config vars editable: A coinjoin on regtest is not possible, because these params cannot be replaced at the moment.
+- Do not run as root inside container.
+  - Clarify what it takes for all services to be started as non-root user.
+  - See [joinmarket-clientserver#PR699](https://github.com/JoinMarket-Org/joinmarket-clientserver/pull/669) and
+    [dmp1ce/joinmarket-DOCKERFILE](https://github.com/dmp1ce/joinmarket-DOCKERFILE)
+- Make irc config options editable via environment variables
+  - A coinjoin on regtest is not possible, because these params can only be replaced by mounting an own `joinmarket.cfg`
