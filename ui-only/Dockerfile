@@ -1,6 +1,7 @@
 
-
 # global arguments
+ARG MAINTAINER='joinmarket-webui https://github.com/joinmarket-webui'
+
 ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
 ARG JM_UI_REPO_BRANCH=master
 ARG JM_UI_REPO_REF=master
@@ -29,8 +30,10 @@ FROM nginx:1.21.6-alpine as runtime
 
 # ---
 FROM runtime
+ARG MAINTAINER
 ARG JM_UI_REPO_REF
 
+LABEL maintainer="$MAINTAINER"
 LABEL ui_version=$JM_UI_REPO_REF
 
 WORKDIR /

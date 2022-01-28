@@ -19,7 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
+  IMAGE_NAME_PREFIX: theborakompanioni/joinmarket-webui-
 
 jobs:
   build-and-push-image:
@@ -52,6 +52,8 @@ jobs:
         uses: docker/metadata-action@v3.6.2
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PREFIX }}${{ matrix.context }}
+          labels: |
+            org.opencontainers.image.title=joinmarket-webui-${{ matrix.context }}
 
       - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v2.8.0
