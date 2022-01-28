@@ -8,6 +8,8 @@ services:
       context: ./ui-only
       dockerfile: Dockerfile
       args: 
+        JM_UI_REPO: ${JM_UI_REPO?err}
+        JM_UI_REPO_BRANCH: ${JM_UI_REPO_BRANCH?err}
         JM_UI_REPO_REF: ${JM_UI_REGRESSION_TEST_REPO_REF:-v0.0.2}
     restart: on-failure
     stop_grace_period: 1m
@@ -22,7 +24,12 @@ services:
       context: ./standalone
       dockerfile: Dockerfile
       args: 
-        JM_UI_REPO_REF: master
+        JM_UI_REPO: ${JM_UI_REPO?err}
+        JM_UI_REPO_BRANCH: ${JM_UI_REPO_BRANCH?err}
+        JM_UI_REPO_REF: ${JM_UI_REPO_REF?err}
+        JM_SERVER_REPO: ${JM_SERVER_REPO?err}
+        JM_SERVER_REPO_BRANCH: ${JM_SERVER_REPO_BRANCH?err}
+        JM_SERVER_REPO_REF: ${JM_SERVER_REPO_REF?err}
     restart: unless-stopped
     environment:
       ENSURE_WALLET: 1
@@ -65,6 +72,10 @@ services:
       context: ./standalone
       dockerfile: Dockerfile
     restart: unless-stopped
+      args: 
+        JM_SERVER_REPO: ${JM_SERVER_REPO?err}
+        JM_SERVER_REPO_BRANCH: ${JM_SERVER_REPO_BRANCH?err}
+        JM_SERVER_REPO_REF: ${JM_SERVER_REPO_REF?err}
     environment:
       ENSURE_WALLET: 1
       READY_FILE: /root/.nbxplorer/btc_fully_synched

@@ -8,9 +8,9 @@ FROM builder-base AS ui-builder
 # install build dependencies
 RUN apk add --no-cache --update nodejs npm
 
-ENV JM_UI_REPO https://github.com/joinmarket-webui/joinmarket-webui
-ENV JM_UI_REPO_BRANCH master
-ENV JM_UI_REPO_REF master
+ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
+ARG JM_UI_REPO_BRANCH=master
+ARG JM_UI_REPO_REF=master
 
 WORKDIR /usr/src/joinmarket-webui
 
@@ -25,9 +25,9 @@ RUN npm run build
 # --- SERVER builder
 FROM builder-base AS server-builder
 
-ENV JM_SERVER_REPO https://github.com/JoinMarket-Org/joinmarket-clientserver
-ENV JM_SERVER_REPO_BRANCH master
-ENV JM_SERVER_REPO_REF master
+ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
+ARG JM_SERVER_REPO_BRANCH=master
+ARG JM_SERVER_REPO_REF=master
 
 WORKDIR /usr/src/joinmarket-clientserver
 
