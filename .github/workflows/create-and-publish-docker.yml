@@ -1,16 +1,19 @@
-#
 
-name: Create and publish a Docker image
+name: Create and publish Docker image
 
 #on:
-#  push:
-#    branches: ['release']
+#  workflow_dispatch:
+#    inputs:
+#      release_tag:
+#        description: 'The release tag (preview or x.y.z)'
+#        required: true
+
 on: [push, pull_request]
 
 env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME: theborakompanioni/jmui-standalone-dev
+  IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
 
 jobs:
   build-and-push-image:
@@ -18,7 +21,9 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    strategy:
+      matrix:
+         context: [standalone,ui-only]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -34,12 +39,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3.6.2
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PREFIX }}${{ matrix.context }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v2.8.0
         with:
-          context: ./standalone
+          context: ./${{ matrix.context }}
+          #platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
