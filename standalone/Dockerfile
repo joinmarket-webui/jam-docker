@@ -1,6 +1,7 @@
 
-
 # global arguments
+ARG MAINTAINER='joinmarket-webui https://github.com/joinmarket-webui'
+
 ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
 ARG JM_UI_REPO_BRANCH=master
 ARG JM_UI_REPO_REF=master
@@ -48,9 +49,11 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 
 # --- RUNTIME builder
 FROM python:3.9.10-slim-bullseye
+ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JM_UI_REPO_REF
 
+LABEL maintainer="$MAINTAINER"
 LABEL ui_version=$JM_UI_REPO_REF
 LABEL server_version=$JM_SERVER_REPO_REF
 
