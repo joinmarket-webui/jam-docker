@@ -3,7 +3,7 @@ name: Check and update versions of dependencies
 
 on:
   schedule:
-    - cron: '0 7 * * *' # every day at 07:00 UTC
+    - cron: '51 6 * * *' # every day at 06:51 UTC
   workflow_dispatch:
 
 jobs:
