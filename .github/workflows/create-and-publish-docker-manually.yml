@@ -1,15 +1,25 @@
 
-name: Create and publish Docker image
+name: Manually create and publish Docker image
 
 on:
-  release:
-    types: [created]
-    #types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'docker app version (e.g. v21.0.0)'
+        required: true
+      ui_repo_ref:
+        description: 'web-ui version/branch (e.g. v1.2.3, master, etc.)'
+        required: true
+        default: 'v0.2.0'
+      server_repo_ref:
+        description: 'server version/branch (e.g. v1.2.3, master, etc.)'
+        required: true
+        default: 'v0.9.4'
 
 env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME_PREFIX: theborakompanioni/jmui-
+  IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
 
 jobs:
   build-and-push-image:
@@ -23,12 +33,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Read .env file
-        id: dotenv
-        uses: falti/dotenv-action@v0.2.7
-        with:
-          log-variables: true
 
       - name: Log in to the Container registry
         uses: docker/login-action@v1.12.0
@@ -44,7 +48,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PREFIX }}${{ matrix.context }}
           labels: |
             org.opencontainers.image.title=joinmarket-webui-${{ matrix.context }}
-            org.opencontainers.image.version=${{ env.GITHUB_REF }}
+            org.opencontainers.image.version=${{ github.event.inputs.version }}-dev
 
       - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v2.8.0
@@ -55,5 +59,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JM_UI_REPO_REF=${{ steps.dotenv.outputs.jm_ui_repo_ref }}
-            JM_SERVER_REPO_REF=${{ steps.dotenv.outputs.jm_server_repo_ref }}
+            JM_UI_REPO_REF=${{ github.event.inputs.ui_repo_ref }}
+            JM_SERVER_REPO_REF=${{ github.event.inputs.ui_repo_ref }}
