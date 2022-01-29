@@ -27,3 +27,11 @@ Generate coins:
     [dmp1ce/joinmarket-DOCKERFILE](https://github.com/dmp1ce/joinmarket-DOCKERFILE)
 - Make irc config options editable via environment variables
   - A coinjoin on regtest is not possible, because these params can only be replaced by mounting an own `joinmarket.cfg`
+
+# Resources
+- JoinMarket (GitHub): https://github.com/JoinMarket-Org/joinmarket-clientserver
+- joinmarket-webui (GitHub): https://github.com/joinmarket-webui/joinmarket-webui
+- Umbrel (GitHub): https://github.com/getumbrel/umbrel
+- Citadel (GitHub): https://github.com/runcitadel/citadel
+---
+- OCI Image Annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md
