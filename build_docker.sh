@@ -1,24 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-#-----------------------------------------------------------
-# UI_ONLY
-UI_ONLY_IMAGE_NAME='joinmarket-webui-ui-only'
-#STANDALONE_UI_IMAGE_TAG=$(git rev-parse HEAD)
-UI_ONLY_IMAGE_TAG='latest'
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
-echo "Building docker image ${UI_ONLY_IMAGE_NAME}:${UI_ONLY_IMAGE_TAG}"
+declare -a contexts=(ui-only standalone)
 
-docker build --tag "${UI_ONLY_IMAGE_NAME}:${UI_ONLY_IMAGE_TAG}" ./ui-only
-# and run with: docker run -it --rm -p "8080:80" joinmarket-webui-ui-only:...
+ORG="joinmarket-webui"
+IMAGE_NAME_PREFIX="joinmarket-webui-"
+IMAGE_TAG='latest'
 
-# STANDALONE
-STANDALONE_UI_IMAGE_NAME='joinmarket-webui-standalone'
-#STANDALONE_UI_IMAGE_TAG=$(git rev-parse HEAD)
-STANDALONE_UI_IMAGE_TAG='latest'
-
-echo "Building docker image ${STANDALONE_UI_IMAGE_NAME}:${STANDALONE_UI_IMAGE_TAG}"
-
-docker build --tag "${STANDALONE_UI_IMAGE_NAME}:${STANDALONE_UI_IMAGE_TAG}" ./standalone
-# and run with: docker run -it --rm -p "8080:80" joinmarket-webui-standalone:...
-
+for context in "${contexts[@]}"
+do
+    docker_path="${script_dir}/${context}"
+    image_name="${ORG}/${IMAGE_NAME_PREFIX}-${context}:${IMAGE_TAG}"
+    echo "Building docker image ${image_name}"
+	docker build --label "local" --tag "${image_name}" "${docker_path}"
+    echo "Built image! Run with: docker run -it --rm -p \"8080:80\" ${image_name}"
+done

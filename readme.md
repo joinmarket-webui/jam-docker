@@ -1,4 +1,10 @@
-# jm-docker
+# joinmarket-webui-docker
+
+Docker images for [joinmarket-webui](https://github.com/joinmarket-webui/joinmarket-webui).
+
+Contains two different type of builds:
+- ui-only: Only the UI
+- standalone: UI + joinmarket clientserver
 
 ## Test
 The docker-compose setup will start 3 joinmarket-ui container. 

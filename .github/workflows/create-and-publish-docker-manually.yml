@@ -18,8 +18,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  #IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME_PREFIX: theborakompanioni/jmui-dev-
+  IMAGE_NAME_PREFIX: joinmarket-webui/joinmarket-webui-dev-
 
 jobs:
   build-and-push-image:
