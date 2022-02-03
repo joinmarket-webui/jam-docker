@@ -20,10 +20,10 @@ Visit your browser on `http://localhost:8080` for the first `standalone` instanc
 
 Generate coins:
 ```sh
-> docker exec -t jm-docker_bitcoind_1 bitcoin-cli -datadir=/data generatetoaddress 1 $target_address
+> docker exec -t joinmarket-webui-docker_bitcoind_1 bitcoin-cli -datadir=/data generatetoaddress 1 $target_address
 ```
 ```sh
-> docker exec -t jm-docker_bitcoind_1 bitcoin-cli -datadir=/data -generate 100
+> docker exec -t joinmarket-webui-docker_bitcoind_1 bitcoin-cli -datadir=/data -generate 100
 ```
 
 ## TODO

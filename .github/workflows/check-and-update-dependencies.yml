@@ -1,4 +1,3 @@
-
 name: Check and update versions of dependencies
 
 on:
@@ -49,7 +48,7 @@ jobs:
           commit-message: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }} (automated change)
           title: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }}
           body: |
-            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}
+            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}.
 
             [1]: ${{ env.LINK }}
           labels: |
@@ -79,7 +78,7 @@ jobs:
           commit-message: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }} (automated change)
           title: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }}
           body: |
-            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}
+            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}.
 
             [1]: ${{ env.LINK }}
           labels: |
