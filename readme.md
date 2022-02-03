@@ -7,7 +7,7 @@ Contains two different type of builds:
 - standalone: UI + joinmarket clientserver
 
 ## Test
-The docker-compose setup will start 3 joinmarket-ui container. 
+The docker-compose setup will start 3 joinmarket-ui containers. 
 Two "standalone" container connecting to the same bitcoin-core instance.
 One "ui-only" container connecting to the second standalone container.
 
