@@ -8,7 +8,7 @@ Contains two different type of builds:
 
 ## Test
 The docker-compose setup will start 3 joinmarket-ui containers. 
-Two "standalone" container connecting to the same bitcoin-core instance.
+Two "standalone" containers connecting to the same bitcoin-core instance.
 One "ui-only" container connecting to the second standalone container.
 
 ```sh
