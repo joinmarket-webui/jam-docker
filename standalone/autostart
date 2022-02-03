@@ -1,5 +1,5 @@
 # Remove comments in front of the services you want to automatically restart
-# when the container restart.
+# when the container restarts.
 
 nginx
 ob-watcher
