@@ -92,7 +92,7 @@ ENV AUTO_START ${DATADIR}/autostart
 ENV ENV_FILE "${DATADIR}/.env"
 ENV PATH /src/scripts:$PATH
 
-RUN ./install.sh --disable-secp-check --without-qt
+RUN ./install.sh --without-qt
 
 RUN . jmvenv/bin/activate \
     && cd /src/scripts \
