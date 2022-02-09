@@ -77,7 +77,7 @@ RUN apt-get update \
     # ---
     && apt-get remove --purge --auto-remove -y \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -f /etc/apt/sources.list.d/nginx.list
+    && rm -f /etc/apt/sources.list.d/nginx.list /var/log/dpkg.log
 
 WORKDIR /src
 
@@ -100,6 +100,8 @@ RUN . jmvenv/bin/activate \
     # && pip install matplotlib \
     && (python wallet-tool.py generate || true) \
     && cp "${CONFIG}" "${DEFAULT_CONFIG}"
+
+RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 WORKDIR /src/scripts
 
