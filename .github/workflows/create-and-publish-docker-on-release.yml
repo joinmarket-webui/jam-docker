@@ -1,0 +1,33 @@
+name: Create and publish Docker image
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  readenv:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ env.GITHUB_REF_NAME }}
+      ui_repo_ref: ${{ steps.dotenv.outputs.jm_ui_repo_ref }}
+      server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Read .env file
+        id: dotenv
+        uses: falti/dotenv-action@v0.2.7
+        with:
+          log-variables: true
+
+  image-on-release:
+    uses: ./.github/workflows/create-and-publish-docker.yml
+    needs: readenv
+    with:
+      version: ${{ needs.readenv.outputs.version }}
+      ui_repo_ref: ${{ needs.readenv.outputs.ui_repo_ref }}
+      server_repo_ref: ${{ needs.readenv.outputs.server_repo_ref }}
+      image_name_prefix: joinmarket-webui/joinmarket-webui-
