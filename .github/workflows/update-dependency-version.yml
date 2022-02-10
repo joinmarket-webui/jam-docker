@@ -1,0 +1,74 @@
+name: Check and update version of single dependency
+
+on:
+  workflow_call:
+    inputs:
+      repo_url:
+        description: 'the repo url; currently only supports github repos'
+        required: true
+        type: string
+      current_tag:
+        description: 'the current repo ref (e.g. master, v1.0.0, etc.)'
+        required: true
+        type: string
+      env_var_name:
+        description: 'the environment variable to replace'
+        required: true
+        type: string
+
+jobs:
+  check-and-update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Read .env file
+        id: dotenv
+        uses: falti/dotenv-action@v0.2.7
+        with:
+          log-variables: true
+    
+      - name: Prepare repo infos
+        id: repoinfo
+        env:
+          REPO_URL: ${{ inputs.repo_url }}
+        run: |
+          echo ::set-output name=name::$(echo ${REPO_URL#*://*/})
+          echo ::set-output name=name_short::$(echo ${REPO_URL##*://*/})
+
+      - name: Get Latest Releases
+        id: versions
+        env:
+          REPO_NAME: ${{ steps.repoinfo.outputs.name }}
+        run: |
+          echo ::set-output name=release_tag::$(curl -sL "https://api.github.com/repos/${REPO_NAME}/releases/latest" | jq -r ".tag_name")
+
+      - name: Update JoinMarket UI Version
+        if: inputs.current_tag != steps.versions.outputs.release_tag
+        env:
+          ENV_VARNAME: ${{ inputs.env_var_name }}
+          RELEASE_TAG: ${{ steps.versions.outputs.release_tag }}
+        run: |
+          sed -i "s/^$ENV_VARNAME=.*/$ENV_VARNAME=$RELEASE_TAG/g" .env
+
+      - name: Create Pull Request
+        if: inputs.current_tag != steps.versions.outputs.elease_tag
+        env:
+          RELEASE_TAG: ${{ steps.versions.outputs.release_tag }}
+          NAME: ${{ steps.repoinfo.outputs.name_short }}
+          LINK: ${{ inputs.repo_url }}
+        uses: peter-evans/create-pull-request@v3
+        with:
+          add-paths: .env
+          branch: ${{ env.NAME }}-updates
+          delete-branch: true
+          commit-message: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }} (automated change)
+          title: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }}
+          body: |
+            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}
+
+            [1]: ${{ env.LINK }}
+          labels: |
+            automated pr
+            dependencies
