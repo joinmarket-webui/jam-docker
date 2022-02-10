@@ -6,82 +6,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-and-update-dependencies:
+  readenv:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      ui_repo_url: ${{ steps.dotenv.outputs.jm_ui_repo }}
+      ui_repo_ref: ${{ steps.dotenv.outputs.jm_ui_repo_ref }}
+      server_repo_url: ${{ steps.dotenv.outputs.jm_server_repo }}
+      server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Read .env file
         id: dotenv
         uses: falti/dotenv-action@v0.2.7
         with:
           log-variables: true
 
-      - name: Get Latest JoinMarket UI Release
-        id: versions
-        run: |
-          echo ::set-output name=ui_release_tag::$(curl -sL https://api.github.com/repos/joinmarket-webui/joinmarket-webui/releases/latest | jq -r ".tag_name")
-          echo ::set-output name=ui_current_tag::${{ steps.dotenv.outputs.jm_ui_repo_ref }}
-          echo ::set-output name=server_release_tag::$(curl -sL https://api.github.com/repos/JoinMarket-Org/joinmarket-clientserver/releases/latest | jq -r ".tag_name")
-          echo ::set-output name=server_current_tag::${{ steps.dotenv.outputs.jm_server_repo_ref }}
+  check-ui:
+    uses: ./.github/workflows/update-dependency-version.yml
+    needs: readenv
+    with:
+      repo_url: ${{ needs.readenv.outputs.ui_repo_url }}
+      current_tag: ${{ needs.readenv.outputs.ui_repo_ref }}
+      env_var_name: 'JM_UI_REPO_REF'
 
-      # UI -----------------
-      - name: Update JoinMarket UI Version
-        if: steps.versions.outputs.ui_current_tag != steps.versions.outputs.ui_release_tag
-        env:
-          RELEASE_TAG: ${{ steps.versions.outputs.ui_release_tag }}
-        run: |
-          sed -i "s/^JM_UI_REPO_REF=.*/JM_UI_REPO_REF=$RELEASE_TAG/g" .env
-
-      - name: Create Pull Request for JoinMarket UI Version
-        if: steps.versions.outputs.ui_current_tag != steps.versions.outputs.ui_release_tag
-        env:
-          RELEASE_TAG: ${{ steps.versions.outputs.ui_release_tag }}
-          NAME: joinmarket-webui
-          LINK: https://github.com/joinmarket-webui/joinmarket-webui
-        uses: peter-evans/create-pull-request@v3
-        with:
-          add-paths: .env
-          branch: ${{ env.NAME }}-updates
-          delete-branch: true
-          commit-message: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }} (automated change)
-          title: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }}
-          body: |
-            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}.
-
-            [1]: ${{ env.LINK }}
-          labels: |
-            automated pr
-            dependencies
-      # UI - end -----------
-
-      # Server -------------
-      - name: Update JoinMarket Server Version
-        if: steps.versions.outputs.server_current_tag != steps.versions.outputs.server_release_tag
-        env:
-          RELEASE_TAG: ${{ steps.versions.outputs.server_release_tag }}
-        run: |
-          sed -i "s/^JM_SERVER_REPO_REF=.*/JM_SERVER_REPO_REF=$RELEASE_TAG/g" .env
-
-      - name: Create Pull Request for JoinMarket Server Version
-        if: steps.versions.outputs.server_current_tag != steps.versions.outputs.server_release_tag
-        env:
-          RELEASE_TAG: ${{ steps.versions.outputs.server_release_tag }}
-          NAME: joinmarket-clientserver
-          LINK: https://github.com/JoinMarket-Org/joinmarket-clientserver
-        uses: peter-evans/create-pull-request@v3
-        with:
-          add-paths: .env
-          branch: ${{ env.NAME }}-updates
-          delete-branch: true
-          commit-message: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }} (automated change)
-          title: Update ${{ env.NAME }} to ${{ env.RELEASE_TAG }}
-          body: |
-            Updates [${{ env.NAME }}][1] to ${{ env.RELEASE_TAG }}.
-
-            [1]: ${{ env.LINK }}
-          labels: |
-            automated pr
-            dependencies
-      # Server - end -------
+  check-server:
+    uses: ./.github/workflows/update-dependency-version.yml
+    needs: readenv
+    with:
+      repo_url: ${{ needs.readenv.outputs.server_repo_url }}
+      current_tag: ${{ needs.readenv.outputs.server_repo_ref }}
+      env_var_name: 'JM_SERVER_REPO_REF'
