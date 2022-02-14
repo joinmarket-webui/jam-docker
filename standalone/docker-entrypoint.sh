@@ -66,6 +66,17 @@ for key in ${!jmenv[@]}; do
     sed -i "s/^#$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
 done
 
+BASIC_AUTH_USER=${APP_USER:-joinmarket}
+BASIC_AUTH_PASS=${APP_PASSWORD:-}
+
+if [ "${BASIC_AUTH_PASS}" = "" ]; then
+    BASIC_AUTH_PASS=$(openssl rand -hex 32)
+    echo "Basic auth credentials: user=${BASIC_AUTH_USER} password=${BASIC_AUTH_PASS}"
+fi
+
+echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PASS}")\n" > /etc/nginx/.htpasswd
+
+
 if [ "${READY_FILE}" ] && [ "${READY_FILE}" != false ]; then
     echo "Waiting $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
