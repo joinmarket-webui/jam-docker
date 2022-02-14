@@ -71,7 +71,7 @@ RUN apt-get update \
     # image dependencies
     tini supervisor iproute2 \
     # servers dependencies (see `install.sh`)
-    sudo build-essential automake pkg-config libtool libltdl-dev python3-dev virtualenv python3-pip \
+    build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
     # ui dependencies
     nginx \
     # ---
@@ -93,10 +93,9 @@ ENV AUTO_START ${DATADIR}/autostart
 ENV ENV_FILE "${DATADIR}/.env"
 ENV PATH /src/scripts:$PATH
 
-RUN ./install.sh --without-qt
+RUN ./install.sh --docker-install --without-qt
 
-RUN . jmvenv/bin/activate \
-    && cd /src/scripts \
+RUN cd /src/scripts \
     # without `matplotlib` charts won't be available - not important for the ui (enable on demand)
     # && pip install matplotlib \
     && (python wallet-tool.py generate || true) \
