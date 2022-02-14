@@ -75,6 +75,7 @@ RUN apt-get update \
     # ui dependencies
     nginx \
     # ---
+    && apt-get clean \
     && apt-get remove --purge --auto-remove -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /etc/apt/sources.list.d/nginx.list \
@@ -82,8 +83,8 @@ RUN apt-get update \
 
 WORKDIR /src
 
-COPY --from=server-builder /usr/src/joinmarket-clientserver .
 COPY --from=ui-builder /usr/src/joinmarket-webui/build /app
+COPY --from=server-builder /usr/src/joinmarket-clientserver .
 
 ENV DATADIR /root/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
@@ -106,7 +107,6 @@ RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc jo
 WORKDIR /src/scripts
 
 COPY docker-entrypoint.sh .
-COPY *.sh ./
 COPY autostart /root/
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 
