@@ -77,7 +77,8 @@ RUN apt-get update \
     # ---
     && apt-get remove --purge --auto-remove -y \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -f /etc/apt/sources.list.d/nginx.list /var/log/dpkg.log
+    && rm -f /etc/apt/sources.list.d/nginx.list \
+    && rm -f /var/log/dpkg.log
 
 WORKDIR /src
 
