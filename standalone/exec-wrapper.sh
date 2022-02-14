@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-pushd . > /dev/null
-cd /src
-. jmvenv/bin/activate
-popd > /dev/null
-
 if [[ "$1" == "unlockwallet" ]]; then
     shift 1
     if ! [ -f "${ENV_FILE}" ]; then
