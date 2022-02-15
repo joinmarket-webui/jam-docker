@@ -91,7 +91,6 @@ ENV CONFIG ${DATADIR}/joinmarket.cfg
 ENV DEFAULT_CONFIG /root/default.cfg
 ENV DEFAULT_AUTO_START /root/autostart
 ENV AUTO_START ${DATADIR}/autostart
-ENV ENV_FILE "${DATADIR}/.env"
 ENV PATH /src/scripts:$PATH
 
 RUN ./install.sh --docker-install --without-qt
