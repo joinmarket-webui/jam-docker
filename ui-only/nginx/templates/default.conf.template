@@ -21,6 +21,12 @@ server {
 
     location /api/ {
         include /etc/nginx/snippets/proxy-params.conf;
+
+        # jmwalletd expects the bearer token in the Authorization header
+        proxy_set_header Authorization $http_x_jm_authorization;
+        # do not forward the custom authorization header
+        proxy_set_header x-jm-authorization "";
+
         # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
         proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
     }
