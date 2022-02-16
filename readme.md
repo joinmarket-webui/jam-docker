@@ -54,13 +54,21 @@ docker pull ghcr.io/joinmarket-webui/joinmarket-webui-standalone:latest
 ```
 
 ### Environment variables
+The following environment variables control the configuration
+- `APP_USER` (required; username used for basic authentication)
+- `APP_PASSWORD` (required; password used for basic authentication)
+- `ENSURE_WALLET` (optional; create and load the wallet in bitcoin core on startup)
+- `READY_FILE` (optional; wait for a file to be created before starting all services, e.g. to wait for chain synchronization)
 
-Variables starting with prefix `JM_` will be applied to `joinmarket.cfg`
+Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
+- `jm_gaplimit: 2000` will set the `gaplimit` config value to `2000`
 
 ### Run
 ```sh
 docker run --rm  -it \
         --add-host=host.docker.internal:host-gateway \
+        --env APP_USER="joinmarket" \
+        --env APP_PASSWORD="joinmarket" \
         --env JM_RPC_HOST="host.docker.internal" \
         --env JM_RPC_PORT="18443" \
         --env JM_RPC_USER="jm" \

@@ -24,12 +24,4 @@ server {
         # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
         proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
     }
-
-    location /ws/ {
-        include /etc/nginx/snippets/proxy-params.conf;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $http_connection;
-        # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
-        proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
-    }
 }

@@ -12,6 +12,11 @@ if ! [ -f "$AUTO_START" ]; then
     cp "$DEFAULT_AUTO_START" "$AUTO_START"
 fi
 
+# setup basic authentication
+BASIC_AUTH_USER=${APP_USER:?APP_USER empty or unset}
+BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
+echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PASS}")\n" > /etc/nginx/.htpasswd
+
 # generate ssl certificates for jmwalletd
 if ! [ -f "${DATADIR}/ssl/key.pem" ]; then
     subj="/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
@@ -66,12 +71,14 @@ for key in ${!jmenv[@]}; do
     sed -i "s/^#$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
 done
 
+# wait for a ready file to be created if necessary
 if [ "${READY_FILE}" ] && [ "${READY_FILE}" != false ]; then
     echo "Waiting $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
     echo "The chain is fully synched"
 fi
 
+# ensure that a wallet exists and is loaded if necessary
 if [ "${ENSURE_WALLET}" ] && [ "${ENSURE_WALLET}" != false ]; then
     btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
     btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
