@@ -69,7 +69,7 @@ RUN apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
     # ---
     # image dependencies
-    tini supervisor iproute2 \
+    tini supervisor iproute2 procps vim \
     # servers dependencies (see `install.sh`)
     build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
     # ui dependencies
