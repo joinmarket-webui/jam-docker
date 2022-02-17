@@ -10,7 +10,7 @@ export LC_ALL=C
 
 # Disabled warnings:
 disabled=(
-    # SC2162 # read without -r will mangle backslashes.
+    SC2034 # parsedval appears unused. Verify use (or export if used externally).
 )
 
 EXIT_CODE=0
