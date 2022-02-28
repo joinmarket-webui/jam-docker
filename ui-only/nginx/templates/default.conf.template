@@ -1,4 +1,16 @@
 
+upstream jmwalletd_api_backend {
+    zone upstreams 64K;
+    server $JMWEBUI_JMWALLETD_API_PROXY;
+    keepalive 16;
+}
+
+upstream jmwalletd_ws_backend {
+    zone upstreams;
+    server $JMWEBUI_JMWALLETD_WEBSOCKET_PROXY;
+    keepalive 2;
+}
+
 server {
     listen 80;
     listen [::]:80;
@@ -22,12 +34,30 @@ server {
     location /api/ {
         include /etc/nginx/snippets/proxy-params.conf;
 
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
         # jmwalletd expects the bearer token in the Authorization header
         proxy_set_header Authorization $http_x_jm_authorization;
         # do not forward the custom authorization header
         proxy_set_header x-jm-authorization "";
 
-        # Proxy API calls to the joinmarket server; the default for the variable is set in jmwebui-entrypoint.sh
-        proxy_pass $JMWEBUI_JM_WALLETD_PROXY;
+        proxy_pass https://jmwalletd_api_backend;
+    }
+
+    location = /jmws {
+        include /etc/nginx/snippets/proxy-params.conf;
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Authorization "";
+
+        # allow 24h without socket activity (default is 60 sec)
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+
+        proxy_pass https://jmwalletd_ws_backend/;
     }
 }
