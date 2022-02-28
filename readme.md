@@ -16,15 +16,17 @@ docker pull ghcr.io/joinmarket-webui/joinmarket-webui-ui-only:latest
 ### Environment variables
 
 The following environment variables control the configuration
-- `JMWEBUI_JM_WALLETD_HOST` (required; jmwalletd rpc hostname)
-- `JMWEBUI_JM_WALLETD_PORT` (required; jmwalletd rpc port)
+- `JMWEBUI_JMWALLETD_HOST` (required; jmwalletd hostname)
+- `JMWEBUI_JMWALLETD_API_PORT` (required; jmwalletd api port)
+- `JMWEBUI_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
 
 ### Run
 ```sh
 docker run --rm  -it \
         --add-host=host.docker.internal:host-gateway \
-        --env JMWEBUI_JM_WALLETD_HOST="host.docker.internal" \
-        --env JMWEBUI_JM_WALLETD_PORT="28183" \
+        --env JMWEBUI_JMWALLETD_HOST="host.docker.internal" \
+        --env JMWEBUI_JMWALLETD_API_PORT="28183" \
+        --env JMWEBUI_JMWALLETD_WEBSOCKET_PORT="28283" \
         --publish "8080:80" \
         joinmarket-webui/joinmarket-webui-ui-only
 ```

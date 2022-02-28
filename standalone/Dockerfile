@@ -114,7 +114,8 @@ COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # nginx
 EXPOSE 80
-#EXPOSE 28183 # jmwallet daemon
+#EXPOSE 28183 # jmwalletd api
+#EXPOSE 28283 # jmwalletd websocket
 #EXPOSE 8080  # payjoin server
 #EXPOSE 27183 # joinmarketd daemon
 #EXPOSE 62601 # obwatch
