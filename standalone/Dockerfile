@@ -13,7 +13,7 @@ ARG JM_SERVER_REPO_REF=master
 # --- Builder base 
 FROM alpine:3.15 AS builder-base
 RUN apk add --no-cache --update git
-# --- Builder base 
+# --- Builder base - end
 
 # --- UI builder 
 FROM builder-base AS ui-builder
@@ -94,19 +94,13 @@ ENV AUTO_START ${DATADIR}/autostart
 ENV PATH /src/scripts:$PATH
 
 RUN ./install.sh --docker-install --without-qt
-
-RUN cd /src/scripts \
-    # without `matplotlib` charts won't be available - not important for the ui (enable on demand)
-    # && pip install matplotlib \
-    && (python wallet-tool.py generate || true) \
-    && cp "${CONFIG}" "${DEFAULT_CONFIG}"
-
 RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 WORKDIR /src/scripts
 
-COPY docker-entrypoint.sh .
-COPY autostart /root/
+COPY docker-entrypoint.sh ./
+COPY autostart ${DEFAULT_AUTO_START}
+COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 
 COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
@@ -114,10 +108,5 @@ COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # nginx
 EXPOSE 80
-#EXPOSE 28183 # jmwalletd api
-#EXPOSE 28283 # jmwalletd websocket
-#EXPOSE 8080  # payjoin server
-#EXPOSE 27183 # joinmarketd daemon
-#EXPOSE 62601 # obwatch
 
 ENTRYPOINT  [ "tini", "-g", "--", "./docker-entrypoint.sh" ]
