@@ -69,7 +69,6 @@ fi
 for key in "${!jmenv[@]}"; do
     val="${jmenv[${key}]}"
     sed -i "s/^$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
-    sed -i "s/^#$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
 done
 
 # wait for a ready file to be created if necessary
