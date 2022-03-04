@@ -61,6 +61,7 @@ The following environment variables control the configuration
 - `APP_PASSWORD` (required; password used for basic authentication)
 - `ENSURE_WALLET` (optional; create and load the wallet in bitcoin core on startup)
 - `READY_FILE` (optional; wait for a file to be created before starting all services, e.g. to wait for chain synchronization)
+- `RESTORE_DEFAULT_CONFIG` (optional; overwrites any existing `joinmarket.cfg` file the container's default config before start)
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `jm_gaplimit: 2000` will set the `gaplimit` config value to `2000`
