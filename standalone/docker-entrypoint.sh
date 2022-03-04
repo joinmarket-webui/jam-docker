@@ -8,11 +8,11 @@ JM_ONION_SERVING_HOST="$(/sbin/ip route|awk '/src/ { print $9 }')"
 mkdir -p "${DATADIR}/logs"
 
 # restore the default config
-if ! [ -f "$CONFIG" ]; then
-    cp "$DEFAULT_CONFIG" "$CONFIG"
+if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = true ]; then
+    cp -f "$DEFAULT_CONFIG" "$CONFIG"
 fi
 
-if ! [ -f "$AUTO_START" ]; then
+if [ ! -f "$AUTO_START" ]; then
     cp "$DEFAULT_AUTO_START" "$AUTO_START"
 fi
 
@@ -22,7 +22,7 @@ BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
 echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PASS}")\n" > /etc/nginx/.htpasswd
 
 # generate ssl certificates for jmwalletd
-if ! [ -f "${DATADIR}/ssl/key.pem" ]; then
+if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
     subj="/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
     mkdir -p "${DATADIR}/ssl/" \
       && pushd "$_" \
