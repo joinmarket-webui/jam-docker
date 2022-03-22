@@ -99,6 +99,7 @@ RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc jo
 WORKDIR /src/scripts
 
 COPY docker-entrypoint.sh ./
+COPY .bashrc /root/.bashrc
 COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
