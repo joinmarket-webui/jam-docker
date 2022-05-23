@@ -27,6 +27,7 @@ server {
 
     location / {
         include /etc/nginx/snippets/proxy-params.conf;
+
         try_files $uri $uri/ /index.html;
         add_header Cache-Control no-cache;
     }
@@ -41,6 +42,12 @@ server {
         proxy_set_header Authorization $http_x_jm_authorization;
         # do not forward the custom authorization header
         proxy_set_header x-jm-authorization "";
+
+        # some api requests can take over a minute. play it safe
+        # and allow 5 min (default is 60 sec). increase on demand.
+        proxy_read_timeout 300s;
+        # allow 5 min to connect (default is 60 sec)
+        proxy_connect_timeout 300s;
 
         proxy_pass https://jmwalletd_api_backend;
     }
