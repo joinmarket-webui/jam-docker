@@ -16,6 +16,12 @@ if [ ! -f "$AUTO_START" ]; then
     cp "$DEFAULT_AUTO_START" "$AUTO_START"
 fi
 
+# remove leftover lockfiles from possible unclean shutdowns before startup
+if [ "${REMOVE_LOCK_FILES}" ] && [ "${REMOVE_LOCK_FILES}" != false ]; then
+    echo "Remove leftover wallet lockfiles before startup..."
+    rm -f "${DATADIR}/wallets/.*.lock" 
+fi
+
 # setup basic authentication
 BASIC_AUTH_USER=${APP_USER:?APP_USER empty or unset}
 BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
