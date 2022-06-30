@@ -45,10 +45,10 @@ COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 # the `.template` suffix) into `/etc/nginx/conf.d/`.
 COPY ./nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
-COPY ./jmwebui-entrypoint.sh .
-RUN chmod +x ./jmwebui-entrypoint.sh
+COPY ./jam-entrypoint.sh /
+RUN chmod +x /jam-entrypoint.sh
 
-ENTRYPOINT  [ "./jmwebui-entrypoint.sh" ]
+ENTRYPOINT  [ "/jam-entrypoint.sh" ]
 
 # the default parameters to ENTRYPOINT (unless overruled on the command line)
 CMD ["nginx", "-g", "daemon off;"]
