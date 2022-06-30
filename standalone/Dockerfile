@@ -98,7 +98,7 @@ RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc jo
 
 WORKDIR /src/scripts
 
-COPY docker-entrypoint.sh ./
+COPY jam-entrypoint.sh /
 COPY .bashrc /root/.bashrc
 COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
@@ -110,4 +110,4 @@ COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 # nginx
 EXPOSE 80
 
-ENTRYPOINT  [ "tini", "-g", "--", "./docker-entrypoint.sh" ]
+ENTRYPOINT  [ "tini", "-g", "--", "/jam-entrypoint.sh" ]
