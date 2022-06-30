@@ -98,7 +98,6 @@ RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc jo
 
 WORKDIR /src/scripts
 
-COPY jam-entrypoint.sh /
 COPY .bashrc /root/.bashrc
 COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
@@ -106,6 +105,9 @@ COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 
 COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY jam-entrypoint.sh /
+RUN chmod +x /jam-entrypoint.sh
 
 # nginx
 EXPOSE 80
