@@ -20,17 +20,6 @@ The following environment variables control the configuration
 - `JMWEBUI_JMWALLETD_API_PORT` (required; jmwalletd api port)
 - `JMWEBUI_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
 
-### Run
-```sh
-docker run --rm  -it \
-        --add-host=host.docker.internal:host-gateway \
-        --env JMWEBUI_JMWALLETD_HOST="host.docker.internal" \
-        --env JMWEBUI_JMWALLETD_API_PORT="28183" \
-        --env JMWEBUI_JMWALLETD_WEBSOCKET_PORT="28283" \
-        --publish "8080:80" \
-        joinmarket-webui/joinmarket-webui-ui-only
-```
-
 ### Building Notes
 ```sh
 docker build --label "local" \
@@ -46,6 +35,17 @@ docker build --label "local" \
 ### Inspecting the Container
 ```sh
 docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/joinmarket-webui-ui-only
+```
+
+### Run
+```sh
+docker run --rm  -it \
+        --add-host=host.docker.internal:host-gateway \
+        --env JMWEBUI_JMWALLETD_HOST="host.docker.internal" \
+        --env JMWEBUI_JMWALLETD_API_PORT="28183" \
+        --env JMWEBUI_JMWALLETD_WEBSOCKET_PORT="28283" \
+        --publish "8080:80" \
+        joinmarket-webui/joinmarket-webui-ui-only
 ```
 
 
@@ -67,21 +67,6 @@ The following environment variables control the configuration
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `jm_gaplimit: 2000` will set the `gaplimit` config value to `2000`
 
-### Run
-```sh
-docker run --rm  -it \
-        --add-host=host.docker.internal:host-gateway \
-        --env APP_USER="joinmarket" \
-        --env APP_PASSWORD="joinmarket" \
-        --env JM_RPC_HOST="host.docker.internal" \
-        --env JM_RPC_PORT="18443" \
-        --env JM_RPC_USER="jm" \
-        --env JM_RPC_PASSWORD="***" \
-        --env JM_NETWORK="regtest" \
-        --publish "8080:80" \
-        joinmarket-webui/joinmarket-webui-standalone
-```
-
 ### Building Notes
 ```sh
 docker build --label "local" \
@@ -102,6 +87,21 @@ docker build --label "local" \
 ### Inspecting the Container
 ```sh
 docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/joinmarket-webui-standalone
+```
+
+### Run
+```sh
+docker run --rm  -it \
+        --add-host=host.docker.internal:host-gateway \
+        --env APP_USER="joinmarket" \
+        --env APP_PASSWORD="joinmarket" \
+        --env JM_RPC_HOST="host.docker.internal" \
+        --env JM_RPC_PORT="18443" \
+        --env JM_RPC_USER="jm" \
+        --env JM_RPC_PASSWORD="***" \
+        --env JM_NETWORK="regtest" \
+        --publish "8080:80" \
+        joinmarket-webui/joinmarket-webui-standalone
 ```
 
 
