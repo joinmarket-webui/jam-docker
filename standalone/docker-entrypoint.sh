@@ -19,7 +19,7 @@ fi
 # remove leftover lockfiles from possible unclean shutdowns before startup
 if [ "${REMOVE_LOCK_FILES}" ] && [ "${REMOVE_LOCK_FILES}" != false ]; then
     echo "Remove leftover wallet lockfiles before startup..."
-    rm -f "${DATADIR}/wallets/.*.lock" 
+    rm --force --verbose "${DATADIR}"/wallets/.*.jmdat.lock
 fi
 
 # setup basic authentication
