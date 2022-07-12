@@ -26,7 +26,7 @@ RUN npm install --no-fund --no-audit
 RUN npm run build
 
 # ---
-FROM nginx:1.21.6-alpine as runtime
+FROM nginx:1.23.0-alpine as runtime
 
 # ---
 FROM runtime

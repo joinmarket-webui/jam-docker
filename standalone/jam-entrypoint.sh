@@ -5,15 +5,21 @@ export JM_ONION_SERVING_HOST
 JM_ONION_SERVING_HOST="$(/sbin/ip route|awk '/src/ { print $9 }')"
 
 # ensure 'logs' directory exists
-mkdir -p "${DATADIR}/logs"
+mkdir --parents "${DATADIR}/logs"
 
 # restore the default config
 if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = true ]; then
-    cp -f "$DEFAULT_CONFIG" "$CONFIG"
+    cp --force "$DEFAULT_CONFIG" "$CONFIG"
 fi
 
 if [ ! -f "$AUTO_START" ]; then
     cp "$DEFAULT_AUTO_START" "$AUTO_START"
+fi
+
+# remove leftover lockfiles from possible unclean shutdowns before startup
+if [ "${REMOVE_LOCK_FILES}" = true ]; then
+    echo "Remove leftover wallet lockfiles before startup..."
+    rm --force --verbose "${DATADIR}"/wallets/.*.jmdat.lock
 fi
 
 # setup basic authentication
@@ -24,7 +30,7 @@ echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PA
 # generate ssl certificates for jmwalletd
 if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
     subj="/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
-    mkdir -p "${DATADIR}/ssl/" \
+    mkdir --parents "${DATADIR}/ssl/" \
       && pushd "$_" \
       && openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes -out cert.pem -keyout key.pem -subj "$subj" \
       && popd
@@ -55,7 +61,7 @@ done < <(env -0)
 # ensure a wallet name is present
 jmenv['rpc_wallet_file']=${jmenv['rpc_wallet_file']:-'jm_webui_default'}
 
-# adapt 'blockchain_source' is missing and we're in regtest mode
+# adapt 'blockchain_source' if missing and we're in regtest mode
 if [ "${jmenv['network']}" == "regtest" ] && [ "${jmenv['blockchain_source']}" == "" ]; then
     jmenv['blockchain_source']='regtest'
 fi
@@ -79,7 +85,7 @@ if [ "${READY_FILE}" ] && [ "${READY_FILE}" != false ]; then
 fi
 
 # ensure that a wallet exists and is loaded if necessary
-if [ "${ENSURE_WALLET}" ] && [ "${ENSURE_WALLET}" != false ]; then
+if [ "${ENSURE_WALLET}" = true ]; then
     btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
     btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
     wallet_name="${jmenv['rpc_wallet_file']}"
