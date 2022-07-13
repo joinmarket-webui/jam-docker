@@ -1,6 +1,7 @@
 # Remove comments in front of the services you want to automatically restart
 # when the container restarts.
 
+tor
 nginx
 ob-watcher
 jmwalletd
