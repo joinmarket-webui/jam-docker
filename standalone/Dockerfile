@@ -101,6 +101,8 @@ RUN mkdir --parents /etc/tor
 RUN ./install.sh --docker-install --with-local-tor --without-qt
 RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
+RUN ln /etc/tor/torrc /usr/local/etc/tor/torrc
+
 WORKDIR /src/scripts
 
 COPY .bashrc /root/.bashrc
