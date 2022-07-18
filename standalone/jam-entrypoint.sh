@@ -23,9 +23,13 @@ if [ "${REMOVE_LOCK_FILES}" = "true" ]; then
 fi
 
 # setup basic authentication
-BASIC_AUTH_USER=${APP_USER:?APP_USER empty or unset}
-BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
-echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PASS}")\n" > /etc/nginx/.htpasswd
+if [ -n "${APP_USER}" ]; then
+    BASIC_AUTH_USER=${APP_USER:?APP_USER empty or unset}
+    BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
+
+    echo -e "${BASIC_AUTH_USER}:$(openssl passwd -quiet -6 <<< echo "${BASIC_AUTH_PASS}")\n" > /etc/nginx/.htpasswd
+    sed -i 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
+fi
 
 # generate ssl certificates for jmwalletd
 if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
