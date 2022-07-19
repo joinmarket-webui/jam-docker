@@ -72,8 +72,8 @@ RUN apt-get update \
     tini supervisor iproute2 procps vim \
     # servers dependencies (see `install.sh`)
     build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
-    # tor dependencies
-    libevent-dev libssl-dev zlib1g-dev \
+    # tor
+    tor \
     # ui dependencies
     nginx \
     # ---
@@ -95,12 +95,13 @@ ENV DEFAULT_AUTO_START /root/autostart
 ENV AUTO_START ${DATADIR}/autostart
 ENV PATH /src/scripts:$PATH
 
-RUN ./install.sh --docker-install --with-local-tor --without-qt
+RUN ./install.sh --docker-install --without-qt
 RUN rm -rf install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 WORKDIR /src/scripts
 
 COPY .bashrc /root/.bashrc
+COPY torrc /etc/tor/torrc
 COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
