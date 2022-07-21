@@ -60,15 +60,13 @@ LABEL server_version=$JM_SERVER_REPO_REF
 RUN apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
-    && sh -c "echo 'deb https://nginx.org/packages/mainline/debian/ bullseye nginx' > /etc/apt/sources.list.d/nginx.list" \
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
-    gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/nginx.gpg --import \
-    && chmod 644 /etc/apt/trusted.gpg.d/nginx.gpg \
+    gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/mainline/debian/ bullseye nginx' > /etc/apt/sources.list.d/nginx.list" \
     # add tor debian repo
-    && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --import \
-    && gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add - \
-    && sh -c "echo 'deb https://deb.torproject.org/torproject.org bullseye main' > /etc/apt/sources.list.d/tor.list" \
-    && sh -c "echo 'deb-src https://deb.torproject.org/torproject.org bullseye main' >> /etc/apt/sources.list.d/tor.list"
+    && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
+    gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bullseye main' > /etc/apt/sources.list.d/tor.list"
 
 RUN apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
@@ -99,8 +97,7 @@ RUN rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github
 
 RUN apt-get clean \
     && apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
-    && rm --recursive --force /var/lib/apt/lists/* /etc/apt/trusted.gpg.d/* \
-    && rm --force /etc/apt/sources.list.d/nginx.list /etc/apt/sources.list.d/tor.list \
+    && rm --recursive --force /var/lib/apt/lists/* \
     && rm --force /var/log/dpkg.log
 
 WORKDIR /src/scripts
