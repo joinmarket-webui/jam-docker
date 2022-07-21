@@ -28,7 +28,7 @@ RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
     && npm run build
 
 # ---
-FROM nginx:1.23.0-alpine as runtime
+FROM nginx:1.23.1-alpine as runtime
 
 # ---
 FROM runtime
