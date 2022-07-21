@@ -21,9 +21,9 @@ WORKDIR /usr/src/app
 # checkout and build project
 RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
     && git fetch --all --tags \
-    && git checkout "$JM_UI_REPO_REF"
-RUN npm install --no-fund --no-audit
-RUN npm run build
+    && git checkout "$JM_UI_REPO_REF" \
+    && npm install --no-fund --no-audit \
+    && npm run build
 
 # ---
 FROM nginx:1.23.0-alpine as runtime
@@ -34,9 +34,8 @@ ARG MAINTAINER
 ARG JM_UI_REPO_REF
 
 LABEL maintainer="$MAINTAINER"
-LABEL ui_version=$JM_UI_REPO_REF
+LABEL ui-version=$JM_UI_REPO_REF
 
-WORKDIR /
 COPY --from=builder /usr/src/app/build /app
 
 COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
@@ -47,6 +46,8 @@ COPY ./nginx/templates/default.conf.template /etc/nginx/templates/default.conf.t
 
 COPY ./jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
+
+WORKDIR /
 
 ENTRYPOINT  [ "/jam-entrypoint.sh" ]
 

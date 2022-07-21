@@ -48,6 +48,11 @@ docker run --rm  -it \
         joinmarket-webui/joinmarket-webui-ui-only
 ```
 
+### Lint
+```sh
+docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/Dockerfile"
+```
+
 
 ## standalone
 ### Usage Notes
