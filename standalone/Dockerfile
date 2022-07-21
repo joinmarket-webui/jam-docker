@@ -21,8 +21,6 @@ ARG JM_UI_REPO
 ARG JM_UI_REPO_BRANCH
 ARG JM_UI_REPO_REF
 
-ENV NODE_ENV production
-
 # install build dependencies
 RUN apk add --no-cache --update nodejs npm
 
