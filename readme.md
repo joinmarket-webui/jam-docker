@@ -104,6 +104,11 @@ docker run --rm  -it \
         joinmarket-webui/joinmarket-webui-standalone
 ```
 
+### Lint
+```sh
+docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
+```
+
 
 ## TODO
 - Do not run as root inside container.
