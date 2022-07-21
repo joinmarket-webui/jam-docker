@@ -36,18 +36,18 @@ ARG JM_UI_REPO_REF
 LABEL maintainer="$MAINTAINER"
 LABEL ui-version=$JM_UI_REPO_REF
 
+WORKDIR /
+
 COPY --from=builder /usr/src/app/build /app
 
-COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 # each time nginx is started it will perform variable substition in all template
 # files found in `/etc/nginx/templates/*.template`, and copy the results (without
 # the `.template` suffix) into `/etc/nginx/conf.d/`.
-COPY ./nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
-COPY ./jam-entrypoint.sh /
+COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
-
-WORKDIR /
 
 ENTRYPOINT  [ "/jam-entrypoint.sh" ]
 

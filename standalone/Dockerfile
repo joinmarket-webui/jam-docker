@@ -83,7 +83,7 @@ RUN apt-get update \
     nginx \
     # cleanup 
     && apt-get clean \
-    && rm --recursive --force /var/lib/apt/lists/* \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 COPY --from=ui-builder /usr/src/joinmarket-webui/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
@@ -94,6 +94,8 @@ ENV DEFAULT_CONFIG /root/default.cfg
 ENV DEFAULT_AUTO_START /root/autostart
 ENV AUTO_START ${DATADIR}/autostart
 ENV PATH /src/scripts:$PATH
+
+WORKDIR /src
 
 # compile and install JoinMarket
 RUN ./install.sh --docker-install --without-qt \
@@ -109,8 +111,8 @@ COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 COPY .bashrc /root/.bashrc
 COPY torrc /etc/tor/torrc
 
-COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
