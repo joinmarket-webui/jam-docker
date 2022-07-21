@@ -16,6 +16,8 @@ ARG JM_UI_REPO
 ARG JM_UI_REPO_BRANCH
 ARG JM_UI_REPO_REF
 
+ENV NODE_ENV production
+
 WORKDIR /usr/src/app
 
 # checkout and build project
