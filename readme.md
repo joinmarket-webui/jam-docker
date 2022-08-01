@@ -16,21 +16,21 @@ docker pull ghcr.io/joinmarket-webui/jam-ui-only:latest
 ### Environment variables
 
 The following environment variables control the configuration
-- `JMWEBUI_JMWALLETD_HOST` (required; jmwalletd hostname)
-- `JMWEBUI_JMWALLETD_API_PORT` (required; jmwalletd api port)
-- `JMWEBUI_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
+- `JAM_JMWALLETD_HOST` (required; jmwalletd hostname)
+- `JAM_JMWALLETD_API_PORT` (required; jmwalletd api port)
+- `JAM_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
 
 ### Building Notes
 ```sh
 docker build --label "local" \
-        --build-arg JM_UI_REPO_REF=master \
+        --build-arg JAM_REPO_REF=master \
         --tag "joinmarket-webui/jam-ui-only" ./ui-only
 ```
 
 #### Build args
-- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
-- `JM_UI_REPO_BRANCH` (ui git branch; defaults to `master`)
-- `JM_UI_REPO_REF` (ui git ref; defaults to `master`)
+- `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
+- `JAM_REPO_BRANCH` (ui git branch; defaults to `master`)
+- `JAM_REPO_REF` (ui git ref; defaults to `master`)
 
 ### Inspecting the Container
 ```sh
@@ -41,9 +41,9 @@ docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/jam-ui-only
 ```sh
 docker run --rm  -it \
         --add-host=host.docker.internal:host-gateway \
-        --env JMWEBUI_JMWALLETD_HOST="host.docker.internal" \
-        --env JMWEBUI_JMWALLETD_API_PORT="28183" \
-        --env JMWEBUI_JMWALLETD_WEBSOCKET_PORT="28283" \
+        --env JAM_JMWALLETD_HOST="host.docker.internal" \
+        --env JAM_JMWALLETD_API_PORT="28183" \
+        --env JAM_JMWALLETD_WEBSOCKET_PORT="28283" \
         --publish "8080:80" \
         joinmarket-webui/jam-ui-only
 ```
@@ -70,15 +70,15 @@ Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 ### Building Notes
 ```sh
 docker build --label "local" \
-        --build-arg JM_UI_REPO_REF=master \
+        --build-arg JAM_REPO_REF=master \
         --build-arg JM_SERVER_REPO_REF=master \
         --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
 
 #### Build args
-- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
-- `JM_UI_REPO_BRANCH` (ui git branch; defaults to `master`)
-- `JM_UI_REPO_REF` (ui git ref; defaults to `master`)
+- `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
+- `JAM_REPO_BRANCH` (ui git branch; defaults to `master`)
+- `JAM_REPO_REF` (ui git ref; defaults to `master`)
 ---
 - `JM_SERVER_REPO` (server git repo; defaults to `https://github.com/JoinMarket-Org/joinmarket-clientserver`)
 - `JM_SERVER_REPO_BRANCH` (server git branch; defaults to `master`)
