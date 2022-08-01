@@ -1,6 +1,6 @@
-# joinmarket-webui-docker
+# jam-docker
 
-Docker images for [joinmarket-webui](https://github.com/joinmarket-webui/joinmarket-webui).
+Docker images for [Jam](https://github.com/joinmarket-webui/jam).
 
 Contains two separate images:
 - ui-only: Only the UI
@@ -10,7 +10,7 @@ Contains two separate images:
 ## ui-only
 ### Usage Notes
 ```sh
-docker pull ghcr.io/joinmarket-webui/joinmarket-webui-ui-only:latest
+docker pull ghcr.io/joinmarket-webui/jam-ui-only:latest
 ```
 
 ### Environment variables
@@ -24,17 +24,17 @@ The following environment variables control the configuration
 ```sh
 docker build --label "local" \
         --build-arg JM_UI_REPO_REF=master \
-        --tag "joinmarket-webui/joinmarket-webui-ui-only" ./ui-only
+        --tag "joinmarket-webui/jam-ui-only" ./ui-only
 ```
 
 #### Build args
-- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/joinmarket-webui`)
+- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JM_UI_REPO_BRANCH` (ui git branch; defaults to `master`)
 - `JM_UI_REPO_REF` (ui git ref; defaults to `master`)
 
 ### Inspecting the Container
 ```sh
-docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/joinmarket-webui-ui-only
+docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/jam-ui-only
 ```
 
 ### Run
@@ -45,14 +45,14 @@ docker run --rm  -it \
         --env JMWEBUI_JMWALLETD_API_PORT="28183" \
         --env JMWEBUI_JMWALLETD_WEBSOCKET_PORT="28283" \
         --publish "8080:80" \
-        joinmarket-webui/joinmarket-webui-ui-only
+        joinmarket-webui/jam-ui-only
 ```
 
 
 ## standalone
 ### Usage Notes
 ```sh
-docker pull ghcr.io/joinmarket-webui/joinmarket-webui-standalone:latest
+docker pull ghcr.io/joinmarket-webui/jam-standalone:latest
 ```
 
 ### Environment variables
@@ -72,11 +72,11 @@ Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 docker build --label "local" \
         --build-arg JM_UI_REPO_REF=master \
         --build-arg JM_SERVER_REPO_REF=master \
-        --tag "joinmarket-webui/joinmarket-webui-standalone" ./standalone
+        --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
 
 #### Build args
-- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/joinmarket-webui`)
+- `JM_UI_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JM_UI_REPO_BRANCH` (ui git branch; defaults to `master`)
 - `JM_UI_REPO_REF` (ui git ref; defaults to `master`)
 ---
@@ -86,7 +86,7 @@ docker build --label "local" \
 
 ### Inspecting the Container
 ```sh
-docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/joinmarket-webui-standalone
+docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 ```
 
 ### Run
@@ -101,7 +101,7 @@ docker run --rm  -it \
         --env JM_RPC_PASSWORD="***" \
         --env JM_NETWORK="regtest" \
         --publish "8080:80" \
-        joinmarket-webui/joinmarket-webui-standalone
+        joinmarket-webui/jam-standalone
 ```
 
 
@@ -116,7 +116,7 @@ docker run --rm  -it \
 
 ## Resources
 - JoinMarket (GitHub): https://github.com/JoinMarket-Org/joinmarket-clientserver
-- joinmarket-webui (GitHub): https://github.com/joinmarket-webui/joinmarket-webui
+- Jam (GitHub): https://github.com/joinmarket-webui/jam
 - Umbrel (GitHub): https://github.com/getumbrel/umbrel
 - Citadel (GitHub): https://github.com/runcitadel/citadel
 ---
