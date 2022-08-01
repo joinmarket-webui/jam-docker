@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# ensure 'logs' directory exists
-mkdir --parents "${DATADIR}/logs"
+# ensure 'log' directory exists
+mkdir --parents /var/log/jam
 
 # restore the default config
 if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = "true" ]; then
