@@ -21,12 +21,12 @@ WORKDIR /usr/src/app
 # checkout and build project
 RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
     && git fetch --all --tags \
-    && git checkout "$JM_UI_REPO_REF"
-RUN npm install --no-fund --no-audit
-RUN npm run build
+    && git checkout "$JM_UI_REPO_REF" \
+    && npm install --no-fund --no-audit \
+    && npm run build
 
 # ---
-FROM nginx:1.23.0-alpine as runtime
+FROM nginx:1.23.1-alpine as runtime
 
 # ---
 FROM runtime
@@ -34,18 +34,19 @@ ARG MAINTAINER
 ARG JM_UI_REPO_REF
 
 LABEL maintainer="$MAINTAINER"
-LABEL ui_version=$JM_UI_REPO_REF
+LABEL ui-version=$JM_UI_REPO_REF
 
 WORKDIR /
+
 COPY --from=builder /usr/src/app/build /app
 
-COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 # each time nginx is started it will perform variable substition in all template
 # files found in `/etc/nginx/templates/*.template`, and copy the results (without
 # the `.template` suffix) into `/etc/nginx/conf.d/`.
-COPY ./nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
-COPY ./jam-entrypoint.sh /
+COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
 
 ENTRYPOINT  [ "/jam-entrypoint.sh" ]

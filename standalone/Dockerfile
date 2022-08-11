@@ -29,9 +29,9 @@ WORKDIR /usr/src/joinmarket-webui
 # checkout and build project
 RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
     && git fetch --all --tags \
-    && git checkout "$JM_UI_REPO_REF"
-RUN npm install --no-fund --no-audit
-RUN npm run build
+    && git checkout "$JM_UI_REPO_REF" \
+    && npm install --no-fund --no-audit \
+    && npm run build
 # --- UI builder - end
 
 # --- SERVER builder
@@ -54,8 +54,10 @@ ARG JM_SERVER_REPO_REF
 ARG JM_UI_REPO_REF
 
 LABEL maintainer="$MAINTAINER"
-LABEL ui_version=$JM_UI_REPO_REF
-LABEL server_version=$JM_SERVER_REPO_REF
+LABEL ui-version=$JM_UI_REPO_REF
+LABEL server-version=$JM_SERVER_REPO_REF
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
@@ -66,9 +68,9 @@ RUN apt-get update \
     # add tor debian repo
     && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
     gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bullseye main' > /etc/apt/sources.list.d/tor.list"
-
-RUN apt-get update \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bullseye main' > /etc/apt/sources.list.d/tor.list" \
+    # install dependencies
+    && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
     # image dependencies
     tini supervisor iproute2 procps vim \
@@ -78,12 +80,13 @@ RUN apt-get update \
     tor \
     deb.torproject.org-keyring \
     # ui dependencies
-    nginx
-
-WORKDIR /src
+    nginx \
+    # cleanup 
+    && apt-get clean \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 COPY --from=ui-builder /usr/src/joinmarket-webui/build /app
-COPY --from=server-builder /usr/src/joinmarket-clientserver .
+COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
 ENV DATADIR /root/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
@@ -92,29 +95,31 @@ ENV DEFAULT_AUTO_START /root/autostart
 ENV AUTO_START ${DATADIR}/autostart
 ENV PATH /src/scripts:$PATH
 
-RUN ./install.sh --docker-install --without-qt
-RUN rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
+WORKDIR /src
 
-RUN apt-get clean \
-    && apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
-    && rm --recursive --force /var/lib/apt/lists/* \
+# compile and install JoinMarket
+RUN ./install.sh --docker-install --without-qt \
+    && rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
+
+# cleanup and remove ephemeral dependencies
+RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
     && rm --force /var/log/dpkg.log
 
-WORKDIR /src/scripts
-
-COPY .bashrc /root/.bashrc
-COPY torrc /etc/tor/torrc
 COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
+COPY .bashrc /root/.bashrc
+COPY torrc /etc/tor/torrc
 
-COPY ./nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
 
 # nginx
 EXPOSE 80
+
+WORKDIR /src/scripts
 
 ENTRYPOINT  [ "tini", "-g", "--", "/jam-entrypoint.sh" ]
