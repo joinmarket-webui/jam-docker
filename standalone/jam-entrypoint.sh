@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-export JM_ONION_SERVING_HOST
-JM_ONION_SERVING_HOST="$(/sbin/ip route|awk '/src/ { print $9 }')"
-
 # ensure 'logs' directory exists
 mkdir --parents "${DATADIR}/logs"
 

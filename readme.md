@@ -48,6 +48,11 @@ docker run --rm  -it \
         joinmarket-webui/jam-ui-only
 ```
 
+### Lint
+```sh
+docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/Dockerfile"
+```
+
 
 ## standalone
 ### Usage Notes
@@ -102,6 +107,11 @@ docker run --rm  -it \
         --env JM_NETWORK="regtest" \
         --publish "8080:80" \
         joinmarket-webui/jam-standalone
+```
+
+### Lint
+```sh
+docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
 ```
 
 

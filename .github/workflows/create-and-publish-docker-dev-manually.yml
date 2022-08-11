@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       ui_repo_ref:
-        description: 'ui version/branch (e.g. v0.0.9, master, etc.)'
+        description: 'ui version/branch (e.g. v0.0.10, master, etc.)'
         required: true
         default: 'master'
         type: string
