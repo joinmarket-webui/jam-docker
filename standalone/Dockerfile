@@ -1,10 +1,10 @@
 
 # global arguments
-ARG MAINTAINER='joinmarket-webui https://github.com/joinmarket-webui'
+ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 
-ARG JM_UI_REPO=https://github.com/joinmarket-webui/joinmarket-webui
-ARG JM_UI_REPO_BRANCH=master
-ARG JM_UI_REPO_REF=master
+ARG JAM_REPO=https://github.com/joinmarket-webui/jam
+ARG JAM_REPO_BRANCH=master
+ARG JAM_REPO_REF=master
 
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_BRANCH=master
@@ -17,19 +17,19 @@ RUN apk add --no-cache --update git
 
 # --- UI builder 
 FROM builder-base AS ui-builder
-ARG JM_UI_REPO
-ARG JM_UI_REPO_BRANCH
-ARG JM_UI_REPO_REF
+ARG JAM_REPO
+ARG JAM_REPO_BRANCH
+ARG JAM_REPO_REF
 
 # install build dependencies
 RUN apk add --no-cache --update nodejs npm
 
-WORKDIR /usr/src/joinmarket-webui
+WORKDIR /usr/src/jam
 
 # checkout and build project
-RUN git clone "$JM_UI_REPO" . --depth=1 --branch "$JM_UI_REPO_BRANCH" \
+RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_BRANCH" \
     && git fetch --all --tags \
-    && git checkout "$JM_UI_REPO_REF" \
+    && git checkout "$JAM_REPO_REF" \
     && npm install --no-fund --no-audit \
     && npm run build
 # --- UI builder - end
@@ -51,10 +51,10 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 FROM python:3.9.10-slim-bullseye
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
-ARG JM_UI_REPO_REF
+ARG JAM_REPO_REF
 
 LABEL maintainer="$MAINTAINER"
-LABEL ui-version=$JM_UI_REPO_REF
+LABEL ui-version=$JAM_REPO_REF
 LABEL server-version=$JM_SERVER_REPO_REF
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -85,7 +85,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
 
-COPY --from=ui-builder /usr/src/joinmarket-webui/build /app
+COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
 ENV DATADIR /root/.joinmarket

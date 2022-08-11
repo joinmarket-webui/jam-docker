@@ -8,15 +8,15 @@ on:
         required: true
         type: string
       ui_repo_ref:
-        description: 'web-ui version/branch (e.g. v0.0.2, master, etc.)'
+        description: 'ui version/branch (e.g. v0.0.10, master, etc.)'
         required: true
         type: string
       server_repo_ref:
-        description: 'server version/branch (e.g. v0.9.4, master, etc.)'
+        description: 'server version/branch (e.g. v0.9.6, master, etc.)'
         required: true
         type: string
       image_name_prefix:
-        description: 'image name prefix: e.g. joinmarket-webui/joinmarket-webui-'
+        description: 'image name prefix: e.g. joinmarket-webui/jam-'
         required: true
         type: string
 
@@ -58,7 +58,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ inputs.image_name_prefix }}${{ matrix.context }}
           labels: |
-            org.opencontainers.image.title=joinmarket-webui-${{ matrix.context }}
+            org.opencontainers.image.title=jam-${{ matrix.context }}
             org.opencontainers.image.version=${{ inputs.version }}
 
       - name: Build and push Docker image for ${{ matrix.context }}
@@ -70,5 +70,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JM_UI_REPO_REF=${{ inputs.ui_repo_ref }}
+            JAM_REPO_REF=${{ inputs.ui_repo_ref }}
             JM_SERVER_REPO_REF=${{ inputs.server_repo_ref }}

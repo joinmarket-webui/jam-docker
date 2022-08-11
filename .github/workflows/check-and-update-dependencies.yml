@@ -11,8 +11,8 @@ jobs:
     permissions:
       contents: read
     outputs:
-      ui_repo_url: ${{ steps.dotenv.outputs.jm_ui_repo }}
-      ui_repo_ref: ${{ steps.dotenv.outputs.jm_ui_repo_ref }}
+      ui_repo_url: ${{ steps.dotenv.outputs.jam_repo }}
+      ui_repo_ref: ${{ steps.dotenv.outputs.jam_repo_ref }}
       server_repo_url: ${{ steps.dotenv.outputs.jm_server_repo }}
       server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
     steps:
@@ -31,7 +31,7 @@ jobs:
     with:
       repo_url: ${{ needs.readenv.outputs.ui_repo_url }}
       current_tag: ${{ needs.readenv.outputs.ui_repo_ref }}
-      env_var_name: 'JM_UI_REPO_REF'
+      env_var_name: 'JAM_REPO_REF'
 
   check-server:
     uses: ./.github/workflows/update-dependency-version.yml
