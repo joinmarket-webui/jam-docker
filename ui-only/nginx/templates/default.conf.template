@@ -67,4 +67,8 @@ server {
 
         proxy_pass https://jmwalletd_ws_backend/;
     }
+
+    location /jam/log/ {
+        return 501; # Not Implemented
+    }
 }
