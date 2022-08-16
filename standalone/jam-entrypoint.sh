@@ -80,7 +80,7 @@ done
 
 # wait for a ready file to be created if necessary
 if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
-    echo "Waiting $READY_FILE to be created..."
+    echo "Waiting for $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
     echo "The chain is fully synched"
 fi
