@@ -9,10 +9,6 @@ if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = "true" ]; then
     cp --force "$DEFAULT_CONFIG" "$CONFIG"
 fi
 
-if [ ! -f "$AUTO_START" ]; then
-    cp "$DEFAULT_AUTO_START" "$AUTO_START"
-fi
-
 # remove leftover lockfiles from possible unclean shutdowns before startup
 if [ "${REMOVE_LOCK_FILES}" = "true" ]; then
     echo "Remove leftover wallet lockfiles before startup..."
@@ -36,19 +32,6 @@ if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
       && openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes -out cert.pem -keyout key.pem -subj "$subj" \
       && popd
 fi
-
-# auto start services
-while read -r p; do
-    [[ "$p" == "" ]] && continue
-    [[ "$p" == "#"* ]] && continue
-    echo "Auto start: $p"
-    file_path="/etc/supervisor/conf.d/$p.conf"
-    if [ -f "$file_path" ]; then
-      sed -i 's/autostart=false/autostart=true/g' "$file_path"
-    else
-      echo "$file_path not found"
-    fi
-done < "$AUTO_START"
 
 declare -A jmenv
 while IFS='=' read -r -d '' envkey parsedval; do

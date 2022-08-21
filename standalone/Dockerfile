@@ -91,8 +91,6 @@ COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 ENV DATADIR /root/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
 ENV DEFAULT_CONFIG /root/default.cfg
-ENV DEFAULT_AUTO_START /root/autostart
-ENV AUTO_START ${DATADIR}/autostart
 ENV PATH /src/scripts:$PATH
 
 WORKDIR /src
@@ -105,7 +103,6 @@ RUN ./install.sh --docker-install --without-qt \
 RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
     && rm --force /var/log/dpkg.log
 
-COPY autostart ${DEFAULT_AUTO_START}
 COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 COPY .bashrc /root/.bashrc
