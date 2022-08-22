@@ -115,7 +115,7 @@ server {
         auth_request /jam/internal/auth;
 
         default_type application/json;
-        return 200 '{ "features": { "orderbook": true, "logs": false } }';
+        return 200 '{ "features": { "logs": false } }';
     }
 
     location /jam/api/v0/log/ {
