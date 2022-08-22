@@ -48,7 +48,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM python:3.9.10-slim-bullseye
+FROM debian:bullseye-20220801-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF

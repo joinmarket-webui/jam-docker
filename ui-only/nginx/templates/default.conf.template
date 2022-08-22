@@ -11,6 +11,12 @@ upstream jmwalletd_ws_backend {
     keepalive 2;
 }
 
+upstream obwatch_backend {
+    zone upstreams;
+    server $JAM_JMOBWATCH_PROXY;
+    keepalive 2;
+}
+
 server {
     listen 80;
     listen [::]:80;
@@ -66,6 +72,21 @@ server {
         proxy_send_timeout 600s;
 
         proxy_pass https://jmwalletd_ws_backend/;
+    }
+
+    location /obwatch/ {
+        include /etc/nginx/snippets/proxy-params.conf;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        # allow 5 min (default is 60 sec). increase on demand.
+        proxy_read_timeout 300s;
+        # allow 5 min to connect (default is 60 sec)
+        proxy_connect_timeout 300s;
+
+        # must proxy via "http" as ob-watcher does not make use of self-signed cert yet
+        proxy_pass http://obwatch_backend/;
     }
 
     location /jam/log/ {
