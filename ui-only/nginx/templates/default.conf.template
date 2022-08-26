@@ -88,4 +88,40 @@ server {
         # must proxy via "http" as ob-watcher does not make use of self-signed cert yet
         proxy_pass http://obwatch_backend/;
     }
+
+    location = /jam/internal/auth {
+        internal;
+
+        # requests to `/session` are valid without auth header.
+        # it must be ensured that it is present and contains a value.
+        # ("if" is evil, but using just "return" inside is fine)
+        if ($jm_auth_present != 1) {
+            return 401;
+        }
+
+        include /etc/nginx/snippets/proxy-params.conf;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+
+        # pass to `/session` which will validate the header
+        proxy_pass http://$server_addr:$server_port/api/v1/session;
+    }
+
+    location = /jam/api/v0/features {
+        auth_request /jam/internal/auth;
+
+        default_type application/json;
+        return 200 '{ "features": { "logs": false } }';
+    }
+
+    location /jam/api/v0/log/ {
+        auth_request /jam/internal/auth;
+
+        return 501; # Not Implemented
+    }
+    
 }
