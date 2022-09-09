@@ -59,7 +59,9 @@ LABEL server-version=$JM_SERVER_REPO_REF
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update \
+RUN addgroup --system tor \
+    && adduser --system --disabled-login --ingroup tor --gecos 'tor user' tor \
+    && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
@@ -106,7 +108,7 @@ RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-http
 COPY default.cfg ${DEFAULT_CONFIG}
 COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
 COPY .bashrc /root/.bashrc
-COPY torrc /etc/tor/torrc
+COPY --chown=tor:tor torrc /etc/tor/torrc
 
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf

@@ -17,6 +17,11 @@ upstream obwatch_backend {
     keepalive 2;
 }
 
+map $http_x_jm_authorization $jm_auth_present {
+    default              0;
+    "~^Bearer (?:.)+$"   1;
+}
+
 server {
     listen 80;
     listen [::]:80;
