@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-# ensure 'log' directory exists
+# ensure jm working directory exists
+mkdir --parents "${DATADIR}/"
+
+# ensure log directory exists
 mkdir --parents /var/log/jam
 
 # restore the default config

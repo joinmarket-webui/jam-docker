@@ -102,11 +102,13 @@ docker run --rm  -it \
         --add-host=host.docker.internal:host-gateway \
         --env APP_USER="joinmarket" \
         --env APP_PASSWORD="joinmarket" \
+        --env ENSURE_WALLET="true" \
         --env JM_RPC_HOST="host.docker.internal" \
         --env JM_RPC_PORT="18443" \
         --env JM_RPC_USER="jm" \
         --env JM_RPC_PASSWORD="***" \
         --env JM_NETWORK="regtest" \
+        --volume jmdatadir:/root/.joinmarket \
         --publish "8080:80" \
         joinmarket-webui/jam-standalone
 ```
