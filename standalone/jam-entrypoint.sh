@@ -110,4 +110,4 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
 fi
 
 
-exec supervisord
+exec supervisord --configuration /etc/supervisor/supervisord.conf
