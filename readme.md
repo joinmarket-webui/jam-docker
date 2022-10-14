@@ -72,7 +72,7 @@ The following environment variables control the configuration
 - `RESTORE_DEFAULT_CONFIG` (optional; overwrites any existing `joinmarket.cfg` file the container's default config on startup)
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
-- `jm_gaplimit: 2000` will set the `gaplimit` config value to `2000`
+- `JM_GAPLIMIT: 2000` will set the `gaplimit` config value to `2000`
 
 ### Building Notes
 ```sh
@@ -100,14 +100,16 @@ docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 ```sh
 docker run --rm  -it \
         --add-host=host.docker.internal:host-gateway \
-        --env APP_USER="joinmarket" \
-        --env APP_PASSWORD="joinmarket" \
-        --env ENSURE_WALLET="true" \
         --env JM_RPC_HOST="host.docker.internal" \
         --env JM_RPC_PORT="18443" \
         --env JM_RPC_USER="jm" \
         --env JM_RPC_PASSWORD="***" \
         --env JM_NETWORK="regtest" \
+        --env APP_USER="joinmarket" \
+        --env APP_PASSWORD="joinmarket" \
+        --env ENSURE_WALLET="true" \
+        --env REMOVE_LOCK_FILES="true" \
+        --env RESTORE_DEFAULT_CONFIG="true" \
         --volume jmdatadir:/root/.joinmarket \
         --publish "8080:80" \
         joinmarket-webui/jam-standalone
