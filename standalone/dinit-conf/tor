@@ -1,0 +1,6 @@
+type = process
+command = /usr/sbin/tor -f /etc/tor/torrc
+env-file = /etc/dinit.d/tor.env
+run-as = tor
+restart = true
+logfile = /var/log/jam/tor_stdout.log

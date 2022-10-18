@@ -1,0 +1,8 @@
+type = process
+command = python3 jmwalletd.py
+working-dir = /src/scripts
+depends-on = tor
+restart = true
+smooth-recovery = true
+start-timeout = 10
+logfile = /var/log/jam/jmwalletd_stdout.log

@@ -7,6 +7,9 @@ mkdir --parents "${DATADIR}/"
 # ensure log directory exists
 mkdir --parents /var/log/jam
 
+# touch jmwalletd log file to preserve read permissions for nginx (644)
+touch /var/log/jam/jmwalletd_stdout.log
+
 # restore the default config
 if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = "true" ]; then
     cp --force "$DEFAULT_CONFIG" "$CONFIG"
@@ -109,5 +112,4 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
     curl --silent --user "${btcuser}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
 fi
 
-
-exec supervisord --configuration /etc/supervisor/supervisord.conf
+exec /sbin/dinit --container

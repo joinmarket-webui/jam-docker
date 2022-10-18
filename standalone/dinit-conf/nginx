@@ -1,0 +1,4 @@
+type = process
+command = nginx -g "daemon off;"
+working-dir = /app
+restart = true

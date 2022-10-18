@@ -1,0 +1,6 @@
+type = internal
+
+waits-for = nginx
+waits-for = tor
+waits-for = jmwalletd
+waits-for = ob-watcher
