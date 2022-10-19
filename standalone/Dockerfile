@@ -49,6 +49,7 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.16.0
     && chmod +x ./configs/mconfig.Linux.sh \
     && ./configs/mconfig.Linux.sh \
     && make \
+    && export ASAN_OPTIONS=detect_leaks=0 \
     && make check \
     && make check-igr \
     && mkdir dinit-bin \
