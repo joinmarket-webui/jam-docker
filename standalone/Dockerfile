@@ -11,7 +11,7 @@ ARG JM_SERVER_REPO_BRANCH=master
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
-FROM alpine:3.15 AS builder-base
+FROM alpine:3.16.2 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 

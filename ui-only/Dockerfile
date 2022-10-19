@@ -6,7 +6,7 @@ ARG JAM_REPO=https://github.com/joinmarket-webui/jam
 ARG JAM_REPO_BRANCH=master
 ARG JAM_REPO_REF=master
 
-FROM alpine:3.15 AS builder-base
+FROM alpine:3.16.2 AS builder-base
 # install build dependencies
 RUN apk add --no-cache --update git nodejs npm
 
