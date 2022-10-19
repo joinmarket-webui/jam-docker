@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
     
       # Parse the repo url (e.g. "https://github.com/bitcoin/bips") and extract:
       # - the full repo name (e.g. "bitcoin/bips")
@@ -55,7 +55,7 @@ jobs:
           RELEASE_TAG: ${{ steps.versions.outputs.release_tag }}
           NAME: ${{ steps.repoinfo.outputs.name_short }}
           LINK: ${{ inputs.repo_url }}
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           add-paths: .env
           branch: ${{ env.NAME }}-updates

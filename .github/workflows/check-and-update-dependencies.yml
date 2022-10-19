@@ -17,11 +17,11 @@ jobs:
       server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Read .env file
         id: dotenv
-        uses: falti/dotenv-action@v0.2.7
+        uses: falti/dotenv-action@v1.0.0
         with:
           log-variables: true
 
