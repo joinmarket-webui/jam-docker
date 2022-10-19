@@ -36,7 +36,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_BRANCH" \
 
 
 # --- dinit builder
-FROM debian:bullseye-20220801-slim AS dinit-builder
+FROM debian:bullseye-20221004-slim AS dinit-builder
 
 # install build dependencies
 RUN apt-get update \
@@ -69,7 +69,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-20220801-slim
+FROM debian:bullseye-20221004-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
