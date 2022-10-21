@@ -11,7 +11,7 @@ ARG JM_SERVER_REPO_BRANCH=master
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
-FROM alpine:3.15 AS builder-base
+FROM alpine:3.16.2 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
@@ -34,6 +34,28 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_BRANCH" \
     && npm run build
 # --- UI builder - end
 
+
+# --- dinit builder
+FROM debian:bullseye-20221004-slim AS dinit-builder
+
+# install build dependencies
+RUN apt-get update \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y ca-certificates git gcc make m4 g++
+
+WORKDIR /usr/src/dinit
+
+# checkout and build project
+RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.16.0" \
+    && chmod +x ./configs/mconfig.Linux.sh \
+    && ./configs/mconfig.Linux.sh \
+    && make \
+    && export ASAN_OPTIONS=detect_leaks=0 \
+    && make check \
+    && make check-igr \
+    && mkdir dinit-bin \
+    && make DESTDIR="$(pwd)/dinit-bin" install
+# --- dinit builder - end
+
 # --- SERVER builder
 FROM builder-base AS server-builder
 ARG JM_SERVER_REPO
@@ -48,7 +70,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-20220801-slim
+FROM debian:bullseye-20221004-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
@@ -75,7 +97,7 @@ RUN addgroup --system tor \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
     # image dependencies
-    tini supervisor iproute2 procps vim \
+    tini iproute2 procps vim \
     # servers dependencies (see `install.sh`)
     build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
     # tor
@@ -87,6 +109,7 @@ RUN addgroup --system tor \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
 
+COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
@@ -106,7 +129,7 @@ RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-http
     && rm --force /var/log/dpkg.log
 
 COPY default.cfg ${DEFAULT_CONFIG}
-COPY supervisor-conf/*.conf /etc/supervisor/conf.d/
+COPY dinit-conf/* /etc/dinit.d/
 COPY .bashrc /root/.bashrc
 COPY --chown=tor:tor torrc /etc/tor/torrc
 
