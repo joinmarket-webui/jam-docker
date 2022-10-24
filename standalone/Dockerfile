@@ -129,17 +129,18 @@ RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-http
     && rm --force /var/log/dpkg.log
 
 COPY default.cfg ${DEFAULT_CONFIG}
-COPY dinit-conf/* /etc/dinit.d/
 COPY .bashrc /root/.bashrc
 COPY --chown=tor:tor torrc /etc/tor/torrc
-
-COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY usr/local/bin/* /usr/local/bin/
 RUN chmod +x -R /usr/local/bin
 
 COPY etc/cron.d/* /etc/cron.d/
+COPY etc/dinit.d/* /etc/dinit.d/
+
+COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
 
 COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
