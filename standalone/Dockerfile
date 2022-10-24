@@ -135,12 +135,9 @@ COPY --chown=tor:tor torrc /etc/tor/torrc
 COPY usr/local/bin/* /usr/local/bin/
 RUN chmod +x -R /usr/local/bin
 
-COPY etc/cron.d/* /etc/cron.d/
-COPY etc/dinit.d/* /etc/dinit.d/
-
-COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
-
+COPY etc/cron.d/ /etc/cron.d/
+COPY etc/dinit.d/ /etc/dinit.d/
+COPY etc/nginx/ /etc/nginx/
 
 COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
