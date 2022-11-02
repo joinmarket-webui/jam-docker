@@ -95,7 +95,7 @@ RUN addgroup --system tor \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
     # image dependencies
-    tini iproute2 procps vim \
+    tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
     build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
     # tor

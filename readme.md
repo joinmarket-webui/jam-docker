@@ -66,10 +66,11 @@ docker pull ghcr.io/joinmarket-webui/jam-standalone:latest
 The following environment variables control the configuration
 - `APP_USER` (optional; username used for basic authentication)
 - `APP_PASSWORD` (optional, but required if `APP_USER` is provided; password used for basic authentication)
-- `ENSURE_WALLET` (optional; create and load the wallet in bitcoin core on startup)
+- `ENSURE_WALLET` (optional, defaults to `false`; create and load the wallet in bitcoin core on startup)
 - `READY_FILE` (optional; wait for a file to be created before starting all services, e.g. to wait for chain synchronization)
-- `REMOVE_LOCK_FILES` (optional; remove leftover lockfiles from possible unclean shutdowns on startup)
-- `RESTORE_DEFAULT_CONFIG` (optional; overwrites any existing `joinmarket.cfg` file the container's default config on startup)
+- `REMOVE_LOCK_FILES` (optional, defaults to `false`; remove leftover lockfiles from possible unclean shutdowns on startup)
+- `RESTORE_DEFAULT_CONFIG` (optional, defaults to `false`; overwrites any existing `joinmarket.cfg` file with a default config)
+- `WAIT_FOR_BITCOIND` (optional, defaults to `true`; wait for bitcoind to accept RPC request and report >= 100 blocks)
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `JM_GAPLIMIT: 2000` will set the `gaplimit` config value to `2000`
@@ -110,6 +111,7 @@ docker run --rm  -it \
         --env ENSURE_WALLET="true" \
         --env REMOVE_LOCK_FILES="true" \
         --env RESTORE_DEFAULT_CONFIG="true" \
+        --env WAIT_FOR_BITCOIND="true" \
         --volume jmdatadir:/root/.joinmarket \
         --publish "8080:80" \
         joinmarket-webui/jam-standalone
