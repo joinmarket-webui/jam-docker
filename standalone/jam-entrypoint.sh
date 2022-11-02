@@ -75,15 +75,36 @@ done
 
 # wait for a ready file to be created if necessary
 if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
-    echo "Waiting for $READY_FILE to be created..."
+    echo "Waiting for file $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
-    echo "The chain is fully synched"
+    echo "Successfully waited for file $READY_FILE to be created."
+fi
+
+btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
+btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
+
+# wait for bitcoind to accept RPC requests if necessary
+if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
+    echo "Waiting for bitcoind to accept RPC requests..."
+    # use `getblockchaininfo` command here, as this is the first request JM is
+    # performing during initialization
+    getblockchaininfo_payload="{\
+        \"jsonrpc\":\"2.0\",\
+        \"id\":\"curl\",\
+        \"method\":\"getblockchaininfo\",\
+        \"params\":{}\
+    }"
+    # generally only testing for a non-error response would be enough, but 
+    # waiting for blocks >= 100 is needed for regtest environments as well!
+    until curl --silent --user "${btcuser}" --data-binary "${getblockchaininfo_payload}" "${btchost}" | jq -e ".result.blocks >= 100" > /dev/null 2>&1
+    do
+        sleep 5
+    done
+    echo "Successfully waited for bitcoind to accept RPC requests."
 fi
 
 # ensure that a wallet exists and is loaded if necessary
 if [ "${ENSURE_WALLET}" = "true" ]; then
-    btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
-    btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
     wallet_name="${jmenv['rpc_wallet_file']}"
 
     echo "Creating wallet $wallet_name if missing..."
