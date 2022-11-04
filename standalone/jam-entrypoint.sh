@@ -96,7 +96,7 @@ if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
     }"
     # generally only testing for a non-error response would be enough, but 
     # waiting for blocks >= 100 is needed for regtest environments as well!
-    until curl --silent --user "${btcuser}" --data-binary "${getblockchaininfo_payload}" "${btchost}" | jq -e ".result.blocks >= 100" > /dev/null 2>&1
+    until curl --silent --show-error --user "${btcuser}" --data-binary "${getblockchaininfo_payload}" "${btchost}" 2>&1 | jq -e ".result.blocks >= 100" > /dev/null 2>&1
     do
         sleep 5
     done
