@@ -1,0 +1,2 @@
+# rotate every second day
+0 0 */2 * * root /usr/local/bin/jam-savelog.sh

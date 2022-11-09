@@ -1,0 +1,5 @@
+type = process
+command = /usr/sbin/cron -f
+working-dir = /root
+restart = true
+logfile = /var/log/cron.log

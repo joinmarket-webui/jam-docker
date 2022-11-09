@@ -95,7 +95,7 @@ RUN addgroup --system tor \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y \
     # image dependencies
-    tini iproute2 procps vim \
+    tini iproute2 procps vim cron \
     # servers dependencies (see `install.sh`)
     build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
     # tor
@@ -127,12 +127,15 @@ RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-http
     && rm --force /var/log/dpkg.log
 
 COPY default.cfg ${DEFAULT_CONFIG}
-COPY dinit-conf/* /etc/dinit.d/
 COPY .bashrc /root/.bashrc
 COPY --chown=tor:tor torrc /etc/tor/torrc
 
-COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY usr/local/bin/* /usr/local/bin/
+RUN chmod +x -R /usr/local/bin
+
+COPY etc/cron.d/ /etc/cron.d/
+COPY etc/dinit.d/ /etc/dinit.d/
+COPY etc/nginx/ /etc/nginx/
 
 COPY jam-entrypoint.sh /
 RUN chmod +x /jam-entrypoint.sh
