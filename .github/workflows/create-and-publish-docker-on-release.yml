@@ -19,7 +19,7 @@ jobs:
 
       - name: Read .env file
         id: dotenv
-        uses: falti/dotenv-action@v1.0.0
+        uses: falti/dotenv-action@v1.0.2
         with:
           log-variables: true
 
