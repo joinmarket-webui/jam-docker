@@ -97,7 +97,7 @@ RUN addgroup --system tor \
     # image dependencies
     tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
-    build-essential automake pkg-config libtool libltdl-dev python3-dev python3-setuptools python3-pip \
+    build-essential automake pkg-config libtool libltdl-dev python3-dev python3-pip python3-setuptools python3-venv \
     # tor
     tor \
     deb.torproject.org-keyring \
