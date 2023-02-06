@@ -31,15 +31,15 @@ jobs:
         env:
           REPO_URL: ${{ inputs.repo_url }}
         run: |
-          echo ::set-output name=name::$(echo ${REPO_URL#*://*/})
-          echo ::set-output name=name_short::$(echo ${REPO_URL##*://*/})
+          echo "{name}={$(echo ${REPO_URL#*://*/})}" >> $GITHUB_OUTPUT
+          echo "{name_short}={$(echo ${REPO_URL##*://*/})}" >> $GITHUB_OUTPUT
 
       - name: Get Latest Releases
         id: versions
         env:
           REPO_NAME: ${{ steps.repoinfo.outputs.name }}
         run: |
-          echo ::set-output name=release_tag::$(curl -sL "https://api.github.com/repos/${REPO_NAME}/releases/latest" | jq -r ".tag_name")
+          echo "{release_tag}={$(curl -sL "https://api.github.com/repos/${REPO_NAME}/releases/latest" | jq -r ".tag_name")}" >> $GITHUB_OUTPUT
 
       - name: Update Environment Variable
         if: inputs.current_tag != steps.versions.outputs.release_tag
@@ -50,7 +50,7 @@ jobs:
           sed -i "s/^$ENV_VARNAME=.*/$ENV_VARNAME=$RELEASE_TAG/g" .env
 
       - name: Create Pull Request
-        if: inputs.current_tag != steps.versions.outputs.release_tag
+        if: steps.versions.outputs.release_tag != '' && inputs.current_tag != steps.versions.outputs.release_tag
         env:
           RELEASE_TAG: ${{ steps.versions.outputs.release_tag }}
           NAME: ${{ steps.repoinfo.outputs.name_short }}
