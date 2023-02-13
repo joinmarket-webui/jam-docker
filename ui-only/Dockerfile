@@ -3,7 +3,6 @@
 ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
-ARG JAM_REPO_BRANCH=master
 ARG JAM_REPO_REF=master
 
 FROM alpine:3.16.2 AS builder-base
@@ -13,15 +12,12 @@ RUN apk add --no-cache --update git nodejs npm
 # ---
 FROM builder-base AS builder
 ARG JAM_REPO
-ARG JAM_REPO_BRANCH
 ARG JAM_REPO_REF
 
 WORKDIR /usr/src/app
 
 # checkout and build project
-RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_BRANCH" \
-    && git fetch --all --tags \
-    && git checkout "$JAM_REPO_REF" \
+RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && npm install --no-fund --no-audit \
     && npm run build
 

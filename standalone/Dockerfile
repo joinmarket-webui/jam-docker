@@ -3,11 +3,9 @@
 ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
-ARG JAM_REPO_BRANCH=master
 ARG JAM_REPO_REF=master
 
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
-ARG JM_SERVER_REPO_BRANCH=master
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
@@ -18,7 +16,6 @@ RUN apk add --no-cache --update git
 # --- UI builder 
 FROM builder-base AS ui-builder
 ARG JAM_REPO
-ARG JAM_REPO_BRANCH
 ARG JAM_REPO_REF
 
 # install build dependencies
@@ -27,9 +24,7 @@ RUN apk add --no-cache --update nodejs npm
 WORKDIR /usr/src/jam
 
 # checkout and build project
-RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_BRANCH" \
-    && git fetch --all --tags \
-    && git checkout "$JAM_REPO_REF" \
+RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && npm install --no-fund --no-audit \
     && npm run build
 # --- UI builder - end
@@ -58,14 +53,11 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.16.1
 # --- SERVER builder
 FROM builder-base AS server-builder
 ARG JM_SERVER_REPO
-ARG JM_SERVER_REPO_BRANCH
 ARG JM_SERVER_REPO_REF
 
 WORKDIR /usr/src/joinmarket-clientserver
 
-RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_BRANCH" \
-    && git fetch --all --tags \
-    && git checkout "$JM_SERVER_REPO_REF"
+RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
