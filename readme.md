@@ -30,7 +30,6 @@ docker build --label "local" \
 
 #### Build args
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
-- `JAM_REPO_BRANCH` (ui git branch; defaults to `master`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 
 ### Inspecting the Container
@@ -85,11 +84,9 @@ docker build --label "local" \
 
 #### Build args
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
-- `JAM_REPO_BRANCH` (ui git branch; defaults to `master`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 ---
 - `JM_SERVER_REPO` (server git repo; defaults to `https://github.com/JoinMarket-Org/joinmarket-clientserver`)
-- `JM_SERVER_REPO_BRANCH` (server git branch; defaults to `master`)
 - `JM_SERVER_REPO_REF` (server git ref; defaults to `master`)
 
 ### Inspecting the Container
