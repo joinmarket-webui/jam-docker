@@ -45,7 +45,8 @@ RUN apt-get update \
 WORKDIR /usr/src/dinit
 
 # checkout and build project
-RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.16.0" \
+# see: https://github.com/davmac314/dinit/releases
+RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.16.1" \
     && make \
     && export ASAN_OPTIONS=detect_leaks=0 \
     && make check \
