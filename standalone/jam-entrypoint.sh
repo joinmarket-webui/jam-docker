@@ -30,6 +30,12 @@ if [ -n "${APP_USER}" ]; then
     sed -i 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
 fi
 
+if [ ! -z "${JAM_UI_PORT##*[!0-9]*}" ]; then
+    echo "UI will be served on port ${JAM_UI_PORT}."
+    sed -i "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+    sed -i "s/listen [::]:80;;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+fi
+
 # generate ssl certificates for jmwalletd
 if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
     subj="/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"

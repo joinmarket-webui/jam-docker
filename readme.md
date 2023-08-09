@@ -15,7 +15,7 @@ docker pull ghcr.io/joinmarket-webui/jam-ui-only:latest
 
 ### Environment variables
 
-The following environment variables control the configuration
+The following environment variables control the configuration:
 - `JAM_JMWALLETD_HOST` (required; jmwalletd hostname)
 - `JAM_JMWALLETD_API_PORT` (required; jmwalletd api port)
 - `JAM_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
@@ -62,7 +62,7 @@ docker pull ghcr.io/joinmarket-webui/jam-standalone:latest
 ```
 
 ### Environment variables
-The following environment variables control the configuration
+The following environment variables control the configuration:
 - `APP_USER` (optional; username used for basic authentication)
 - `APP_PASSWORD` (optional, but required if `APP_USER` is provided; password used for basic authentication)
 - `ENSURE_WALLET` (optional, defaults to `false`; create and load the wallet in bitcoin core on startup)
@@ -70,9 +70,10 @@ The following environment variables control the configuration
 - `REMOVE_LOCK_FILES` (optional, defaults to `false`; remove leftover lockfiles from possible unclean shutdowns on startup)
 - `RESTORE_DEFAULT_CONFIG` (optional, defaults to `false`; overwrites any existing `joinmarket.cfg` file with a default config)
 - `WAIT_FOR_BITCOIND` (optional, defaults to `true`; wait for bitcoind to accept RPC request and report >= 100 blocks)
+- `JAM_UI_PORT` (optional, defaults to `80`; adapt the port the UI is served on)
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
-- `JM_GAPLIMIT: 2000` will set the `gaplimit` config value to `2000`
+- `--env JM_GAPLIMIT=200` will set the `gaplimit` config value to `200`
 
 ### Building Notes
 ```sh
@@ -125,8 +126,8 @@ docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalo
   - Clarify what it takes for all services to be started as non-root user.
   - See [joinmarket-clientserver#PR699](https://github.com/JoinMarket-Org/joinmarket-clientserver/pull/669) and
     [dmp1ce/joinmarket-DOCKERFILE](https://github.com/dmp1ce/joinmarket-DOCKERFILE)
-- Make irc config options editable via environment variables
-  - A coinjoin on regtest is not possible, because these params can only be replaced by mounting an own `joinmarket.cfg`
+- Make IRC config options editable via environment variables
+  - A collaborative transaction on regtest is only possible when these params are replaced by mounting an own `joinmarket.cfg` config file
 
 
 ## Resources
