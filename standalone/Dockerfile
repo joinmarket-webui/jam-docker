@@ -163,7 +163,7 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --chmod=0755 jam-entrypoint.sh /
 
-# nginx
+# nginx default port
 EXPOSE 80
 
 WORKDIR /src/scripts
