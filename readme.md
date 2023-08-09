@@ -92,9 +92,10 @@ The following environment variables control the configuration:
 - `REMOVE_LOCK_FILES` (optional, defaults to `false`; remove leftover lockfiles from possible unclean shutdowns on startup)
 - `RESTORE_DEFAULT_CONFIG` (optional, defaults to `false`; overwrites any existing `joinmarket.cfg` file with a default config)
 - `WAIT_FOR_BITCOIND` (optional, defaults to `true`; wait for bitcoind to accept RPC request and report >= 100 blocks)
+- `JAM_UI_PORT` (optional, defaults to `80`; adapt the port the UI is served on)
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
-- `JM_GAPLIMIT: 2000` will set the `gaplimit` config value to `2000`
+- `--env JM_GAPLIMIT=200` will set the `gaplimit` config value to `200`
 
 ### Building Notes
 Building a specific release:
