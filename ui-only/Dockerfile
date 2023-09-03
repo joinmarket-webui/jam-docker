@@ -18,7 +18,7 @@ COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
 # install build dependencies
-RUN apk add --no-cache --update git
+RUN apk add --no-cache --update git gnupg
 
 # ---
 FROM builder-base AS builder
@@ -27,8 +27,12 @@ ARG JAM_REPO_REF
 
 WORKDIR /usr/src/app
 
+COPY pubkeys/ /pubkeys
+
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
+    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+    && git verify-tag "$JAM_REPO_REF" \
     && npm install --no-fund --no-audit \
     && npm run build
 
