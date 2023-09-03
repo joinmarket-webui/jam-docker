@@ -17,7 +17,7 @@ FROM node:${NODE_VERSION}-alpine AS node
 
 # --- Builder base 
 FROM alpine:${ALPINE_VERSION} AS builder-base
-RUN apk add --no-cache --update git
+RUN apk add --no-cache --update git gnupg
 # --- Builder base - end
 
 # --- UI builder 
@@ -32,8 +32,12 @@ COPY --from=node /usr/local/bin /usr/local/bin
 
 WORKDIR /usr/src/jam
 
+COPY pubkeys/ /pubkeys
+
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
+    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+    && git verify-tag "$JAM_REPO_REF" \
     && npm install --no-fund --no-audit \
     && npm run build
 # --- UI builder - end
@@ -67,7 +71,11 @@ ARG JM_SERVER_REPO_REF
 
 WORKDIR /usr/src/joinmarket-clientserver
 
-RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
+COPY pubkeys/ /pubkeys
+
+RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF" \
+    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+    && git verify-tag "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
