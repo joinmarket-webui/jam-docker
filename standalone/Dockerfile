@@ -31,7 +31,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 
 # --- dinit builder
-FROM debian:bullseye-20221004-slim AS dinit-builder
+FROM debian:bullseye-slim AS dinit-builder
 
 # install build dependencies
 RUN apt-get update \
@@ -61,7 +61,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-20221004-slim
+FROM debian:bullseye-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
@@ -72,9 +72,14 @@ LABEL server-version=$JM_SERVER_REPO_REF
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN addgroup --system tor \
-    && adduser --system --disabled-login --ingroup tor --gecos 'tor user' tor \
+RUN addgroup --gid 704704 --system tor \
+    && addgroup --gid 701234 joinmarket \
+    && adduser --uid 704704 --disabled-login --disabled-password --system --ingroup tor --gecos 'tor user' tor \
+    && adduser --uid 7012347 --disabled-login --disabled-password --no-create-home --ingroup joinmarket --gecos 'jmwalletd.py user' --home /data --add_extra_groups tor jm-w \
+    && adduser --uid 7012348 --disabled-login --disabled-password --no-create-home --ingroup joinmarket --gecos 'ob-watcher.py user' jm-ob \
+    && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
@@ -96,6 +101,8 @@ RUN addgroup --system tor \
     deb.torproject.org-keyring \
     # ui dependencies
     nginx \
+    # privilege separation dependency:
+    sudo \
     # cleanup 
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
@@ -104,9 +111,9 @@ COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
-ENV DATADIR /root/.joinmarket
+ENV DATADIR /data/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
-ENV DEFAULT_CONFIG /root/default.cfg
+ENV DEFAULT_CONFIG /data/default.cfg
 ENV PATH /src/scripts:$PATH
 
 WORKDIR /src
