@@ -40,12 +40,24 @@ docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/jam-ui-only
 ### Run
 ```sh
 docker run --rm  -it \
-        --add-host=host.docker.internal:host-gateway \
+        --add-host host.docker.internal:host-gateway \
         --env JAM_JMWALLETD_HOST="host.docker.internal" \
         --env JAM_JMWALLETD_API_PORT="28183" \
         --env JAM_JMWALLETD_WEBSOCKET_PORT="28283" \
         --env JAM_JMOBWATCH_PORT="62601" \
         --publish "8080:80" \
+        joinmarket-webui/jam-ui-only
+```
+
+or (using the host network)
+
+```sh
+docker run --rm  -it \
+        --network host \
+        --env JAM_JMWALLETD_HOST="localhost" \
+        --env JAM_JMWALLETD_API_PORT="28183" \
+        --env JAM_JMWALLETD_WEBSOCKET_PORT="28283" \
+        --env JAM_JMOBWATCH_PORT="62601" \
         joinmarket-webui/jam-ui-only
 ```
 
@@ -97,7 +109,7 @@ docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 ### Run
 ```sh
 docker run --rm  -it \
-        --add-host=host.docker.internal:host-gateway \
+        --add-host host.docker.internal:host-gateway \
         --env JM_RPC_HOST="host.docker.internal" \
         --env JM_RPC_PORT="18443" \
         --env JM_RPC_USER="jm" \
