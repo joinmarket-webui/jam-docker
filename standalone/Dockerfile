@@ -75,7 +75,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN addgroup --gid 704704 --system tor \
     && adduser --uid 704704 --disabled-login --disabled-password --system --ingroup tor --gecos 'tor user' tor \
     && addgroup --gid 701234 joinmarket \
-    && adduser --uid 7012347 --disabled-login --disabled-password --ingroup joinmarket --gecos 'jmwalletd.py user' --home /data --add_extra_groups tor jm-w \
+    && adduser --uid 7012347 --disabled-login --disabled-password --ingroup joinmarket --gecos 'jmwalletd.py user' --add_extra_groups tor --home /data jm-w \
     && adduser --uid 7012348 --disabled-login --disabled-password --no-create-home --ingroup joinmarket --gecos 'ob-watcher.py user' jm-ob \
     && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
