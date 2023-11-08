@@ -5,7 +5,7 @@ ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
 ARG JAM_REPO_REF=master
 
-FROM alpine:3.16.2 AS builder-base
+FROM alpine:3.18.3 AS builder-base
 # install build dependencies
 RUN apk add --no-cache --update git nodejs npm
 
@@ -22,7 +22,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && npm run build
 
 # ---
-FROM nginx:1.23.1-alpine as runtime
+FROM nginx:1.25.2-alpine3.18 as runtime
 
 # ---
 FROM runtime

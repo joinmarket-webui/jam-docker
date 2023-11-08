@@ -9,7 +9,7 @@ ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
-FROM alpine:3.16.2 AS builder-base
+FROM alpine:3.18.3 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
@@ -31,7 +31,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 
 # --- dinit builder
-FROM debian:bullseye-slim AS dinit-builder
+FROM debian:bullseye-20230919-slim AS dinit-builder
 
 # install build dependencies
 RUN apt-get update \
@@ -61,7 +61,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-slim
+FROM debian:bullseye-20230919-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
@@ -78,7 +78,6 @@ RUN adduser --uid 704704 --system --group --gecos 'tor user' tor \
     && useradd --uid 7012348 --system -g joinmarket --comment 'ob-watcher user' jm-ob \
     && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
-    && apt-get upgrade -y \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
