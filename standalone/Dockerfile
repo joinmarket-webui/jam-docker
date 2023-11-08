@@ -78,7 +78,7 @@ RUN adduser --uid 704704 --system --group --gecos 'tor user' tor \
     && useradd --uid 7012348 --system -g joinmarket --comment 'ob-watcher user' jm-ob \
     && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
