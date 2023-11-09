@@ -9,7 +9,7 @@ ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
-FROM alpine:3.16.2 AS builder-base
+FROM alpine:3.18.3 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
@@ -31,7 +31,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 
 # --- dinit builder
-FROM debian:bullseye-20221004-slim AS dinit-builder
+FROM debian:bullseye-20230919-slim AS dinit-builder
 
 # install build dependencies
 RUN apt-get update \
@@ -61,7 +61,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-20221004-slim
+FROM debian:bullseye-20230919-slim
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
@@ -72,10 +72,13 @@ LABEL server-version=$JM_SERVER_REPO_REF
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN addgroup --system tor \
-    && adduser --system --disabled-login --ingroup tor --gecos 'tor user' tor \
+RUN adduser --uid 704704 --system --group --gecos 'tor user' tor \
+    && addgroup --gid 701234 --system joinmarket \
+    && useradd --uid 7012347 --system -g joinmarket --groups tor --comment 'jmwalletd user' --home-dir /data jm-w \
+    && useradd --uid 7012348 --system -g joinmarket --comment 'ob-watcher user' jm-ob \
+    && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
@@ -96,6 +99,8 @@ RUN addgroup --system tor \
     deb.torproject.org-keyring \
     # ui dependencies
     nginx \
+    # privilege separation dependency:
+    sudo \
     # cleanup 
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
@@ -104,9 +109,9 @@ COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
-ENV DATADIR /root/.joinmarket
+ENV DATADIR /data/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
-ENV DEFAULT_CONFIG /root/default.cfg
+ENV DEFAULT_CONFIG /data/default.cfg
 ENV PATH /src/scripts:$PATH
 
 WORKDIR /src
