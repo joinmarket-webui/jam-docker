@@ -41,7 +41,7 @@ WORKDIR /usr/src/dinit
 
 # checkout and build project
 # see: https://github.com/davmac314/dinit/releases
-RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.17.0" \
+RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.18.0" \
     && make \
     && export ASAN_OPTIONS=detect_leaks=0 \
     && make check \
