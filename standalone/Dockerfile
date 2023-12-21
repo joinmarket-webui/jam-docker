@@ -76,6 +76,7 @@ RUN adduser --uid 704704 --system --group --gecos 'tor user' tor \
     && addgroup --gid 701234 --system joinmarket \
     && useradd --uid 7012347 --system -g joinmarket --groups tor --comment 'jmwalletd user' --home-dir /data jm-w \
     && useradd --uid 7012348 --system -g joinmarket --comment 'ob-watcher user' jm-ob \
+    && mkdir /data && chown :701234 /data \
     && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl ca-certificates \
