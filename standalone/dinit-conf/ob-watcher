@@ -1,5 +1,5 @@
 type = process
-command = python3 ob-watcher.py --host=127.0.0.1
+command = sudo -u jm-ob python3 ob-watcher.py --host=127.0.0.1
 working-dir = /src/scripts/obwatch
 depends-on = tor
 restart = true

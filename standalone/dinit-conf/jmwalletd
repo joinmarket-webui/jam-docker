@@ -1,5 +1,5 @@
 type = process
-command = python3 jmwalletd.py
+command = sudo -u jm-w python3 jmwalletd.py
 working-dir = /src/scripts
 depends-on = tor
 restart = true
