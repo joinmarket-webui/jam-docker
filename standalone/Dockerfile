@@ -9,7 +9,7 @@ ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
 # --- Builder base 
-FROM alpine:3.18.3 AS builder-base
+FROM alpine:3.19.1 AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
