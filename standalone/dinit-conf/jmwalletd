@@ -6,3 +6,5 @@ restart = true
 smooth-recovery = true
 start-timeout = 10
 logfile = /var/log/jam/jmwalletd_stdout.log
+logfile-gid = nginx
+logfile-permissions = 640
