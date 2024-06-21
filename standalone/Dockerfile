@@ -72,10 +72,14 @@ LABEL server-version=$JM_SERVER_REPO_REF
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN addgroup --system tor \
-    && adduser --system --disabled-login --ingroup tor --gecos 'tor user' tor \
+RUN adduser --uid 704704 --system --group --gecos 'tor user' tor \
+    && addgroup --gid 701234 --system joinmarket \
+    && useradd --uid 7012347 --system -g joinmarket --groups tor --comment 'jmwalletd user' --home-dir /data jm-w \
+    && useradd --uid 7012348 --system -g joinmarket --comment 'ob-watcher user' jm-ob \
+    && mkdir /data && chown :701234 /data \
+    && sed "s|http://|https://|" /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
@@ -96,6 +100,8 @@ RUN addgroup --system tor \
     deb.torproject.org-keyring \
     # ui dependencies
     nginx \
+    # privilege separation dependency:
+    sudo \
     # cleanup 
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
@@ -104,9 +110,9 @@ COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
-ENV DATADIR /root/.joinmarket
+ENV DATADIR /data/.joinmarket
 ENV CONFIG ${DATADIR}/joinmarket.cfg
-ENV DEFAULT_CONFIG /root/default.cfg
+ENV DEFAULT_CONFIG /data/default.cfg
 ENV PATH /src/scripts:$PATH
 
 WORKDIR /src
