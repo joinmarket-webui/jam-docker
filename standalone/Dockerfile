@@ -8,8 +8,14 @@ ARG JAM_REPO_REF=master
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
+ARG NODE_VERSION=22.3.0
+ARG ALPINE_VERSION=3.19.1
+ARG DEBIAN_VERSION=bullseye-20240211-slim
+
+FROM node:${NODE_VERSION}-alpine AS node
+
 # --- Builder base 
-FROM alpine:3.19.1 AS builder-base
+FROM alpine:${ALPINE_VERSION} AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
@@ -18,8 +24,10 @@ FROM builder-base AS ui-builder
 ARG JAM_REPO
 ARG JAM_REPO_REF
 
-# install build dependencies
-RUN apk add --no-cache --update nodejs npm
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
 
 WORKDIR /usr/src/jam
 
@@ -31,7 +39,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 
 # --- dinit builder
-FROM debian:bullseye-20240211-slim AS dinit-builder
+FROM debian:${DEBIAN_VERSION} AS dinit-builder
 
 # install build dependencies
 RUN apt-get update \
@@ -61,7 +69,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:bullseye-20240211-slim
+FROM debian:${DEBIAN_VERSION}
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
