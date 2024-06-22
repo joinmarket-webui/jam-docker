@@ -104,10 +104,10 @@ COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
-ENV DATADIR /root/.joinmarket
-ENV CONFIG ${DATADIR}/joinmarket.cfg
-ENV DEFAULT_CONFIG /root/default.cfg
-ENV PATH /src/scripts:$PATH
+ENV DATADIR=/root/.joinmarket
+ENV CONFIG=${DATADIR}/joinmarket.cfg
+ENV DEFAULT_CONFIG=/root/default.cfg
+ENV PATH=/src/scripts:$PATH
 
 WORKDIR /src
 
