@@ -5,9 +5,20 @@ ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
 ARG JAM_REPO_REF=master
 
-FROM alpine:3.19.1 AS builder-base
+ARG NODE_VERSION=22.3.0
+ARG ALPINE_VERSION=3.19.1
+
+FROM node:${NODE_VERSION}-alpine AS node
+
+FROM alpine:${ALPINE_VERSION} AS builder-base
+
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
 # install build dependencies
-RUN apk add --no-cache --update git nodejs npm
+RUN apk add --no-cache --update git
 
 # ---
 FROM builder-base AS builder
