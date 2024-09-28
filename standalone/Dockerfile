@@ -11,6 +11,7 @@ ARG JM_SERVER_REPO_REF=master
 ARG NODE_VERSION=22.9.0
 ARG ALPINE_VERSION=3.20.3
 ARG DEBIAN_VERSION=bullseye-20240926-slim
+ARG DINIT_VERSION=0.19.0
 
 FROM node:${NODE_VERSION}-alpine AS node
 
@@ -40,6 +41,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 # --- dinit builder
 FROM debian:${DEBIAN_VERSION} AS dinit-builder
+ARG DINIT_VERSION
 
 # install build dependencies
 RUN apt-get update \
@@ -49,7 +51,7 @@ WORKDIR /usr/src/dinit
 
 # checkout and build project
 # see: https://github.com/davmac314/dinit/releases
-RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v0.18.0" \
+RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT_VERSION" \
     && make \
     && export ASAN_OPTIONS=detect_leaks=0 \
     && make check \
