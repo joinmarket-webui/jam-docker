@@ -5,8 +5,8 @@ ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
 ARG JAM_REPO_REF=master
 
-ARG NODE_VERSION=22.3.0
-ARG ALPINE_VERSION=3.19.1
+ARG NODE_VERSION=22.9.0
+ARG ALPINE_VERSION=3.20.3
 
 FROM node:${NODE_VERSION}-alpine AS node
 
