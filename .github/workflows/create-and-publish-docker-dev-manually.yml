@@ -17,6 +17,11 @@ on:
         required: true
         default: 'master'
         type: string
+      verify_release:
+        description: 'enable or disable release verification'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   image-manually:
@@ -26,3 +31,4 @@ jobs:
       ui_repo_ref: ${{ github.event.inputs.ui_repo_ref }}
       server_repo_ref: ${{ github.event.inputs.server_repo_ref }}
       image_name_prefix: joinmarket-webui/jam-dev-
+      verify_release: ${{ github.event.inputs.verify_release }}

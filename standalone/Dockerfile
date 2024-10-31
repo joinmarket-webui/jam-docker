@@ -31,9 +31,9 @@ RUN apk add --no-cache --update git gnupg
 
 # --- UI builder 
 FROM builder-base AS ui-builder
+ARG VERIFY_RELEASE
 ARG JAM_REPO
 ARG JAM_REPO_REF
-ARG VERIFY_RELEASE
 
 COPY --from=node /usr/lib /usr/lib
 COPY --from=node /usr/local/lib /usr/local/lib
@@ -78,6 +78,7 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT
 
 # --- SERVER builder
 FROM builder-base AS server-builder
+ARG VERIFY_RELEASE
 ARG JM_SERVER_REPO
 ARG JM_SERVER_REPO_REF
 

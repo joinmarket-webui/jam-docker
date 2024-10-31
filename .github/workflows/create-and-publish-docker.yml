@@ -16,9 +16,14 @@ on:
         required: true
         type: string
       image_name_prefix:
-        description: 'image name prefix: e.g. joinmarket-webui/jam-'
+        description: 'image name prefix (e.g. joinmarket-webui/jam-)'
         required: true
         type: string
+      verify_release:
+        description: 'enable or disable release verification'
+        required: false
+        default: true
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -72,3 +77,4 @@ jobs:
           build-args: |
             JAM_REPO_REF=${{ inputs.ui_repo_ref }}
             JM_SERVER_REPO_REF=${{ inputs.server_repo_ref }}
+            VERIFY_RELEASE=${{ inputs.verify_release }}

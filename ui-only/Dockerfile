@@ -31,9 +31,9 @@ RUN apk add --no-cache --update git gnupg
 
 # --- UI builder 
 FROM builder-base AS builder
+ARG VERIFY_RELEASE
 ARG JAM_REPO
 ARG JAM_REPO_REF
-ARG VERIFY_RELEASE
 
 WORKDIR /usr/src/app
 
