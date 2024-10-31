@@ -8,6 +8,8 @@ ARG JAM_REPO_REF=master
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
+ARG VERIFY_RELEASE=true
+
 ARG NODE_IMAGE_VERSION=22.11.0
 ARG NODE_IMAGE_HASH=f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3
 ARG NODE_IMAGE=node:${NODE_IMAGE_VERSION}-alpine@sha256:${NODE_IMAGE_HASH}
@@ -17,6 +19,7 @@ ARG ALPINE_IMAGE=alpine:${ALPINE_IMAGE_VERSION}@sha256:${ALPINE_IMAGE_HASH}
 ARG DEBIAN_IMAGE_VERSION=bullseye-20240926-slim
 ARG DEBIAN_IMAGE_HASH=3f9e53602537cc817d96f0ebb131a39bdb16fa8b422137659a9a597e7e3853c1
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
+
 ARG DINIT_VERSION=0.19.0
 
 FROM ${NODE_IMAGE} AS node
@@ -30,6 +33,7 @@ RUN apk add --no-cache --update git gnupg
 FROM builder-base AS ui-builder
 ARG JAM_REPO
 ARG JAM_REPO_REF
+ARG VERIFY_RELEASE
 
 COPY --from=node /usr/lib /usr/lib
 COPY --from=node /usr/local/lib /usr/local/lib
@@ -42,8 +46,10 @@ COPY pubkeys/ /pubkeys
 
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
-    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-    && git verify-tag "$JAM_REPO_REF" \
+    && (if [ "$VERIFY_RELEASE" != "false" ]; then \
+        find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+        && git verify-tag "$JAM_REPO_REF"; \
+    fi) \
     && npm install --no-fund --no-audit \
     && npm run build
 # --- UI builder - end
@@ -80,8 +86,10 @@ WORKDIR /usr/src/joinmarket-clientserver
 COPY pubkeys/ /pubkeys
 
 RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF" \
-    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-    && git verify-tag "$JM_SERVER_REPO_REF"
+    && (if [ "$VERIFY_RELEASE" != "false" ]; then \
+        find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+        && git verify-tag "$JM_SERVER_REPO_REF"; \
+    fi)
 # --- SERVER builder - end
 
 # --- RUNTIME builder

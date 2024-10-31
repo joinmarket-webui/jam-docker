@@ -15,20 +15,30 @@ docker pull ghcr.io/joinmarket-webui/jam-ui-only:latest
 
 ### Environment variables
 
-The following environment variables control the configuration
+The following environment variables control the configuration:
 - `JAM_JMWALLETD_HOST` (required; jmwalletd hostname)
 - `JAM_JMWALLETD_API_PORT` (required; jmwalletd api port)
 - `JAM_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
 - `JAM_JMOBWATCH_PORT` (required; ob-watcher port)
 
 ### Building Notes
+Building a specific release:
 ```sh
 docker build --label "local" \
+        --build-arg JAM_REPO_REF=v0.3.0 \
+        --tag "joinmarket-webui/jam-ui-only" ./ui-only
+```
+
+Building from a specific branch (with disabled release verification):
+```sh
+docker build --label "local" \
+        --build-arg VERIFY_RELEASE=false \
         --build-arg JAM_REPO_REF=master \
         --tag "joinmarket-webui/jam-ui-only" ./ui-only
 ```
 
 #### Build args
+- `VERIFY_RELEASE` (optional, defaults to `true`; enable or disable release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 
@@ -74,7 +84,7 @@ docker pull ghcr.io/joinmarket-webui/jam-standalone:latest
 ```
 
 ### Environment variables
-The following environment variables control the configuration
+The following environment variables control the configuration:
 - `APP_USER` (optional; username used for basic authentication)
 - `APP_PASSWORD` (optional, but required if `APP_USER` is provided; password used for basic authentication)
 - `ENSURE_WALLET` (optional, defaults to `false`; create and load the wallet in bitcoin core on startup)
@@ -87,17 +97,27 @@ Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `JM_GAPLIMIT: 2000` will set the `gaplimit` config value to `2000`
 
 ### Building Notes
+Building a specific release:
 ```sh
 docker build --label "local" \
+        --build-arg JAM_REPO_REF=v0.3.0 \
+        --build-arg JM_SERVER_REPO_REF=v0.9.11 \
+        --tag "joinmarket-webui/jam-standalone" ./standalone
+```
+
+Building from a specific branch (with disabled release verification):
+```sh
+docker build --label "local" \
+        --build-arg VERIFY_RELEASE=false \
         --build-arg JAM_REPO_REF=master \
         --build-arg JM_SERVER_REPO_REF=master \
         --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
 
 #### Build args
+- `VERIFY_RELEASE` (optional, defaults to `true`; enable or disable release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
----
 - `JM_SERVER_REPO` (server git repo; defaults to `https://github.com/JoinMarket-Org/joinmarket-clientserver`)
 - `JM_SERVER_REPO_REF` (server git ref; defaults to `master`)
 

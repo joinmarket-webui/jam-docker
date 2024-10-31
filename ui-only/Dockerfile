@@ -5,6 +5,8 @@ ARG MAINTAINER='Jam https://github.com/joinmarket-webui'
 ARG JAM_REPO=https://github.com/joinmarket-webui/jam
 ARG JAM_REPO_REF=master
 
+ARG VERIFY_RELEASE=true
+
 ARG NODE_IMAGE_VERSION=22.11.0
 ARG NODE_IMAGE_HASH=f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3
 ARG NODE_IMAGE=node:${NODE_IMAGE_VERSION}-alpine@sha256:${NODE_IMAGE_HASH}
@@ -27,10 +29,11 @@ COPY --from=node /usr/local/bin /usr/local/bin
 # install build dependencies
 RUN apk add --no-cache --update git gnupg
 
-# ---
+# --- UI builder 
 FROM builder-base AS builder
 ARG JAM_REPO
 ARG JAM_REPO_REF
+ARG VERIFY_RELEASE
 
 WORKDIR /usr/src/app
 
@@ -38,10 +41,13 @@ COPY pubkeys/ /pubkeys
 
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
-    && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-    && git verify-tag "$JAM_REPO_REF" \
+    && (if [ "$VERIFY_RELEASE" != "false" ]; then \
+        find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+        && git verify-tag "$JAM_REPO_REF"; \
+    fi) \
     && npm install --no-fund --no-audit \
     && npm run build
+# --- UI builder - end
 
 # ---
 FROM ${NGINX_IMAGE} AS runtime
