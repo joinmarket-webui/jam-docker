@@ -53,8 +53,7 @@ COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 # the `.template` suffix) into `/etc/nginx/conf.d/`.
 COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
-COPY jam-entrypoint.sh /
-RUN chmod +x /jam-entrypoint.sh
+COPY --chmod=0755 jam-entrypoint.sh /
 
 ENTRYPOINT  [ "/jam-entrypoint.sh" ]
 

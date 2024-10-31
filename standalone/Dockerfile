@@ -137,8 +137,7 @@ COPY --chown=tor:tor torrc /etc/tor/torrc
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-COPY jam-entrypoint.sh /
-RUN chmod +x /jam-entrypoint.sh
+COPY --chmod=0755 jam-entrypoint.sh /
 
 # nginx
 EXPOSE 80
