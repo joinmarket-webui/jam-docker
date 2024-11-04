@@ -8,15 +8,21 @@ ARG JAM_REPO_REF=master
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
-ARG NODE_VERSION=22.11.0
-ARG ALPINE_VERSION=3.20.3
-ARG DEBIAN_VERSION=bullseye-20240926-slim
+ARG NODE_IMAGE_VERSION=22.11.0
+ARG NODE_IMAGE_HASH=f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3
+ARG NODE_IMAGE=node:${NODE_IMAGE_VERSION}-alpine@sha256:${NODE_IMAGE_HASH}
+ARG ALPINE_IMAGE_VERSION=3.20.3
+ARG ALPINE_IMAGE_HASH=beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d
+ARG ALPINE_IMAGE=alpine:${ALPINE_IMAGE_VERSION}@sha256:${ALPINE_IMAGE_HASH}
+ARG DEBIAN_IMAGE_VERSION=bullseye-20240926-slim
+ARG DEBIAN_IMAGE_HASH=3f9e53602537cc817d96f0ebb131a39bdb16fa8b422137659a9a597e7e3853c1
+ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 ARG DINIT_VERSION=0.19.0
 
-FROM node:${NODE_VERSION}-alpine AS node
+FROM ${NODE_IMAGE} AS node
 
 # --- Builder base 
-FROM alpine:${ALPINE_VERSION} AS builder-base
+FROM ${ALPINE_IMAGE} AS builder-base
 RUN apk add --no-cache --update git
 # --- Builder base - end
 
@@ -40,7 +46,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
 
 
 # --- dinit builder
-FROM debian:${DEBIAN_VERSION} AS dinit-builder
+FROM ${DEBIAN_IMAGE} AS dinit-builder
 ARG DINIT_VERSION
 
 # install build dependencies
@@ -71,14 +77,14 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF"
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM debian:${DEBIAN_VERSION}
+FROM ${DEBIAN_IMAGE}
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
 
 LABEL maintainer="$MAINTAINER"
-LABEL ui-version=$JAM_REPO_REF
-LABEL server-version=$JM_SERVER_REPO_REF
+LABEL ui-version="$JAM_REPO_REF"
+LABEL server-version="$JM_SERVER_REPO_REF"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -129,7 +135,7 @@ RUN ./install.sh --docker-install --without-qt \
 RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
     && rm --force /var/log/dpkg.log
 
-COPY default.cfg ${DEFAULT_CONFIG}
+COPY default.cfg "${DEFAULT_CONFIG}"
 COPY dinit-conf/* /etc/dinit.d/
 COPY .bashrc /root/.bashrc
 COPY --chown=tor:tor torrc /etc/tor/torrc
