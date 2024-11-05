@@ -8,7 +8,7 @@ ARG JAM_REPO_REF=master
 ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
-ARG VERIFY_RELEASE=true
+ARG SKIP_RELEASE_VERIFICATION=false
 
 ARG NODE_IMAGE_VERSION=22.11.0
 ARG NODE_IMAGE_HASH=f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3
@@ -31,7 +31,7 @@ RUN apk add --no-cache --update git gnupg
 
 # --- UI builder 
 FROM builder-base AS ui-builder
-ARG VERIFY_RELEASE
+ARG SKIP_RELEASE_VERIFICATION
 ARG JAM_REPO
 ARG JAM_REPO_REF
 
@@ -46,7 +46,7 @@ COPY pubkeys/ /pubkeys
 
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
-    && (if [ "$VERIFY_RELEASE" != "false" ]; then \
+    && (if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
         && git verify-tag "$JAM_REPO_REF"; \
     fi) \
@@ -78,7 +78,7 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT
 
 # --- SERVER builder
 FROM builder-base AS server-builder
-ARG VERIFY_RELEASE
+ARG SKIP_RELEASE_VERIFICATION
 ARG JM_SERVER_REPO
 ARG JM_SERVER_REPO_REF
 
@@ -87,7 +87,7 @@ WORKDIR /usr/src/joinmarket-clientserver
 COPY pubkeys/ /pubkeys
 
 RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF" \
-    && (if [ "$VERIFY_RELEASE" != "false" ]; then \
+    && (if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
         && git verify-tag "$JM_SERVER_REPO_REF"; \
     fi)

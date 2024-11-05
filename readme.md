@@ -32,13 +32,13 @@ docker build --label "local" \
 Building from a specific branch (with disabled release verification):
 ```sh
 docker build --label "local" \
-        --build-arg VERIFY_RELEASE=false \
+        --build-arg SKIP_RELEASE_VERIFICATION=true \
         --build-arg JAM_REPO_REF=master \
         --tag "joinmarket-webui/jam-ui-only" ./ui-only
 ```
 
 #### Build args
-- `VERIFY_RELEASE` (optional, defaults to `true`; enable or disable release verification)
+- `SKIP_RELEASE_VERIFICATION` (optional, defaults to `false`; enable skipping release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 
@@ -108,14 +108,14 @@ docker build --label "local" \
 Building from a specific branch (with disabled release verification):
 ```sh
 docker build --label "local" \
-        --build-arg VERIFY_RELEASE=false \
+        --build-arg SKIP_RELEASE_VERIFICATION=true \
         --build-arg JAM_REPO_REF=master \
         --build-arg JM_SERVER_REPO_REF=master \
         --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
 
 #### Build args
-- `VERIFY_RELEASE` (optional, defaults to `true`; enable or disable release verification)
+- `SKIP_RELEASE_VERIFICATION` (optional, defaults to `false`; enable skipping release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 - `JM_SERVER_REPO` (server git repo; defaults to `https://github.com/JoinMarket-Org/joinmarket-clientserver`)
