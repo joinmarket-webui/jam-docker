@@ -26,20 +26,36 @@ system-info:
 
 # create "ui" docker image
 [group("docker")]
-docker-build-ui:
+docker-build-ui jam_repo_ref=env('JAM_REPO_REF') *args='':
     @echo "Creating 'ui' docker image ..."
-    @docker build --label "local" \
-        --build-arg JAM_REPO_REF=$JAM_REPO_REF \
+    @docker build {{args}} \
+        --label "local" \
+        --build-arg JAM_REPO_REF={{jam_repo_ref}} \
         --tag "joinmarket-webui/jam-ui-only" ./ui-only
+
+# create "ui" docker image from master
+[group("docker")]
+docker-build-ui-master *args='':
+    @just docker-build-ui master \
+        --build-arg SKIP_RELEASE_VERIFICATION=true \
+        {{args}}
 
 # create "standalone" docker image
 [group("docker")]
-docker-build-standalone:
+docker-build-standalone jam_repo_ref=env('JAM_REPO_REF') jm_server_repo_ref=env('JM_SERVER_REPO_REF') *args='':
     @echo "Creating 'standalone' docker image ..."
-    @docker build --label "local" \
-        --build-arg JAM_REPO_REF=$JAM_REPO_REF \
-        --build-arg JM_SERVER_REPO_REF=$JM_SERVER_REPO_REF \
+    @docker build {{args}} \
+        --label "local" \
+        --build-arg JAM_REPO_REF={{jam_repo_ref}} \
+        --build-arg JM_SERVER_REPO_REF={{jm_server_repo_ref}} \
         --tag "joinmarket-webui/jam-standalone" ./standalone
+
+# create "standalone" docker image from master
+[group("docker")]
+docker-build-standalone-master *args='':
+    @just docker-build-standalone master master \
+        --build-arg SKIP_RELEASE_VERIFICATION=true \
+        {{args}}
 
 # run shell in "standalone" docker container
 [group("docker")]
