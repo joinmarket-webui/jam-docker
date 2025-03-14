@@ -110,7 +110,7 @@ COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
 RUN addgroup --system tor \
-    && adduser --system --disabled-login --ingroup tor --gecos 'tor user' tor \
+    && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
