@@ -44,7 +44,7 @@ docker-build-ui-master *args='':
 [group("docker")]
 docker-build-standalone jam_repo_ref=env('JAM_REPO_REF') jm_server_repo_ref=env('JM_SERVER_REPO_REF') *args='':
     @echo "Creating 'standalone' docker image ..."
-    @docker build {{args}} \
+    @docker buildx build {{args}} \
         --label "local" \
         --build-arg JAM_REPO_REF={{jam_repo_ref}} \
         --build-arg JM_SERVER_REPO_REF={{jm_server_repo_ref}} \
@@ -55,6 +55,12 @@ docker-build-standalone jam_repo_ref=env('JAM_REPO_REF') jm_server_repo_ref=env(
 docker-build-standalone-master *args='':
     @just docker-build-standalone master master \
         --build-arg SKIP_RELEASE_VERIFICATION=true \
+        {{args}}
+
+[group("docker")]
+docker-buildx-standalone-master *args='':
+    @just docker-build-standalone-master \
+        --platform linux/amd64,linux/arm64 \
         {{args}}
 
 # run shell in "standalone" docker container
