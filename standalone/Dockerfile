@@ -61,7 +61,7 @@ ARG DINIT_VERSION
 
 # install build dependencies
 RUN apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y ca-certificates git gcc make m4 g++
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes ca-certificates git gcc make m4 g++
 
 WORKDIR /usr/src/dinit
 
@@ -112,7 +112,7 @@ COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 RUN addgroup --system tor \
     && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg curl apt-transport-https ca-certificates \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes gnupg curl apt-transport-https ca-certificates \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
@@ -123,7 +123,7 @@ RUN addgroup --system tor \
     && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list" \
     # install dependencies
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --no-install-suggests -y \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # image dependencies
     tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
@@ -150,7 +150,7 @@ RUN pip3 config set global.break-system-packages true \
     && rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 # cleanup and remove ephemeral dependencies
-RUN apt-get remove --purge --auto-remove -y gnupg python3-pip apt-transport-https \
+RUN apt-get remove --purge --auto-remove --yes gnupg python3-pip apt-transport-https \
     && rm --force /var/log/dpkg.log
 
 COPY default.cfg "${DEFAULT_CONFIG}"
