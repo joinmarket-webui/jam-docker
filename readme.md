@@ -49,7 +49,7 @@ docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/jam-ui-only
 
 ### Run
 ```sh
-docker run --rm  -it \
+docker run --rm -it \
         --add-host host.docker.internal:host-gateway \
         --env JAM_JMWALLETD_HOST="host.docker.internal" \
         --env JAM_JMWALLETD_API_PORT="28183" \
@@ -62,7 +62,7 @@ docker run --rm  -it \
 or (using the host network)
 
 ```sh
-docker run --rm  -it \
+docker run --rm -it \
         --network host \
         --env JAM_JMWALLETD_HOST="localhost" \
         --env JAM_JMWALLETD_API_PORT="28183" \
@@ -128,7 +128,7 @@ docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 
 ### Run
 ```sh
-docker run --rm  -it \
+docker run --rm -it \
         --add-host host.docker.internal:host-gateway \
         --env JM_RPC_HOST="host.docker.internal" \
         --env JM_RPC_PORT="18443" \
@@ -150,15 +150,6 @@ docker run --rm  -it \
 ```sh
 docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
 ```
-
-
-## TODO
-- Do not run as root inside container.
-  - Clarify what it takes for all services to be started as non-root user.
-  - See [joinmarket-clientserver#PR699](https://github.com/JoinMarket-Org/joinmarket-clientserver/pull/669) and
-    [dmp1ce/joinmarket-DOCKERFILE](https://github.com/dmp1ce/joinmarket-DOCKERFILE)
-- Make irc config options editable via environment variables
-  - A coinjoin on regtest is not possible, because these params can only be replaced by mounting an own `joinmarket.cfg`
 
 
 ## Resources
