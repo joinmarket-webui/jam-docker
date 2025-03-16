@@ -82,3 +82,7 @@ extract-default-config:
     @docker exec -it jam-dev-create-config cat /root/.joinmarket/joinmarket.cfg > standalone/default.cfg
     @echo "Stopping docker container..."
     @docker stop jam-dev-create-config
+
+[group("development")]
+probe-directory-node onion_url port='5222':
+    @curl --verbose --proxy socks5h://localhost:9050 {{onion_url}}:{{port}}
