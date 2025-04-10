@@ -73,6 +73,14 @@ docker-run-shell-standalone:
 docker-image-size:
     @docker images "joinmarket-webui/jam-*"
 
+[group("docker")]
+docker-lint-ui-only:
+    @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/Dockerfile"
+
+[group("docker")]
+docker-lint-standalone:
+    @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
+
 [group("development")]
 extract-default-config:
     @echo "Starting docker container to extract default configuration..."
