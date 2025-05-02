@@ -81,6 +81,13 @@ docker-lint-ui-only:
 docker-lint-standalone:
     @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
 
+# push docker image manually
+[group("docker")]
+docker-push username image_name tag:
+    # this exists in case ci actoin fails (e.g. because if resource exhaustion)
+    @docker login --username {{username}} --password-stdin ghcr.io
+    @docker push ghcr.io/{{image_name}}:{{tag}}
+
 [group("development")]
 extract-default-config:
     @echo "Starting docker container to extract default configuration..."
