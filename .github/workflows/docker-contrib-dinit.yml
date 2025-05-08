@@ -41,7 +41,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.7.0
         with:
-          images: ${{ env.REGISTRY }}/jam-contrib-dinit
+          images: ${{ env.REGISTRY }}/joinmarket-webui/jam-contrib-dinit
           labels: |
             org.opencontainers.image.title=jam-contrib-dinit
             org.opencontainers.image.version=${{ inputs.dinit_version }}
