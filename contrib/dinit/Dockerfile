@@ -8,7 +8,7 @@ ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
 ARG DINIT_VERSION=0.19.3
 
-FROM ${DEBIAN_IMAGE}
+FROM ${DEBIAN_IMAGE} AS builder
 ARG DINIT_VERSION
 
 # install build dependencies
@@ -26,3 +26,6 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT
     && make check-igr \
     && mkdir dinit-bin \
     && make DESTDIR="$(pwd)/dinit-bin" install
+
+FROM scratch
+COPY --from=builder /usr/src/dinit/dinit-bin/sbin /out
