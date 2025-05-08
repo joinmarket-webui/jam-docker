@@ -31,6 +31,22 @@ FROM ${ALPINE_IMAGE} AS builder-base
 RUN apk add --no-cache --update git gnupg
 # --- Builder base - end
 
+FROM ${DEBIAN_IMAGE} AS runtime-base
+RUN apt-get update \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes gnupg curl apt-transport-https ca-certificates
+
+# add nginx debian repo
+RUN curl --silent https://nginx.org/keys/nginx_signing.key | \
+    gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian bookworm nginx' > /etc/apt/sources.list.d/nginx.list"
+# add tor debian repo
+RUN curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
+    gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list"
+
+# install dependencies
+RUN apt-get update
+
 # --- UI builder 
 FROM builder-base AS ui-builder
 ARG SKIP_RELEASE_VERIFICATION
@@ -76,7 +92,7 @@ RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF" \
 # --- SERVER builder - end
 
 # --- RUNTIME builder
-FROM ${DEBIAN_IMAGE}
+FROM runtime-base
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
@@ -92,31 +108,27 @@ COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
 RUN addgroup --system tor \
-    && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor \
-    && apt-get update \
-    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes gnupg curl apt-transport-https ca-certificates \
-    # add nginx debian repo
-    && curl --silent https://nginx.org/keys/nginx_signing.key | \
-    gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/mainline/debian/ bookworm nginx' > /etc/apt/sources.list.d/nginx.list" \
-    # add tor debian repo
-    && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
-    gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list" \
-    # install dependencies
-    && apt-get update \
-    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
+    && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor
+
+RUN apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # image dependencies
-    tini iproute2 procps vim jq \
+    tini iproute2 procps vim jq
+
+RUN apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # servers dependencies (see `install.sh`)
-    build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
+    build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev
+
+RUN apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # tor
     tor \
-    deb.torproject.org-keyring \
+    deb.torproject.org-keyring
+
+RUN apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # ui dependencies
-    nginx \
-    # cleanup 
-    && apt-get clean \
+    nginx
+
+# cleanup 
+RUN apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
 
 ENV DATADIR=/root/.joinmarket
