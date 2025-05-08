@@ -102,9 +102,9 @@ RUN addgroup --system tor \
     # add tor debian repo
     && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
     gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list"
-# install dependencies
-RUN apt-get update \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list" \
+    # install dependencies
+    && apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # image dependencies
     tini iproute2 procps vim jq \
