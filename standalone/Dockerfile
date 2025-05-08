@@ -20,7 +20,9 @@ ARG DEBIAN_IMAGE_VERSION=bookworm-20250224-slim
 ARG DEBIAN_IMAGE_HASH=12c396bd585df7ec21d5679bb6a83d4878bc4415ce926c9e5ea6426d23c60bdc
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
-ARG DINIT_VERSION=0.19.3
+ARG DINIT_IMAGE_VERSION=0.19.3
+ARG DINIT_IMAGE_HASH=632163119c6cd10e825b3fa60d6bcee11c99828a8f430dec02c85b484b9b11dc
+ARG DINIT_IMAGE=ghcr.io/joinmarket-webui/jam-contrib-dinit:${DINIT_IMAGE_VERSION}@sha256:${DINIT_IMAGE_HASH}
 
 FROM ${NODE_IMAGE} AS node
 
@@ -54,27 +56,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && npm run build
 # --- UI builder - end
 
-
-# --- dinit builder
-FROM ${DEBIAN_IMAGE} AS dinit-builder
-ARG DINIT_VERSION
-
-# install build dependencies
-RUN apt-get update \
-    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes ca-certificates git gcc make m4 g++
-
-WORKDIR /usr/src/dinit
-
-# checkout and build project
-# see: https://github.com/davmac314/dinit/releases
-RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT_VERSION" \
-    && make \
-    && export ASAN_OPTIONS=detect_leaks=0 \
-    && make check \
-    && make check-igr \
-    && mkdir dinit-bin \
-    && make DESTDIR="$(pwd)/dinit-bin" install
-# --- dinit builder - end
+FROM ${DINIT_IMAGE} AS dinit
 
 # --- SERVER builder
 FROM builder-base AS server-builder
@@ -105,7 +87,7 @@ LABEL server-version="$JM_SERVER_REPO_REF"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-COPY --from=dinit-builder /usr/src/dinit/dinit-bin/sbin /sbin
+COPY --from=dinit /out /sbin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
