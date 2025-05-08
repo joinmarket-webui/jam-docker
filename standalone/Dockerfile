@@ -98,13 +98,13 @@ RUN addgroup --system tor \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/mainline/debian/ bookworm nginx' > /etc/apt/sources.list.d/nginx.list" \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian bookworm nginx' > /etc/apt/sources.list.d/nginx.list" \
     # add tor debian repo
     && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
     gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
-    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list" \
-    # install dependencies
-    && apt-get update \
+    && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list"
+# install dependencies
+RUN apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # image dependencies
     tini iproute2 procps vim jq \
