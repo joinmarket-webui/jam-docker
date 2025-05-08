@@ -68,6 +68,14 @@ docker-buildx-standalone-master *args='':
 docker-run-shell-standalone:
     @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 
+# create "contrib/dinit" docker image
+[group("docker")]
+docker-build-contrib-dinit *args='':
+    @echo "Creating 'dinit' docker image ..."
+    @docker buildx build {{args}} \
+        --label "local" \
+        --tag "joinmarket-webui/jam-contrib-dinit" ./contrib/dinit
+
 # size of the docker images
 [group("docker")]
 docker-image-size:
