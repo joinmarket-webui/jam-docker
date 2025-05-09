@@ -99,6 +99,7 @@ RUN addgroup --system tor \
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
     && sh -c "echo 'deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian bookworm nginx' > /etc/apt/sources.list.d/nginx.list" \
+    && echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx > /dev/null \
     # add tor debian repo
     && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
     gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
