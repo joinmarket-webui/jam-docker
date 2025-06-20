@@ -19,6 +19,7 @@ The following environment variables control the configuration:
 - `JAM_JMWALLETD_HOST` (required; jmwalletd hostname)
 - `JAM_JMWALLETD_API_PORT` (required; jmwalletd api port)
 - `JAM_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
+- `JAM_JMOBWATCH_HOST` (optional; ob-watcher host; if not set `JAM_JMWALLETD_HOST` will be used)
 - `JAM_JMOBWATCH_PORT` (required; ob-watcher port)
 
 ### Building Notes
