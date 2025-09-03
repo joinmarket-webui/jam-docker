@@ -27,7 +27,7 @@ if [ -n "${APP_USER}" ]; then
     sed -i 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
 fi
 
-if [ ! -z "${JAM_UI_PORT##*[!0-9]*}" ]; then
+if [ -n "${JAM_UI_PORT##*[!0-9]*}" ]; then
     echo "UI will be served on port ${JAM_UI_PORT}."
     sed -i "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
     sed -i "s/listen [::]:80;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
@@ -70,10 +70,11 @@ if [ "${jmenv['network']}" = "regtest" ]; then
     jmenv['network']='testnet'
 fi
 
-# For every env variable JM_FOO=BAR, replace the default configuration value of 'foo' by 'BAR'
+# for every env variable JM_FOO=BAR, replace the default configuration value of 'foo' by 'BAR'
 for key in "${!jmenv[@]}"; do
     val="${jmenv[${key}]}"
-    sed -i "s/^$key =.*/$key = $val/g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
+    sed -i "s/^#$key =/$key =/g" "$CONFIG"
+    sed -i "s|^$key =.*|$key = $val|g" "$CONFIG" || echo "Couldn't set : $key = $val, please modify $CONFIG manually"
 done
 
 # wait for a ready file to be created if necessary
@@ -83,8 +84,24 @@ if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
     echo "Successfully waited for file $READY_FILE to be created."
 fi
 
-btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
 btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
+
+# determine RPC authentication method
+if [ -n "${jmenv['rpc_cookie_file']}" ]; then
+    echo "Using RPC cookie authentication with file: ${jmenv['rpc_cookie_file']}"
+    btcauth_arg="--cookie ${jmenv['rpc_cookie_file']}"
+
+    # using cookie auth, comment out user/password
+    sed -i 's/^rpc_user =/#rpc_user =/g' "$CONFIG"
+    sed -i 's/^rpc_password =/#rpc_password =/g' "$CONFIG"
+else
+    echo "Using RPC user/password authentication"
+    btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
+    btcauth_arg="--user ${btcuser}"
+
+    # using user/password auth, comment out cookie file
+    sed -i 's/^rpc_cookie_file =/#rpc_cookie_file =/g' "$CONFIG"
+fi
 
 # wait for bitcoind to accept RPC requests if necessary
 if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
@@ -99,7 +116,7 @@ if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
     }"
     # generally only testing for a non-error response would be enough, but 
     # waiting for blocks >= 100 is needed for regtest environments as well!
-    until curl --silent --show-error --user "${btcuser}" --data-binary "${getblockchaininfo_payload}" "${btchost}" 2>&1 | jq -e ".result.blocks >= 100" > /dev/null 2>&1
+    until curl --silent --show-error "${btcauth_arg}" --data-binary "${getblockchaininfo_payload}" "${btchost}" 2>&1 | jq -e ".result.blocks >= 100" > /dev/null 2>&1
     do
         sleep 5
     done
@@ -121,7 +138,7 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
             \"load_on_startup\":true\
         }\
     }"
-    curl --silent --user "${btcuser}" --data-binary "${create_payload}" "${btchost}" > /dev/null || true
+    curl --silent "${btcauth_arg}" --data-binary "${create_payload}" "${btchost}" > /dev/null || true
 
     echo "Loading wallet $wallet_name..."
     load_payload="{\
@@ -133,7 +150,7 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
             \"load_on_startup\":true\
         }\
     }"
-    curl --silent --user "${btcuser}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
+    curl --silent "${btcauth_arg}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
 fi
 
 exec /sbin/dinit --container

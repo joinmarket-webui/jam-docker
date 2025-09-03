@@ -98,11 +98,28 @@ The following environment variables control the configuration:
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `--env JM_GAPLIMIT=200` will set the `gaplimit` config value to `200`
 
+### RPC authentication
+
+The container supports two methods for Bitcoin RPC authentication:
+
+#### Method 1: user/password
+```sh
+--env JM_RPC_USER="bitcoin" \
+--env JM_RPC_PASSWORD="password"
+```
+
+#### Method 2: cookie authentication
+```sh
+--env JM_RPC_COOKIE_FILE="/path/to/.cookie"
+```
+
+**Note**: If `JM_RPC_COOKIE_FILE` is set, cookie authentication will be used. Otherwise, user/password authentication is used. The cookie file path should be accessible from within the container.
+
 ### Building Notes
 Building a specific release:
 ```sh
 docker build --label "local" \
-        --build-arg JAM_REPO_REF=v0.3.0 \
+        --build-arg JAM_REPO_REF=v0.4.1 \
         --build-arg JM_SERVER_REPO_REF=v0.9.11 \
         --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
@@ -129,6 +146,8 @@ docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 ```
 
 ### Run
+
+#### Using user/password authentication
 ```sh
 docker run --rm -it \
         --add-host host.docker.internal:host-gateway \
@@ -144,6 +163,26 @@ docker run --rm -it \
         --env RESTORE_DEFAULT_CONFIG="true" \
         --env WAIT_FOR_BITCOIND="true" \
         --volume jmdatadir:/root/.joinmarket \
+        --publish "8080:80" \
+        joinmarket-webui/jam-standalone
+```
+
+#### Using cookie authentication
+```sh
+docker run --rm -it \
+        --add-host host.docker.internal:host-gateway \
+        --env JM_RPC_HOST="host.docker.internal" \
+        --env JM_RPC_PORT="18443" \
+        --env JM_RPC_COOKIE_FILE="/bitcoin/.cookie" \
+        --env JM_NETWORK="regtest" \
+        --env APP_USER="joinmarket" \
+        --env APP_PASSWORD="joinmarket" \
+        --env ENSURE_WALLET="true" \
+        --env REMOVE_LOCK_FILES="true" \
+        --env RESTORE_DEFAULT_CONFIG="true" \
+        --env WAIT_FOR_BITCOIND="true" \
+        --volume jmdatadir:/root/.joinmarket \
+        --volume /path/to/bitcoin/data:/bitcoin \
         --publish "8080:80" \
         joinmarket-webui/jam-standalone
 ```
