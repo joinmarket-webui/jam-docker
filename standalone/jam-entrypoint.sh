@@ -89,16 +89,13 @@ btchost="http://${jmenv['rpc_host']}:${jmenv['rpc_port']}"
 # determine RPC authentication method
 if [ -n "${jmenv['rpc_cookie_file']}" ]; then
     echo "Using RPC cookie authentication with file: ${jmenv['rpc_cookie_file']}"
-    btcauth_arg="--cookie ${jmenv['rpc_cookie_file']}"
-
+    btcuser=$(cat "${jmenv['rpc_cookie_file']}")
     # using cookie auth, comment out user/password
     sed -i 's/^rpc_user =/#rpc_user =/g' "$CONFIG"
     sed -i 's/^rpc_password =/#rpc_password =/g' "$CONFIG"
 else
     echo "Using RPC user/password authentication"
     btcuser="${jmenv['rpc_user']}:${jmenv['rpc_password']}"
-    btcauth_arg="--user ${btcuser}"
-
     # using user/password auth, comment out cookie file
     sed -i 's/^rpc_cookie_file =/#rpc_cookie_file =/g' "$CONFIG"
 fi
@@ -116,7 +113,7 @@ if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
     }"
     # generally only testing for a non-error response would be enough, but 
     # waiting for blocks >= 100 is needed for regtest environments as well!
-    until curl --silent --show-error "${btcauth_arg}" --data-binary "${getblockchaininfo_payload}" "${btchost}" 2>&1 | jq -e ".result.blocks >= 100" > /dev/null 2>&1
+    until curl --silent --show-error --user "${btcuser}" --data-binary "${getblockchaininfo_payload}" "${btchost}" 2>&1 | jq -e ".result.blocks >= 100" > /dev/null 2>&1
     do
         sleep 5
     done
@@ -138,7 +135,7 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
             \"load_on_startup\":true\
         }\
     }"
-    curl --silent "${btcauth_arg}" --data-binary "${create_payload}" "${btchost}" > /dev/null || true
+    curl --silent --user "${btcuser}" --data-binary "${create_payload}" "${btchost}" > /dev/null || true
 
     echo "Loading wallet $wallet_name..."
     load_payload="{\
@@ -150,7 +147,7 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
             \"load_on_startup\":true\
         }\
     }"
-    curl --silent "${btcauth_arg}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
+    curl --silent --user "${btcuser}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
 fi
 
 exec /sbin/dinit --container
