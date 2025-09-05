@@ -1,4 +1,4 @@
-name: Check and update version of single dependency
+name: 'call: update-dependency-version'
 
 on:
   workflow_call:
