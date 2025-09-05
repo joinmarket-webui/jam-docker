@@ -1,8 +1,6 @@
-name: Check and update versions of dependencies
+name: 'dispatch: check and update dependencies'
 
 on:
-  schedule:
-    - cron: '51 6 * * *' # every day at 06:51 UTC
   workflow_dispatch:
 
 jobs:

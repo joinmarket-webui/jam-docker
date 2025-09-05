@@ -1,4 +1,4 @@
-name: Docker jam-contrib-dinit
+name: 'dispatch: build & publish jam-contrib-dinit'
 
 on:
   workflow_dispatch:

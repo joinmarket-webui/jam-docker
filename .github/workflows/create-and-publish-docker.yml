@@ -1,4 +1,4 @@
-name: Create and publish Docker image
+name: 'call: create-and-publish-docker'
 
 on:
   workflow_call:
