@@ -45,7 +45,7 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
         find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
         && git verify-tag "$JAM_REPO_REF"; \
     fi) \
-    && npm install --no-fund --no-audit \
+    && npm clean-install --no-fund --no-audit \
     && npm run build
 # --- UI builder - end
 
