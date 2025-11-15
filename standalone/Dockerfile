@@ -19,8 +19,8 @@ ARG ALPINE_IMAGE=alpine:${ALPINE_IMAGE_VERSION}@sha256:${ALPINE_IMAGE_HASH}
 ARG DEBIAN_IMAGE_VERSION=bookworm-20250428-slim
 ARG DEBIAN_IMAGE_HASH=4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
-ARG DINIT_IMAGE_VERSION=0.19.4
-ARG DINIT_IMAGE_HASH=6338f8ef4d8d8b5bceff2980b40214af73e15b7d675f6cd54ad2e542153eb988
+ARG DINIT_IMAGE_VERSION=0.20.0
+ARG DINIT_IMAGE_HASH=5352e5896eaf2380a2671b9be8fbfb70b9f3e015e3d0f883aa58eee7f0426d9b
 ARG DINIT_IMAGE=ghcr.io/joinmarket-webui/jam-contrib-dinit:${DINIT_IMAGE_VERSION}@sha256:${DINIT_IMAGE_HASH}
 
 FROM ${NODE_IMAGE} AS node
@@ -86,7 +86,7 @@ LABEL server-version="$JM_SERVER_REPO_REF"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-COPY --from=dinit /out /sbin
+COPY --from=dinit /out/usr/bin /usr/bin
 COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 
