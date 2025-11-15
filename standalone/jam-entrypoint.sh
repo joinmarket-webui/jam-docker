@@ -150,4 +150,4 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
     curl --silent --user "${btcuser}" --data-binary "${load_payload}" "${btchost}" > /dev/null || true
 fi
 
-exec /sbin/dinit --container
+exec /usr/bin/dinit --container
