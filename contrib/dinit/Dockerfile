@@ -6,7 +6,7 @@ ARG DEBIAN_IMAGE_VERSION=bookworm-20250428-slim
 ARG DEBIAN_IMAGE_HASH=4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
-ARG DINIT_VERSION=0.19.4
+ARG DINIT_VERSION=0.20.0
 
 FROM ${DEBIAN_IMAGE} AS builder
 ARG DINIT_VERSION
@@ -28,4 +28,4 @@ RUN git clone "https://github.com/davmac314/dinit" . --depth=1 --branch "v$DINIT
     && make DESTDIR="$(pwd)/dinit-bin" install
 
 FROM scratch
-COPY --from=builder /usr/src/dinit/dinit-bin/sbin /out
+COPY --from=builder /usr/src/dinit/dinit-bin /out
