@@ -145,6 +145,9 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --chmod=0755 jam-entrypoint.sh /
 
+# ensure log directory exists (dinit files depend on it)
+RUN mkdir --parents /var/log/jam
+
 # nginx default port
 EXPOSE 80
 
