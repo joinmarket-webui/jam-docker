@@ -1,7 +1,9 @@
-# Default JoinMarket Tor configuration
-# taken from v0.9.7 on 2022-08-28:
-# https://github.com/JoinMarket-Org/joinmarket-clientserver/blob/v0.9.7/install.sh#L429-L433
+# Default JoinMarket Tor configuration taken from v0.9.11 on 2025-11-15:
+# https://github.com/JoinMarket-Org/joinmarket-clientserver/blob/v0.9.11/install.sh#L429-L432
 Log warn stderr
 SOCKSPort 9050 IsolateDestAddr IsolateDestPort
 ControlPort 9051
 CookieAuthentication 1
+
+# Jam additions
+ExitPolicy reject *:* # no exits allowed
