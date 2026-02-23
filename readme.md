@@ -133,6 +133,16 @@ docker build --label "local" \
         --tag "joinmarket-webui/jam-standalone" ./standalone
 ```
 
+Building with custom tor/nginx versions (using dependency version build args):
+```sh
+docker build --label "local" \
+        --build-arg JAM_REPO_REF=v0.4.1 \
+        --build-arg JM_SERVER_REPO_REF=v0.9.11 \
+        --build-arg TOR_VERSION="0.4.9.5-1~d12.bookworm+1" \
+        --build-arg NGINX_VERSION="1.28.2-1~bookworm" \
+        --tag "joinmarket-webui/jam-standalone" ./standalone
+```
+
 #### Build args
 - `SKIP_RELEASE_VERIFICATION` (optional, defaults to `false`; enable skipping release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)
