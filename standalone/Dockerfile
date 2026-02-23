@@ -126,6 +126,13 @@ ENV PATH=/src/scripts:$PATH
 
 WORKDIR /src
 
+# workaround: adjust libsodium download URL in install.sh for legacy 1.0.18 releases
+# TODO: remove this once v0.9.11 is no longer supported and new releases are available
+RUN set -eux \
+    && if grep --quiet "sodium_version='libsodium-1.0.18'" install.sh; then \
+         sed --in-place "s#sodium_url='https://download.libsodium.org/libsodium/releases'#sodium_url='https://download.libsodium.org/libsodium/releases/old'#g" install.sh; \
+       fi
+
 # compile and install JoinMarket
 RUN pip3 config set global.break-system-packages true \
     && ./install.sh --docker-install --without-qt \
