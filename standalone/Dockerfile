@@ -80,6 +80,30 @@ ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
 
+# package version arguments (can be overridden at build time)
+ARG GNUPG_VERSION=2.2.40-1.1+deb12u2
+ARG CURL_VERSION=7.88.1-10+deb12u14
+ARG APT_TRANSPORT_HTTPS_VERSION=2.6.1
+ARG CA_CERTIFICATES_VERSION=20230311+deb12u1
+ARG TINI_VERSION=0.19.0-1+b3
+ARG IPROUTE2_VERSION=6.1.0-3
+ARG PROCPS_VERSION=2:4.0.2-3
+ARG VIM_VERSION=2:9.0.1378-2+deb12u2
+ARG JQ_VERSION=1.6-2.1+deb12u1
+ARG BUILD_ESSENTIAL_VERSION=12.9
+ARG AUTOMAKE_VERSION=1:1.16.5-1.3
+ARG AUTOCONF_VERSION=2.71-3
+ARG PKG_CONFIG_VERSION=1.8.1-1
+ARG LIBTOOL_VERSION=2.4.7-7~deb12u1
+ARG PYTHON3_DEV_VERSION=3.11.2-1+b1
+ARG PYTHON3_PIP_VERSION=23.0.1+dfsg-1
+ARG PYTHON3_SETUPTOOLS_VERSION=66.1.1-1+deb12u2
+ARG PYTHON3_VENV_VERSION=3.11.2-1+b1
+ARG LIBLTDL_DEV_VERSION=2.4.7-7~deb12u1
+ARG TOR_VERSION=0.4.9.5-1~d12.bookworm+1
+ARG DEB_TOR_KEYRING_VERSION=2025.08.08
+ARG NGINX_VERSION=1.28.2-1~bookworm
+
 LABEL maintainer="$MAINTAINER"
 LABEL ui-version="$JAM_REPO_REF"
 LABEL server-version="$JM_SERVER_REPO_REF"
@@ -93,7 +117,11 @@ COPY --from=server-builder /usr/src/joinmarket-clientserver /src
 RUN addgroup --system tor \
     && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor \
     && apt-get update \
-    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes gnupg curl apt-transport-https ca-certificates \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
+    gnupg=${GNUPG_VERSION} \
+    curl=${CURL_VERSION} \
+    apt-transport-https=${APT_TRANSPORT_HTTPS_VERSION} \
+    ca-certificates=${CA_CERTIFICATES_VERSION} \
     # add nginx debian repo
     && curl --silent https://nginx.org/keys/nginx_signing.key | \
     gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null \
@@ -103,18 +131,31 @@ RUN addgroup --system tor \
     && curl --silent https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | \
     gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null \
     && sh -c "echo 'deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org bookworm main' > /etc/apt/sources.list.d/tor.list" \
-    # install dependencies
+    # install dependencies (versions pinned for reproducible builds)
     && apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
     # image dependencies
-    tini iproute2 procps vim jq \
+    tini=${TINI_VERSION} \
+    iproute2=${IPROUTE2_VERSION} \
+    procps=${PROCPS_VERSION} \
+    vim=${VIM_VERSION} \
+    jq=${JQ_VERSION} \
     # servers dependencies (see `install.sh`)
-    build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
-    # tor
-    tor \
-    deb.torproject.org-keyring \
-    # ui dependencies
-    nginx \
+    build-essential=${BUILD_ESSENTIAL_VERSION} \
+    automake=${AUTOMAKE_VERSION} \
+    autoconf=${AUTOCONF_VERSION} \
+    pkg-config=${PKG_CONFIG_VERSION} \
+    libtool=${LIBTOOL_VERSION} \
+    python3-dev=${PYTHON3_DEV_VERSION} \
+    python3-pip=${PYTHON3_PIP_VERSION} \
+    python3-setuptools=${PYTHON3_SETUPTOOLS_VERSION} \
+    python3-venv=${PYTHON3_VENV_VERSION} \
+    libltdl-dev=${LIBLTDL_DEV_VERSION} \
+    # tor (from torproject.org repo)
+    tor=${TOR_VERSION} \
+    deb.torproject.org-keyring=${DEB_TOR_KEYRING_VERSION} \
+    # ui dependencies (from nginx.org repo)
+    nginx=${NGINX_VERSION} \
     # cleanup 
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/*
