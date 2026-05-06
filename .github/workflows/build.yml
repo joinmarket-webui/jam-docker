@@ -34,7 +34,8 @@ jobs:
           images: joinmarket-webui/jam-${{ matrix.context }}-ci
           labels: |
             org.opencontainers.image.title=jam-${{ matrix.context }}
-            org.opencontainers.image.version=${{ github.sha }}
+            org.opencontainers.image.version=0.0.0
+            org.opencontainers.image.description=Jam CI Build (${{ matrix.context }})
 
       - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v7.1.0
