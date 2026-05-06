@@ -4,5 +4,5 @@
     copytruncate
     missingok
     notifempty
-    create 640 root root
+    shred
 }

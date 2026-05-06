@@ -6,5 +6,5 @@
     ifempty
     compress
     delaycompress
-    create 640 root root
+    shred
 }

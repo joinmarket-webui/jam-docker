@@ -111,7 +111,7 @@ RUN addgroup --system tor \
     # servers dependencies (see `install.sh`)
     build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
     # logrotate
-    logrotate \
+    logrotate coreutils \
     # tor
     tor \
     deb.torproject.org-keyring \

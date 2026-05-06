@@ -8,8 +8,8 @@
     create 640 nginx adm
     sharedscripts
     postrotate
-        if [ -f /run/nginx.pid ]; then
-            kill -USR1 `cat /run/nginx.pid`
+        if /usr/sbin/dinitctl status nginx > /dev/null; then
+            /usr/sbin/dinitctl signal USR1 nginx > /dev/null
         fi
     endscript
 }
