@@ -1,9 +1,9 @@
 /root/.joinmarket/logs/*.log {
-    size 1M
+    size 210k
     rotate 1
     copytruncate
     missingok
-    ifempty
+    notifempty
     compress
     delaycompress
     shred

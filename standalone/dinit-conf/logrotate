@@ -1,4 +1,4 @@
 type = process
-command = /bin/sh -c "while true; do /usr/sbin/logrotate /etc/logrotate.d/* --state /var/lib/logrotate/status; sleep 3600; done"
+command = /bin/sh -c "while true; do /usr/sbin/logrotate /etc/logrotate.d/* --state /var/lib/logrotate/status; sleep 600; done"
 restart = true
 smooth-recovery = true
