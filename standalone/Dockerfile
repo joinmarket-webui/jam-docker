@@ -9,6 +9,7 @@ ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
 ARG SKIP_RELEASE_VERIFICATION=false
+ARG JM_INSTALL_SCRIPT_ARGS=''
 
 ARG NODE_IMAGE_VERSION=22.14.0
 ARG NODE_IMAGE_HASH=9bef0ef1e268f60627da9ba7d7605e8831d5b56ad07487d24d1aa386336d1944
@@ -79,6 +80,7 @@ FROM ${DEBIAN_IMAGE}
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
+ARG JM_INSTALL_SCRIPT_ARGS
 
 LABEL maintainer="$MAINTAINER"
 LABEL ui-version="$JAM_REPO_REF"
@@ -137,7 +139,7 @@ RUN set -eux \
 
 # compile and install JoinMarket
 RUN pip3 config set global.break-system-packages true \
-    && ./install.sh --docker-install --without-qt \
+    && ./install.sh --docker-install --without-qt $JM_INSTALL_SCRIPT_ARGS \
     && rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 # cleanup and remove ephemeral dependencies

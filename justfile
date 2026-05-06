@@ -57,6 +57,13 @@ docker-build-standalone-master *args='':
         --build-arg SKIP_RELEASE_VERIFICATION=true \
         {{args}}
 
+# create "standalone" docker image from master (with secp-check **and** gpg-validation disabled)
+[group("docker")]
+docker-build-standalone-master-fast-inscure *args='':
+    @just docker-build-standalone-master \
+        "--build-arg 'JM_INSTALL_SCRIPT_ARGS=--disable-secp-check\ --no-gpg-validation'" \
+        {{args}}
+
 [group("docker")]
 docker-buildx-standalone-master *args='':
     @just docker-build-standalone-master \
