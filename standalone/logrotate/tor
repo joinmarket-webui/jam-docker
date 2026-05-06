@@ -8,7 +8,7 @@
     create 0640 tor adm
     sharedscripts
     postrotate
-        if /usr/sbin/dinitctl status tor > /dev/null; then
+        if /usr/sbin/dinitctl is-started tor > /dev/null; then
             /usr/sbin/dinitctl signal USR1 tor > /dev/null
         fi
     endscript
