@@ -8,8 +8,8 @@
     create 640 nginx adm
     sharedscripts
     postrotate
-        if /usr/sbin/dinitctl is-started nginx > /dev/null; then
-            /usr/sbin/dinitctl signal USR1 nginx > /dev/null
+        if /usr/bin/dinitctl is-started nginx > /dev/null; then
+            /usr/bin/dinitctl signal USR1 nginx > /dev/null
         fi
     endscript
 }
