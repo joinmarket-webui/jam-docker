@@ -41,9 +41,7 @@ jobs:
         with:
           context: ./${{ matrix.context }}
           #platforms: linux/amd64,linux/arm64
-          #load: false # not supported for multiplatform builds
           platforms: linux/arm64
-          load: true
           push: false
           tags: joinmarket-webui/jam-${{ matrix.context }}-ci
           labels: ci
