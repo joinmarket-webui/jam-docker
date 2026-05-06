@@ -36,7 +36,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-         context: [ui-only,standalone]
+         context: [ ui-only, standalone ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2

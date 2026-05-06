@@ -2,7 +2,7 @@ name: 'release: build & publish Docker images'
 
 on:
   release:
-    types: [created]
+    types: [ created ]
 
 jobs:
   readenv:
