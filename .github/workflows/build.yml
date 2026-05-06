@@ -38,6 +38,8 @@ jobs:
 
       - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v7.1.0
+        env:
+          SOURCE_DATE_EPOCH: 0
         with:
           context: ./${{ matrix.context }}
           outputs: type=cacheonly

@@ -48,6 +48,8 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7.1.0
+        env:
+          SOURCE_DATE_EPOCH: 0
         with:
           context: ./contrib/dinit
           platforms: linux/amd64,linux/arm64
