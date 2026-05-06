@@ -1,0 +1,10 @@
+/root/.joinmarket/logs/*.log {
+    size 1M
+    rotate 1
+    copytruncate
+    missingok
+    ifempty
+    compress
+    delaycompress
+    create 640 root root
+}

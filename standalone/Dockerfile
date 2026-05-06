@@ -110,6 +110,8 @@ RUN addgroup --system tor \
     tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
     build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
+    # logrotate
+    logrotate \
     # tor
     tor \
     deb.torproject.org-keyring \
@@ -151,6 +153,9 @@ COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --chmod=0755 jam-entrypoint.sh /
+
+RUN mkdir --parents /var/lib/logrotate
+COPY logrotate/* /etc/logrotate.d/
 
 # ensure log directory exists (dinit files depend on it)
 RUN mkdir --parents /var/log/jam
