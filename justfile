@@ -59,7 +59,7 @@ docker-build-standalone-master *args='':
 
 # create "standalone" docker image from master (with secp-check **and** gpg-validation disabled)
 [group("docker")]
-docker-build-standalone-master-fast-inscure *args='':
+docker-build-standalone-master-fast-insecure *args='':
     @just docker-build-standalone-master \
         "--build-arg 'JM_INSTALL_SCRIPT_ARGS=--disable-secp-check\ --no-gpg-validation'" \
         {{args}}

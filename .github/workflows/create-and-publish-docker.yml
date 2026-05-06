@@ -10,7 +10,6 @@ on:
       description:
         description: 'docker app description (e.g. "Your sats. Your privacy. Your profit.")'
         required: true
-        default: 'Your sats. Your privacy. Your profit.'
         type: string
       ui_repo_ref:
         description: 'ui version/branch (e.g. v0.1.1, master, etc.)'
