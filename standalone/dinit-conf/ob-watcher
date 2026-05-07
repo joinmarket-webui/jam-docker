@@ -4,5 +4,5 @@ working-dir = /src/scripts/obwatch
 depends-on = tor
 restart = true
 smooth-recovery = true
-start-timeout = 10
+start-timeout = 60
 logfile = /var/log/jam/obwatch_stdout.log
