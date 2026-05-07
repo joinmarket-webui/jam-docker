@@ -9,6 +9,7 @@ ARG JM_SERVER_REPO=https://github.com/JoinMarket-Org/joinmarket-clientserver
 ARG JM_SERVER_REPO_REF=master
 
 ARG SKIP_RELEASE_VERIFICATION=false
+ARG JM_INSTALL_SCRIPT_ARGS=''
 
 ARG NODE_IMAGE_VERSION=22.14.0
 ARG NODE_IMAGE_HASH=9bef0ef1e268f60627da9ba7d7605e8831d5b56ad07487d24d1aa386336d1944
@@ -79,6 +80,7 @@ FROM ${DEBIAN_IMAGE}
 ARG MAINTAINER
 ARG JM_SERVER_REPO_REF
 ARG JAM_REPO_REF
+ARG JM_INSTALL_SCRIPT_ARGS
 
 LABEL maintainer="$MAINTAINER"
 LABEL ui-version="$JAM_REPO_REF"
@@ -110,6 +112,8 @@ RUN addgroup --system tor \
     tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
     build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
+    # logrotate
+    logrotate coreutils \
     # tor
     tor \
     deb.torproject.org-keyring \
@@ -135,7 +139,7 @@ RUN set -eux \
 
 # compile and install JoinMarket
 RUN pip3 config set global.break-system-packages true \
-    && ./install.sh --docker-install --without-qt \
+    && ./install.sh --docker-install --without-qt $JM_INSTALL_SCRIPT_ARGS \
     && rm --recursive --force install.sh deps/cache/ test/ .git/ .gitignore .github/ .coveragerc joinmarket-qt.desktop
 
 # cleanup and remove ephemeral dependencies
@@ -151,6 +155,9 @@ COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --chmod=0755 jam-entrypoint.sh /
+
+RUN mkdir --parents /var/lib/logrotate
+COPY logrotate/* /etc/logrotate.d/
 
 # ensure log directory exists (dinit files depend on it)
 RUN mkdir --parents /var/log/jam

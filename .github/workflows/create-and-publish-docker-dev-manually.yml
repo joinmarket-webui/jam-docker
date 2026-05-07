@@ -7,6 +7,10 @@ on:
         description: 'docker app version (e.g. v21.0.0)'
         required: true
         type: string
+      description:
+        description: 'docker app description (e.g. "Your sats. Your privacy. Your profit.")'
+        required: true
+        type: string
       ui_repo_ref:
         description: 'ui version/branch (e.g. v0.4.1, master, etc.)'
         required: true
@@ -28,6 +32,7 @@ jobs:
     uses: ./.github/workflows/create-and-publish-docker.yml
     with:
       version: ${{ github.event.inputs.version }}-dev
+      description: ${{ github.event.inputs.description }}
       ui_repo_ref: ${{ github.event.inputs.ui_repo_ref }}
       server_repo_ref: ${{ github.event.inputs.server_repo_ref }}
       image_name_prefix: joinmarket-webui/jam-dev-

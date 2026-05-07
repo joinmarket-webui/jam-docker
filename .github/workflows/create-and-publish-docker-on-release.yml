@@ -2,7 +2,7 @@ name: 'release: build & publish Docker images'
 
 on:
   release:
-    types: [created]
+    types: [ created ]
 
 jobs:
   readenv:
@@ -11,15 +11,16 @@ jobs:
       contents: read
     outputs:
       version: ${{ env.GITHUB_REF_NAME }}
+      description: ${{ steps.dotenv.outputs.description }}
       ui_repo_ref: ${{ steps.dotenv.outputs.jam_repo_ref }}
       server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Read .env file
         id: dotenv
-        uses: falti/dotenv-action@v1.1.2
+        uses: falti/dotenv-action@v1.2.0
         with:
           log-variables: true
 
@@ -28,6 +29,7 @@ jobs:
     needs: readenv
     with:
       version: ${{ needs.readenv.outputs.version }}
+      description: ${{ needs.readenv.outputs.description }}
       ui_repo_ref: ${{ needs.readenv.outputs.ui_repo_ref }}
       server_repo_ref: ${{ needs.readenv.outputs.server_repo_ref }}
       image_name_prefix: joinmarket-webui/jam-

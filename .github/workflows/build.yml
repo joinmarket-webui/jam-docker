@@ -1,0 +1,58 @@
+name: 'build'
+
+on:
+  push:
+    branches: [ master, devel ]
+  pull_request:
+    branches: [ master, devel ]
+  workflow_dispatch:
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+         context: [ ui-only, standalone ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4.0.0
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4.0.0
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v6.0.0
+        with:
+          images: joinmarket-webui/jam-${{ matrix.context }}-ci
+          labels: |
+            org.opencontainers.image.title=jam-${{ matrix.context }}
+            org.opencontainers.image.version=0.0.0
+            org.opencontainers.image.description=Jam CI Build (${{ matrix.context }})
+
+      - name: Build and push Docker image for ${{ matrix.context }}
+        uses: docker/build-push-action@v7.1.0
+        env:
+          SOURCE_DATE_EPOCH: 0
+        with:
+          context: ./${{ matrix.context }}
+          outputs: type=cacheonly
+          cache-from: type=gha
+          cache-to: type=gha
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
+          push: false
+          tags: joinmarket-webui/jam-${{ matrix.context }}-ci
+          labels: ci
+          build-args: |
+            JAM_REPO_REF=master
+            JM_SERVER_REPO_REF=master
+            SKIP_RELEASE_VERIFICATION=true
+            JM_INSTALL_SCRIPT_ARGS=--disable-secp-check --no-gpg-validation

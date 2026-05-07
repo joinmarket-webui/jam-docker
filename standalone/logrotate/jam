@@ -1,0 +1,8 @@
+/var/log/jam/*.log {
+    size 1M
+    rotate 10
+    copytruncate
+    missingok
+    notifempty
+    shred
+}
