@@ -1,0 +1,15 @@
+/var/log/nginx/*.log {
+    daily
+    missingok
+    rotate 3
+    compress
+    delaycompress
+    notifempty
+    create 640 nginx adm
+    sharedscripts
+    postrotate
+        if /usr/bin/dinitctl is-started nginx > /dev/null; then
+            /usr/bin/dinitctl signal USR1 nginx > /dev/null
+        fi
+    endscript
+}

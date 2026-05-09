@@ -1,4 +1,4 @@
 type = process
-command = nginx -g "daemon off;"
+command = /usr/sbin/nginx -g "daemon off;"
 working-dir = /app
 restart = true

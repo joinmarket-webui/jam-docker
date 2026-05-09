@@ -1,0 +1,15 @@
+/var/log/tor/*log {
+    daily
+    rotate 5
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 tor adm
+    sharedscripts
+    postrotate
+        if /usr/bin/dinitctl is-started tor > /dev/null; then
+            /usr/bin/dinitctl signal USR1 tor > /dev/null
+        fi
+    endscript
+}
