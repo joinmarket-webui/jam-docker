@@ -14,6 +14,9 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
@@ -25,13 +28,30 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v4.0.0
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v6.0.0
+        with:
+          images: joinmarket-webui/jam-standalone-ng-ci
+          labels: |
+            org.opencontainers.image.title=jam-standalone-ng
+            org.opencontainers.image.version=0.0.0
+            org.opencontainers.image.description=Jam CI Build (standalone-ng)
+
       - name: Build standalone-ng Docker image
         uses: docker/build-push-action@v7.1.0
+        env:
+          SOURCE_DATE_EPOCH: 0
         with:
           context: ./standalone-ng
           outputs: type=cacheonly
-          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: false
+          tags: joinmarket-webui/jam-standalone-ng-ci
+          labels: ci
           build-args: |
             JAM_REPO_REF=devel
             JM_NG_REPO_REF=main
