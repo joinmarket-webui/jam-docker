@@ -168,7 +168,7 @@ RUN case "$(uname -m)" in \
     && rm -rf /tmp/bitcoin-${BITCOIN_VERSION} "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz"
 
 # Copy UI build artifacts from ui-builder
-COPY --from=ui-builder /usr/src/jam/build /app
+COPY --from=ui-builder /usr/src/jam/dist /app
 
 # Copy Python virtual environment from venv-builder
 COPY --from=venv-builder /opt/venv /opt/venv
