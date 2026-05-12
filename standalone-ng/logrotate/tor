@@ -1,0 +1,15 @@
+/var/log/jam-ng/tor/*.log {
+    daily
+    rotate 5
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root adm
+    sharedscripts
+    postrotate
+        if /usr/bin/pgrep -f "^/usr/bin/tor" > /dev/null; then
+            kill -USR1 $(pgrep -f "^/usr/bin/tor" | head -1) 2>/dev/null || true
+        fi
+    endscript
+}

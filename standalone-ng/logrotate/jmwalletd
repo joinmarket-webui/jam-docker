@@ -1,0 +1,10 @@
+/var/log/jam-ng/jmwalletd/*.log {
+    size 210k
+    rotate 1
+    copytruncate
+    missingok
+    notifempty
+    compress
+    delaycompress
+    shred
+}

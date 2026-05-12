@@ -1,0 +1,16 @@
+/var/log/jam-ng/access.log
+/var/log/jam-ng/error.log {
+    daily
+    missingok
+    rotate 3
+    compress
+    delaycompress
+    notifempty
+    create 0640 nginx adm
+    sharedscripts
+    postrotate
+        if /usr/bin/s6-rc-service-status nginx-svc > /dev/null 2>&1; then
+            nginx -s reopen 2>/dev/null || true
+        fi
+    endscript
+}
