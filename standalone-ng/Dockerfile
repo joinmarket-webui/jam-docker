@@ -148,8 +148,8 @@ RUN case "$(uname -m)" in \
         armv7l) S6_ARCH=armhf ;; \
         *) echo "Unsupported architecture: $(uname -m)" && exit 1 ;; \
     esac \
-    && curl -SLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
-    && curl -SLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
+    && curl -fsSLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
+    && curl -fsSLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
     && tar -C / -Jxpf s6-overlay-noarch.tar.xz \
     && tar -C / -Jxpf s6-overlay-${S6_ARCH}.tar.xz \
     && rm s6-overlay-*.tar.xz
@@ -162,13 +162,13 @@ RUN case "$(uname -m)" in \
         armv7l) BITCOIN_ARCH=arm ;; \
         *) echo "Unsupported architecture for bitcoin-cli: $(uname -m)" && exit 1 ;; \
     esac \
-    && curl -SLO "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz" \
+    && curl -fsSLO "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz" \
     && tar -xzf "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz" -C /tmp \
     && install -m 0755 -o root -g root -t /usr/local/bin /tmp/bitcoin-${BITCOIN_VERSION}/bin/bitcoin-cli \
     && rm -rf /tmp/bitcoin-${BITCOIN_VERSION} "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz"
 
 # Copy UI build artifacts from ui-builder
-COPY --from=ui-builder /usr/src/jam/dist /app
+COPY --from=ui-builder /usr/src/jam/build /app
 
 # Copy Python virtual environment from venv-builder
 COPY --from=venv-builder /opt/venv /opt/venv
