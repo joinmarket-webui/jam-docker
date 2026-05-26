@@ -1,8 +1,14 @@
-/var/log/jam-ng/*.log {
-    size 1M
-    rotate 10
-    copytruncate
+/var/log/jam-ng/access.log
+/var/log/jam-ng/error.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
     missingok
     notifempty
-    shred
+    create 0640 root adm
+    sharedscripts
+    postrotate
+        /usr/sbin/nginx -s reopen 2>/dev/null || true
+    endscript
 }

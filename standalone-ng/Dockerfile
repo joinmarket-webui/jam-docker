@@ -168,7 +168,21 @@ RUN case "$(uname -m)" in \
     && rm -rf /tmp/bitcoin-${BITCOIN_VERSION} "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz"
 
 # Copy UI build artifacts from ui-builder
-COPY --from=ui-builder /usr/src/jam/build /app
+# Modern Jam (devel) uses Vite and outputs to dist/
+# Legacy Jam (v0.4.1+) uses CRA and outputs to build/
+RUN --mount=type=bind,from=ui-builder,source=/usr/src/jam,target=/tmp/jam \
+    if [ -d /tmp/jam/dist ]; then \
+        echo "Detected Vite build output (dist/)"; \
+        cp -r /tmp/jam/dist /app; \
+    elif [ -d /tmp/jam/build ]; then \
+        echo "Detected CRA build output (build/)"; \
+        cp -r /tmp/jam/build /app; \
+    else \
+        echo "ERROR: No UI build output found!"; \
+        echo "Checked directories:"; \
+        ls -la /tmp/jam/ || true; \
+        exit 1; \
+    fi
 
 # Copy Python virtual environment from venv-builder
 COPY --from=venv-builder /opt/venv /opt/venv
@@ -191,12 +205,18 @@ COPY --from=venv-builder /build/jmwalletd/rootfs/etc/s6-overlay /etc/s6-overlay
 # Copy local nginx service definition
 COPY s6-overlay/ /etc/s6-overlay/
 
-# Ensure all run scripts are executable
+# Ensure all run scripts are executable.
+# Upstream joinmarket-ng scripts (tor/run, jmwalletd-svc/run, obwatcher/run) are
+# copied from the venv-builder stage and may not have the execute bit set.
+# Local scripts (logger services, tor-ready/up, nginx-svc/run) are also made executable here.
 RUN chmod +x \
     /etc/s6-overlay/s6-rc.d/tor/run \
     /etc/s6-overlay/s6-rc.d/tor-ready/up \
+    /etc/s6-overlay/s6-rc.d/tor-log/run \
     /etc/s6-overlay/s6-rc.d/jmwalletd-svc/run \
+    /etc/s6-overlay/s6-rc.d/jmwalletd-svc-log/run \
     /etc/s6-overlay/s6-rc.d/obwatcher/run \
+    /etc/s6-overlay/s6-rc.d/obwatcher-log/run \
     /etc/s6-overlay/s6-rc.d/nginx-svc/run
 
 # Copy nginx configuration

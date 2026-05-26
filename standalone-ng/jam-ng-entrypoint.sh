@@ -27,12 +27,6 @@ rpc_user = "user"
 rpc_password = "password"
 # rpc_cookie_file = ""
 
-[daemon]
-port = 28183
-
-[orderbook]
-port = 8000
-
 [coinjoin]
 max_cj_fee_abs = 7500
 max_cj_fee_rel = 0.0002
@@ -72,6 +66,9 @@ jmngenv['max_cj_fee_rel']=${jmngenv['max_cj_fee_rel']:-"0.000$((RANDOM%3+1))"}
 
 # for every env variable JMNG_FOO=BAR, replace the config.toml value of 'foo' by 'BAR'
 # config.toml uses TOML format: key = "value" (quoted strings) or key = number/bool
+# Note: this mapping is not section-aware. All JMNG_* keys must be unique across sections.
+# Keys that appear in multiple sections (e.g. 'port') should not be set via env vars;
+# use RESTORE_DEFAULT_CONFIG=true and mount a custom config.toml instead.
 toml_escape() {
     printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
@@ -87,10 +84,14 @@ toml_set() {
         replace_val="\"$(toml_escape "$val")\""
     fi
 
-    # uncomment the key if it is commented out (e.g. # rpc_cookie_file = "")
-    sed -i "s|^# $key = .*|$key = $replace_val|g" "$CONFIG_FILE"
-    # replace existing key = "..." or key = number/bool
-    sed -i "s|^$key = .*|$key = $replace_val|g" "$CONFIG_FILE" || echo "Couldn't set: $key = $val, please modify $CONFIG_FILE manually"
+    if grep -Eq "^# $key = |^$key = " "$CONFIG_FILE"; then
+        # uncomment the key if it is commented out (e.g. # rpc_cookie_file = "")
+        sed -i "s|^# $key = .*|$key = $replace_val|g" "$CONFIG_FILE"
+        # replace existing key = "..." or key = number/bool
+        sed -i "s|^$key = .*|$key = $replace_val|g" "$CONFIG_FILE"
+    else
+        echo "Warning: key '$key' not found in $CONFIG_FILE, skipping (set JMNG_${key^^} has no effect)"
+    fi
 }
 
 for key in "${!jmngenv[@]}"; do

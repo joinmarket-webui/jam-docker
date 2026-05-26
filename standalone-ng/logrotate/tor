@@ -1,4 +1,4 @@
-/var/log/jam-ng/tor/*.log {
+/var/log/jam-ng/tor/current {
     daily
     rotate 5
     compress
@@ -8,8 +8,6 @@
     create 0640 root adm
     sharedscripts
     postrotate
-        if /usr/bin/pgrep -f "^/usr/bin/tor" > /dev/null; then
-            kill -USR1 $(pgrep -f "^/usr/bin/tor" | head -1) 2>/dev/null || true
-        fi
+        pkill -USR1 -x tor 2>/dev/null || true
     endscript
 }
