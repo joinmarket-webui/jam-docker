@@ -5,9 +5,7 @@
     delaycompress
     missingok
     notifempty
-    create 0640 root adm
-    sharedscripts
-    postrotate
-        pkill -USR1 -x tor 2>/dev/null || true
-    endscript
+    # s6-log holds an open fd on `current`; copytruncate is required so the
+    # supervisor keeps writing to the truncated file instead of a renamed one.
+    copytruncate
 }
