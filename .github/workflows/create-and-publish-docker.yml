@@ -23,6 +23,10 @@ on:
         description: 'ng server version/branch (e.g. main, v0.1.0, etc.)'
         required: true
         type: string
+      ng_ui_repo_ref:
+        description: 'ng ui version/branch override for standalone-ng (e.g. devel, v2.0, etc.); falls back to ui_repo_ref if not set'
+        required: false
+        type: string
       image_name_prefix:
         description: 'image name prefix (e.g. joinmarket-webui/jam-)'
         required: true
@@ -84,7 +88,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JAM_REPO_REF=${{ inputs.ui_repo_ref }}
+            JAM_REPO_REF=${{ matrix.context == 'standalone-ng' && (inputs.ng_ui_repo_ref || inputs.ui_repo_ref) || inputs.ui_repo_ref }}
             JM_SERVER_REPO_REF=${{ inputs.server_repo_ref }}
             JM_NG_REPO_REF=${{ inputs.ng_server_repo_ref }}
             SKIP_RELEASE_VERIFICATION=${{ inputs.skip_release_verification }}
