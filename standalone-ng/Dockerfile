@@ -189,6 +189,7 @@ COPY --from=venv-builder /opt/venv /opt/venv
 
 # Configure PATH to include /opt/venv/bin
 ENV PATH="/opt/venv/bin:${PATH}"
+ENV JOINMARKET_DATA_DIR=/root/.joinmarket-ng
 ENV DATADIR=/root/.joinmarket-ng
 ENV JMWALLETD_HOST=0.0.0.0
 ENV JMWALLETD_NO_TLS=true
