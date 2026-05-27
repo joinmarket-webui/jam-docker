@@ -75,6 +75,32 @@ docker-buildx-standalone-master *args='':
 docker-run-shell-standalone:
     @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
 
+# create "standalone-ng" docker image (joinmarket-ng backend)
+[group("docker")]
+docker-build-standalone-ng jam_repo_ref=env('JM_NG_UI_REPO_REF') jm_ng_repo_ref=env('JM_NG_REPO_REF') *args='':
+    @echo "Creating 'standalone-ng' docker image ..."
+    @docker buildx build {{args}} \
+        --label "local" \
+        --build-arg JAM_REPO_REF={{jam_repo_ref}} \
+        --build-arg JM_NG_REPO_REF={{jm_ng_repo_ref}} \
+        --tag "joinmarket-webui/jam-standalone-ng" ./standalone-ng
+
+# create "standalone-ng" docker image from main (skip release verification)
+[group("docker")]
+docker-build-standalone-ng-main *args='':
+    @just docker-build-standalone-ng devel main \
+        --build-arg SKIP_RELEASE_VERIFICATION=true \
+        {{args}}
+
+# run shell in "standalone-ng" docker container
+[group("docker")]
+docker-run-shell-standalone-ng:
+    @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone-ng
+
+[group("docker")]
+docker-lint-standalone-ng:
+    @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone-ng/Dockerfile"
+
 # create "contrib/dinit" docker image
 [group("docker")]
 docker-build-contrib-dinit *args='':
