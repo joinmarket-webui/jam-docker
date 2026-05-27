@@ -218,7 +218,8 @@ RUN chmod +x \
     /etc/s6-overlay/s6-rc.d/jmwalletd-svc-log/run \
     /etc/s6-overlay/s6-rc.d/obwatcher/run \
     /etc/s6-overlay/s6-rc.d/obwatcher-log/run \
-    /etc/s6-overlay/s6-rc.d/nginx-svc/run
+    /etc/s6-overlay/s6-rc.d/nginx-svc/run \
+    /etc/s6-overlay/s6-rc.d/logrotate-svc/run
 
 # Copy nginx configuration
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
