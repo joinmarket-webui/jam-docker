@@ -140,7 +140,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install s6-overlay
-ARG S6_OVERLAY_VERSION=3.2.0.2
+ARG S6_OVERLAY_VERSION=3.2.3.0
 # Determine architecture for s6-overlay
 RUN case "$(uname -m)" in \
         x86_64) S6_ARCH=x86_64 ;; \
