@@ -8,6 +8,12 @@ ARG JAM_REPO_REF=master
 ARG JM_NG_REPO=https://github.com/joinmarket-ng/joinmarket-ng
 ARG JM_NG_REPO_REF=main
 
+ARG S6_OVERLAY_VERSION=3.2.3.0
+ARG S6_OVERLAY_NOARCH_HASH=b720f9d9340efc8bb07528b9743813c836e4b02f8693d90241f047998b4c53cf
+ARG S6_OVERLAY_X86_64_HASH=a93f02882c6ed46b21e7adb5c0add86154f01236c93cd82c7d682722e8840563
+ARG S6_OVERLAY_AARCH64_HASH=0952056ff913482163cc30e35b2e944b507ba1025d78f5becbb89367bf344581
+ARG S6_OVERLAY_ARMHF_HASH=1ff4721b2a51e4f4dd9dbfffa47a994f14dbc3048853a83f7fb1c6ce93d59bf4
+
 ARG SKIP_RELEASE_VERIFICATION=false
 
 ARG NODE_IMAGE_VERSION=24.11.1
@@ -46,11 +52,11 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         echo "Importing GPG keys for Jam release verification..." \
         && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-        && if git rev-parse -q --verify "refs/tags/$JAM_REPO_REF" >/dev/null; then \
+        && if [ "$(git cat-file -t "refs/tags/$JAM_REPO_REF" 2>/dev/null)" = "tag" ]; then \
             echo "Verifying GPG signature for tag: $JAM_REPO_REF" \
             && git verify-tag "$JAM_REPO_REF"; \
         else \
-            echo "Ref $JAM_REPO_REF is not a tag; skipping verify-tag."; \
+            echo "Ref $JAM_REPO_REF is not an annotated tag; skipping verify-tag."; \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
@@ -69,7 +75,7 @@ ARG SKIP_RELEASE_VERIFICATION
 
 # Install Python, build dependencies, git, and gnupg
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install --yes --no-install-recommends \
         python3 \
         python3-venv \
         python3-pip \
@@ -81,7 +87,7 @@ RUN apt-get update \
         libsecp256k1-dev \
         pkg-config \
         cmake \
-    && rm -rf /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/*
 
 # Copy GPG public keys from builder-base
 COPY --from=builder-base /pubkeys /pubkeys
@@ -94,11 +100,11 @@ RUN git clone "$JM_NG_REPO" . --depth=1 --branch "$JM_NG_REPO_REF" \
     && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         echo "Importing GPG keys for joinmarket-ng release verification..." \
         && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-        && if git rev-parse -q --verify "refs/tags/$JM_NG_REPO_REF" >/dev/null; then \
+        && if [ "$(git cat-file -t "refs/tags/$JM_NG_REPO_REF" 2>/dev/null)" = "tag" ]; then \
             echo "Verifying GPG signature for tag: $JM_NG_REPO_REF" \
             && git verify-tag "$JM_NG_REPO_REF"; \
         else \
-            echo "Ref $JM_NG_REPO_REF is not a tag; skipping verify-tag."; \
+            echo "Ref $JM_NG_REPO_REF is not an annotated tag; skipping verify-tag."; \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
@@ -120,10 +126,15 @@ FROM ${DEBIAN_IMAGE} AS runtime
 ARG MAINTAINER
 ARG JAM_REPO_REF
 ARG JM_NG_REPO_REF
+ARG S6_OVERLAY_VERSION
+ARG S6_OVERLAY_NOARCH_HASH
+ARG S6_OVERLAY_X86_64_HASH
+ARG S6_OVERLAY_AARCH64_HASH
+ARG S6_OVERLAY_ARMHF_HASH
 
 # Install runtime dependencies (includes python3 so the venv symlinks resolve)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install --yes --no-install-recommends \
         nginx \
         tor \
         curl \
@@ -137,35 +148,23 @@ RUN apt-get update \
         libsodium23 \
         libsecp256k1-1 \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/*
 
 # Install s6-overlay
-ARG S6_OVERLAY_VERSION=3.2.3.0
 # Determine architecture for s6-overlay
 RUN case "$(uname -m)" in \
-        x86_64) S6_ARCH=x86_64 ;; \
-        aarch64) S6_ARCH=aarch64 ;; \
-        armv7l) S6_ARCH=armhf ;; \
+        x86_64) S6_ARCH=x86_64; S6_HASH=${S6_OVERLAY_X86_64_HASH} ;; \
+        aarch64) S6_ARCH=aarch64; S6_HASH=${S6_OVERLAY_AARCH64_HASH} ;; \
+        armv7l) S6_ARCH=armhf; S6_HASH=${S6_OVERLAY_ARMHF_HASH} ;; \
         *) echo "Unsupported architecture: $(uname -m)" && exit 1 ;; \
     esac \
-    && curl -fsSLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
-    && curl -fsSLO "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
-    && tar -C / -Jxpf s6-overlay-noarch.tar.xz \
-    && tar -C / -Jxpf s6-overlay-${S6_ARCH}.tar.xz \
-    && rm s6-overlay-*.tar.xz
-
-# Install bitcoin-cli (from Bitcoin Core)
-ARG BITCOIN_VERSION=28.0
-RUN case "$(uname -m)" in \
-        x86_64) BITCOIN_ARCH=x86_64 ;; \
-        aarch64) BITCOIN_ARCH=aarch64 ;; \
-        armv7l) BITCOIN_ARCH=arm ;; \
-        *) echo "Unsupported architecture for bitcoin-cli: $(uname -m)" && exit 1 ;; \
-    esac \
-    && curl -fsSLO "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz" \
-    && tar -xzf "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz" -C /tmp \
-    && install -m 0755 -o root -g root -t /usr/local/bin /tmp/bitcoin-${BITCOIN_VERSION}/bin/bitcoin-cli \
-    && rm -rf /tmp/bitcoin-${BITCOIN_VERSION} "bitcoin-${BITCOIN_VERSION}-${BITCOIN_ARCH}-linux-gnu.tar.gz"
+    && curl --fail --silent --show-error --location --remote-name "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
+    && curl --fail --silent --show-error --location --remote-name "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
+    && echo "${S6_OVERLAY_NOARCH_HASH}  s6-overlay-noarch.tar.xz" | sha256sum -c - \
+    && echo "${S6_HASH}  s6-overlay-${S6_ARCH}.tar.xz" | sha256sum -c - \
+    && tar --directory / --extract --xz --preserve-permissions --file s6-overlay-noarch.tar.xz \
+    && tar --directory / --extract --xz --preserve-permissions --file s6-overlay-${S6_ARCH}.tar.xz \
+    && rm --force s6-overlay-*.tar.xz
 
 # Copy UI build artifacts from ui-builder
 # Modern Jam (devel) uses Vite and outputs to dist/
@@ -173,10 +172,10 @@ RUN case "$(uname -m)" in \
 RUN --mount=type=bind,from=ui-builder,source=/usr/src/jam,target=/tmp/jam \
     if [ -d /tmp/jam/dist ]; then \
         echo "Detected Vite build output (dist/)"; \
-        cp -r /tmp/jam/dist /app; \
+        cp --recursive /tmp/jam/dist /app; \
     elif [ -d /tmp/jam/build ]; then \
         echo "Detected CRA build output (build/)"; \
-        cp -r /tmp/jam/build /app; \
+        cp --recursive /tmp/jam/build /app; \
     else \
         echo "ERROR: No UI build output found!"; \
         echo "Checked directories:"; \
@@ -224,7 +223,7 @@ RUN chmod +x \
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 # Remove the default nginx site that conflicts with our config
-RUN rm -f /etc/nginx/sites-enabled/default
+RUN rm --force /etc/nginx/sites-enabled/default
 
 # Copy logrotate configuration
 COPY --chmod=0644 logrotate/ /etc/logrotate.d/
@@ -238,10 +237,11 @@ RUN chmod +x /usr/local/bin/jam-ng-entrypoint.sh
 
 # Create log directories and fix tor data directory ownership
 # (Debian's tor package creates /var/lib/tor owned by debian-tor; we run tor as root)
-RUN mkdir -p /var/log/jam-ng/jmwalletd \
-    && mkdir -p /var/log/jam-ng/obwatcher \
-    && mkdir -p /var/log/jam-ng/tor \
-    && mkdir -p /var/lib/logrotate \
+RUN mkdir --parents /var/log/jam-ng/jmwalletd \
+    && mkdir --parents /var/log/jam-ng/obwatcher \
+    && mkdir --parents /var/log/jam-ng/tor \
+    && mkdir --parents /var/log/jam-ng/nginx \
+    && mkdir --parents /var/lib/logrotate \
     && chown root:root /var/lib/tor \
     && chmod 700 /var/lib/tor
 

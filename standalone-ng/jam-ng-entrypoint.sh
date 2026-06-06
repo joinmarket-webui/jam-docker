@@ -53,14 +53,14 @@ if [ -n "${APP_USER}" ]; then
     BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
 
     echo "${BASIC_AUTH_USER}:$(openssl passwd -apr1 "${BASIC_AUTH_PASS}")" > /etc/nginx/.htpasswd
-    sed -i 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
+    sed --in-place 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
 fi
 
 # nginx listen port override
 if [ -n "${JAM_UI_PORT##*[!0-9]*}" ]; then
     echo "UI will be served on port ${JAM_UI_PORT}."
-    sed -i "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
-    sed -i "s/listen \[::\]:80;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+    sed --in-place "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+    sed --in-place "s/listen \[::\]:80;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
 fi
 
 # wait for a ready file before starting services (e.g. chain sync gate)
@@ -89,23 +89,28 @@ rpc_password="${BITCOIN__RPC_PASSWORD:-}"
 rpc_cookie_file="${BITCOIN__RPC_COOKIE_FILE:-}"
 
 if [ -n "${rpc_url}" ]; then
-    # parse host and port from rpc_url (http[s]://host:port[/path])
-    rpc_host=$(printf '%s' "${rpc_url}" | sed -E 's|^https?://||; s|/.*$||; s|:[0-9]+$||')
-    rpc_port=$(printf '%s' "${rpc_url}" | sed -E 's|^https?://||; s|/.*$||; s|^[^:]*:||')
+    rpc_call() {
+        local method="$1"
+        local params="${2:-[]}"
+        local auth
+        if [ -n "${rpc_cookie_file}" ] && [ -f "${rpc_cookie_file}" ]; then
+            auth="$(cat "${rpc_cookie_file}")"
+        else
+            auth="${rpc_user}:${rpc_password}"
+        fi
 
-    btccli_base=(bitcoin-cli "-rpcconnect=${rpc_host}" "-rpcport=${rpc_port}")
-    if [ -n "${rpc_cookie_file}" ]; then
-        btccli_base+=("-rpccookiefile=${rpc_cookie_file}")
-    elif [ -n "${rpc_user}" ]; then
-        btccli_base+=("-rpcuser=${rpc_user}" "-rpcpassword=${rpc_password}")
-    fi
+        curl --silent --location \
+             --user "${auth}" \
+             --header "Content-Type: text/plain" \
+             --data "{\"jsonrpc\":\"1.0\",\"id\":\"jam-ng-entrypoint\",\"method\":\"${method}\",\"params\":${params}}" \
+             "${rpc_url}"
+    }
 
     if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
         echo "Waiting for bitcoind at ${rpc_url} to accept RPC requests..."
         # generally a non-error response would be enough, but waiting for
         # blocks >= 100 is also needed for regtest environments.
-        until blocks=$("${btccli_base[@]}" getblockchaininfo 2>/dev/null \
-                | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['blocks'])" 2>/dev/null) \
+        until blocks=$(rpc_call "getblockchaininfo" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('result', {}).get('blocks', ''))" 2>/dev/null) \
             && [ -n "${blocks}" ] && [ "${blocks}" -ge 100 ] 2>/dev/null
         do
             sleep 5
@@ -114,11 +119,11 @@ if [ -n "${rpc_url}" ]; then
     fi
 
     if [ "${ENSURE_WALLET}" = "true" ]; then
-        wallet_name="${BITCOIN__RPC_WALLET_FILE:-jam}"
+        wallet_name="${BITCOIN__DESCRIPTOR_WALLET_NAME:-jam}"
         echo "Creating wallet ${wallet_name} if missing..."
-        "${btccli_base[@]}" createwallet "${wallet_name}" false false "" false false true > /dev/null 2>&1 || true
+        rpc_call "createwallet" "[\"${wallet_name}\", false, false, \"\", false, true, true]" > /dev/null 2>&1 || true
         echo "Loading wallet ${wallet_name}..."
-        "${btccli_base[@]}" loadwallet "${wallet_name}" true > /dev/null 2>&1 || true
+        rpc_call "loadwallet" "[\"${wallet_name}\", true]" > /dev/null 2>&1 || true
     fi
 else
     if [ "${WAIT_FOR_BITCOIND}" != "false" ] || [ "${ENSURE_WALLET}" = "true" ]; then
