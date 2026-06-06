@@ -1,5 +1,5 @@
-/var/log/jam-ng/access.log
-/var/log/jam-ng/error.log {
+/var/log/jam-ng/nginx/access.log
+/var/log/jam-ng/nginx/error.log {
     daily
     rotate 7
     compress

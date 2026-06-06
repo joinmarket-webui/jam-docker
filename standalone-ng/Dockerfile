@@ -179,7 +179,7 @@ RUN --mount=type=bind,from=ui-builder,source=/usr/src/jam,target=/tmp/jam \
     else \
         echo "ERROR: No UI build output found!"; \
         echo "Checked directories:"; \
-        ls -la /tmp/jam/ || true; \
+        ls --all -l /tmp/jam/ || true; \
         exit 1; \
     fi
 
