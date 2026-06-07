@@ -1,0 +1,137 @@
+#!/bin/bash
+#
+# jam-ng entrypoint
+#
+# joinmarket-ng reads its configuration from environment variables (highest
+# priority) and from a TOML file (~/.joinmarket-ng/config.toml or
+# $JOINMARKET_DATA_DIR/config.toml). Env vars use the SECTION__KEY convention
+# (double underscore), e.g. BITCOIN__RPC_URL, NETWORK_CONFIG__NETWORK,
+# TAKER__MAX_CJ_FEE_ABS.
+#
+# This entrypoint does NOT generate config.toml. If you need to customize
+# anything beyond what env vars cover, mount your own config.toml into
+# $JOINMARKET_DATA_DIR/config.toml.
+#
+# See:
+#   https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
+#   https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/settings.py
+set -e
+
+# DATADIR is kept for backwards compatibility with legacy standalone users.
+# joinmarket-ng reads JOINMARKET_DATA_DIR; the Dockerfile sets both to the
+# same default so they stay in sync unless explicitly overridden.
+DATADIR=${JOINMARKET_DATA_DIR:-${DATADIR:-/root/.joinmarket-ng}}
+export JOINMARKET_DATA_DIR="$DATADIR"
+
+# ensure joinmarket-ng data directory exists
+mkdir --parents "$DATADIR"
+
+# ensure log directory structure exists
+mkdir --parents /var/log/jam-ng/jmwalletd
+mkdir --parents /var/log/jam-ng/obwatcher
+mkdir --parents /var/log/jam-ng/tor
+
+# optional: remove leftover wallet lockfiles from unclean shutdowns
+if [ "${REMOVE_LOCK_FILES}" = "true" ]; then
+    echo "Removing leftover wallet lockfiles before startup..."
+    rm --force --verbose "${DATADIR}"/wallets/.*.jmdat.lock || true
+fi
+
+# generate ssl certificates for jmwalletd
+if [ ! -f "${DATADIR}/ssl/key.pem" ]; then
+    subj="/C=US/ST=Utah/L=Lehi/O=Your Company, Inc./OU=IT/CN=example.com"
+    mkdir --parents "${DATADIR}/ssl/" \
+      && pushd "$_" \
+      && openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes \
+         -out cert.pem -keyout key.pem -subj "$subj" \
+      && popd
+fi
+
+# basic authentication for the nginx-served UI
+if [ -n "${APP_USER}" ]; then
+    BASIC_AUTH_USER=${APP_USER:?APP_USER empty or unset}
+    BASIC_AUTH_PASS=${APP_PASSWORD:?APP_PASSWORD empty or unset}
+
+    echo "${BASIC_AUTH_USER}:$(openssl passwd -apr1 "${BASIC_AUTH_PASS}")" > /etc/nginx/.htpasswd
+    sed --in-place 's/auth_basic off;/auth_basic "JoinMarket WebUI";/g' /etc/nginx/conf.d/default.conf
+fi
+
+# nginx listen port override
+if [ -n "${JAM_UI_PORT##*[!0-9]*}" ]; then
+    echo "UI will be served on port ${JAM_UI_PORT}."
+    sed --in-place "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+    sed --in-place "s/listen \[::\]:80;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
+fi
+
+# wait for a ready file before starting services (e.g. chain sync gate)
+if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
+    echo "Waiting for file $READY_FILE to be created..."
+    while [ ! -f "$READY_FILE" ]; do sleep 1; done
+    echo "Successfully waited for file $READY_FILE to be created."
+fi
+
+# Bitcoin RPC wait and optional wallet management.
+#
+# Configuration is read from env vars (canonical joinmarket-ng convention)
+# with sensible fallbacks. Unlike the legacy standalone wrapper, no values
+# are read out of config.toml because the entrypoint does not generate one.
+#
+#   BITCOIN__RPC_URL=http://host:port      (preferred)
+#   BITCOIN__RPC_USER, BITCOIN__RPC_PASSWORD
+#   BITCOIN__RPC_COOKIE_FILE               (alternative to user/password)
+#
+# If BITCOIN__RPC_URL is unset, the bitcoind wait and wallet management are
+# skipped silently (jmwalletd will still start; it will simply fail later if
+# it cannot reach Bitcoin Core, which is the user's responsibility to fix).
+rpc_url="${BITCOIN__RPC_URL:-}"
+rpc_user="${BITCOIN__RPC_USER:-}"
+rpc_password="${BITCOIN__RPC_PASSWORD:-}"
+rpc_cookie_file="${BITCOIN__RPC_COOKIE_FILE:-}"
+
+if [ -n "${rpc_url}" ]; then
+    rpc_call() {
+        local method="$1"
+        local params="${2:-[]}"
+        local auth
+        if [ -n "${rpc_cookie_file}" ] && [ -f "${rpc_cookie_file}" ]; then
+            auth="$(cat "${rpc_cookie_file}")"
+        else
+            auth="${rpc_user}:${rpc_password}"
+        fi
+
+        curl --silent --location \
+             --user "${auth}" \
+             --header "Content-Type: text/plain" \
+             --data "{\"jsonrpc\":\"1.0\",\"id\":\"jam-ng-entrypoint\",\"method\":\"${method}\",\"params\":${params}}" \
+             "${rpc_url}"
+    }
+
+    if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
+        echo "Waiting for bitcoind at ${rpc_url} to accept RPC requests..."
+        # generally a non-error response would be enough, but waiting for
+        # blocks >= 100 is also needed for regtest environments.
+        until blocks=$(rpc_call "getblockchaininfo" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('result', {}).get('blocks', ''))" 2>/dev/null) \
+            && [ -n "${blocks}" ] && [ "${blocks}" -ge 100 ] 2>/dev/null
+        do
+            sleep 5
+        done
+        echo "Successfully waited for bitcoind to accept RPC requests."
+    fi
+
+    if [ "${ENSURE_WALLET}" = "true" ]; then
+        wallet_name="${BITCOIN__DESCRIPTOR_WALLET_NAME:-jam}"
+        echo "Creating wallet ${wallet_name} if missing..."
+        rpc_call "createwallet" "[\"${wallet_name}\", false, false, \"\", false, true, true]" > /dev/null 2>&1 || true
+        echo "Loading wallet ${wallet_name}..."
+        rpc_call "loadwallet" "[\"${wallet_name}\", true]" > /dev/null 2>&1 || true
+    fi
+else
+    if [ "${WAIT_FOR_BITCOIND}" != "false" ] || [ "${ENSURE_WALLET}" = "true" ]; then
+        echo "BITCOIN__RPC_URL is not set; skipping bitcoind wait and wallet management."
+    fi
+fi
+
+# shellcheck source=/dev/null
+source /opt/venv/bin/activate
+
+exec /init

@@ -1,0 +1,2 @@
+#!/command/execlineb -P
+s6-log -b -- /var/log/jam-ng/jmwalletd

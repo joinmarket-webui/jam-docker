@@ -1,0 +1,9 @@
+/var/log/jam-ng/obwatcher/current {
+    daily
+    rotate 5
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

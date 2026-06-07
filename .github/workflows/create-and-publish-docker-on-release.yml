@@ -14,6 +14,8 @@ jobs:
       description: ${{ steps.dotenv.outputs.description }}
       ui_repo_ref: ${{ steps.dotenv.outputs.jam_repo_ref }}
       server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
+      ng_server_repo_ref: ${{ steps.dotenv.outputs.jm_ng_repo_ref }}
+      ng_ui_repo_ref: ${{ steps.dotenv.outputs.jm_ng_ui_repo_ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
@@ -32,4 +34,6 @@ jobs:
       description: ${{ needs.readenv.outputs.description }}
       ui_repo_ref: ${{ needs.readenv.outputs.ui_repo_ref }}
       server_repo_ref: ${{ needs.readenv.outputs.server_repo_ref }}
+      ng_server_repo_ref: ${{ needs.readenv.outputs.ng_server_repo_ref }}
+      ng_ui_repo_ref: ${{ needs.readenv.outputs.ng_ui_repo_ref }}
       image_name_prefix: joinmarket-webui/jam-

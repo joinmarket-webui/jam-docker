@@ -1,0 +1,7 @@
+#!/bin/sh
+# Periodically rotate logs configured in /etc/logrotate.d.
+# No cron is shipped in this image; this service is the only logrotate trigger.
+while true; do
+    /usr/sbin/logrotate /etc/logrotate.d/* --state /var/lib/logrotate/status
+    sleep 600
+done

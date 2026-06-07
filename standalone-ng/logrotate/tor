@@ -1,0 +1,11 @@
+/var/log/jam-ng/tor/current {
+    daily
+    rotate 5
+    compress
+    delaycompress
+    missingok
+    notifempty
+    # s6-log holds an open fd on `current`; copytruncate is required so the
+    # supervisor keeps writing to the truncated file instead of a renamed one.
+    copytruncate
+}

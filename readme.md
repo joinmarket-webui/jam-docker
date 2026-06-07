@@ -2,9 +2,10 @@
 
 Docker images for [Jam](https://github.com/joinmarket-webui/jam).
 
-Contains two separate images:
+Contains three separate images:
 - ui-only: Only the UI
 - standalone: UI + joinmarket clientserver
+- standalone-ng: UI + joinmarket-ng backend
 
 
 ## ui-only
@@ -190,6 +191,61 @@ docker run --rm -it \
 ### Lint
 ```sh
 docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
+```
+
+
+## standalone-ng
+### Usage Notes
+```sh
+docker pull ghcr.io/joinmarket-webui/jam-standalone-ng:latest
+```
+
+Wraps the [joinmarket-ng](https://github.com/joinmarket-ng/joinmarket-ng)
+backend (the next-generation Python rewrite of joinmarket-clientserver).
+
+Configuration follows the joinmarket-ng convention: environment variables
+take precedence and use the `SECTION__KEY` (double underscore) form, for
+example:
+
+```
+BITCOIN__RPC_URL=http://bitcoin:8332
+BITCOIN__RPC_USER=bitcoin
+BITCOIN__RPC_PASSWORD=secret
+# or alternatively:
+# BITCOIN__RPC_COOKIE_FILE=/bitcoin/.cookie
+NETWORK_CONFIG__NETWORK=mainnet
+TAKER__MAX_CJ_FEE_ABS=10000
+TAKER__MAX_CJ_FEE_REL=0.0003
+```
+
+Anything not covered by env vars can be set by mounting a custom
+`config.toml` into `$JOINMARKET_DATA_DIR/config.toml` (default
+`/root/.joinmarket-ng/config.toml`). The wrapper does not generate this
+file. See the upstream [`config.toml.template`](https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template)
+and [`settings.py`](https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/settings.py)
+for the full list of supported keys.
+
+Wrapper-specific env vars:
+- `APP_USER`, `APP_PASSWORD`: enable HTTP basic auth for the UI
+- `JAM_UI_PORT`: override the nginx listen port (default 80)
+- `REMOVE_LOCK_FILES=true`: remove leftover wallet lockfiles on startup
+- `READY_FILE=/path`: wait for this file before starting services
+- `WAIT_FOR_BITCOIND=false`: skip the bitcoind RPC wait
+- `ENSURE_WALLET=true`: create and load `BITCOIN__RPC_WALLET_FILE` (default `jam`) at startup
+
+### Build
+```sh
+JAM_REPO_REF="devel" \
+JM_NG_REPO_REF="main" \
+    docker buildx build \
+        --build-arg JAM_REPO_REF \
+        --build-arg JM_NG_REPO_REF \
+        --tag "joinmarket-webui/jam-standalone-ng" ./standalone-ng
+```
+
+### Lint
+```sh
+docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone-ng/Dockerfile"
 ```
 
 
