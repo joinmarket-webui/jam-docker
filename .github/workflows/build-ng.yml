@@ -15,11 +15,13 @@ on:
 
 jobs:
   build-image:
-    name: build-image (standalone-ng)
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+         context: [ standalone-ng ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
@@ -35,25 +37,25 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6.0.0
         with:
-          images: joinmarket-webui/jam-standalone-ng-ci
+          images: joinmarket-webui/jam-${{ matrix.context }}-ci
           labels: |
-            org.opencontainers.image.title=jam-standalone-ng
+            org.opencontainers.image.title=jam-${{ matrix.context }}
             org.opencontainers.image.version=0.0.0
-            org.opencontainers.image.description=Jam CI Build (standalone-ng)
+            org.opencontainers.image.description=Jam CI Build (${{ matrix.context }})
 
-      - name: Build standalone-ng Docker image
+      - name: Build and push Docker image for ${{ matrix.context }}
         uses: docker/build-push-action@v7.1.0
         env:
           SOURCE_DATE_EPOCH: 0
         with:
-          context: ./standalone-ng
+          context: ./${{ matrix.context }}
           outputs: type=cacheonly
           cache-from: type=gha
           cache-to: type=gha
           #platforms: linux/amd64,linux/arm64
           platforms: linux/arm64
           push: false
-          tags: joinmarket-webui/jam-standalone-ng-ci
+          tags: joinmarket-webui/jam-${{ matrix.context }}-ci
           labels: ci
           build-args: |
             JAM_REPO_REF=devel
