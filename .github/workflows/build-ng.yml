@@ -2,13 +2,15 @@ name: 'build-ng'
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, devel ]
     paths:
       - 'standalone-ng/**'
+      - '.env'
   pull_request:
-    branches: [ master ]
+    branches: [ master, devel ]
     paths:
       - 'standalone-ng/**'
+      - '.env'
   workflow_dispatch:
 
 jobs:

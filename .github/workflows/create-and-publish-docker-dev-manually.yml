@@ -22,12 +22,12 @@ on:
         default: 'master'
         type: string
       ng_server_repo_ref:
-        description: 'ng server version/branch (e.g. main, v0.1.0, etc.)'
+        description: 'ng server version/branch (e.g. main, 0.32.0, etc.)'
         required: true
         default: 'main'
         type: string
       ng_ui_repo_ref:
-        description: 'ng ui version/branch for standalone-ng (e.g. devel, v2.0, etc.)'
+        description: 'ng ui version/branch for standalone-ng (e.g. devel, v2.0.0, etc.)'
         required: false
         default: 'devel'
         type: string
