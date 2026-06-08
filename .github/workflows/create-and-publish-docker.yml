@@ -36,6 +36,11 @@ on:
         required: false
         default: false
         type: boolean
+      images_matrix:
+        description: 'the images you want to build as json array ([ "ui-only", "standalone-ng", "standalone" ])'
+        required: false
+        type: string
+        default: '[ "ui-only", "standalone-ng", "standalone" ]'
 
 env:
   REGISTRY: ghcr.io
@@ -48,7 +53,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-         context: [ ui-only, standalone, standalone-ng ]
+         context: ${{ fromJSON(inputs.images_matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
