@@ -22,12 +22,12 @@ on:
         default: 'master'
         type: string
       ng_server_repo_ref:
-        description: 'ng server version/branch (e.g. main, v0.1.0, etc.)'
+        description: 'ng server version/branch (e.g. main, 0.32.0, etc.)'
         required: true
         default: 'main'
         type: string
       ng_ui_repo_ref:
-        description: 'ng ui version/branch for standalone-ng (e.g. devel, v2.0, etc.)'
+        description: 'ng ui version/branch for standalone-ng (e.g. devel, v2.0.0, etc.)'
         required: false
         default: 'devel'
         type: string
@@ -36,6 +36,11 @@ on:
         required: false
         default: false
         type: boolean
+      images_matrix:
+        description: 'the images you want to build as json array ([ "ui-only", "standalone-ng", "standalone" ])'
+        required: false
+        type: string
+        default: '[ "ui-only", "standalone-ng", "standalone" ]'
 
 jobs:
   image-manually:
@@ -47,5 +52,6 @@ jobs:
       server_repo_ref: ${{ github.event.inputs.server_repo_ref }}
       ng_server_repo_ref: ${{ github.event.inputs.ng_server_repo_ref }}
       ng_ui_repo_ref: ${{ github.event.inputs.ng_ui_repo_ref }}
-      image_name_prefix: joinmarket-webui/jam-dev-
       skip_release_verification: ${{ github.event.inputs.skip_release_verification == 'true' }}
+      image_name_prefix: joinmarket-webui/jam-dev-
+      images_matrix: ${{ github.event.inputs.images_matrix }}

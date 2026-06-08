@@ -62,8 +62,8 @@ RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
     fi
 
-# Build the Jam UI with NG backend enabled
-RUN npm ci && VITE_BACKEND=ng npm run build
+RUN npm clean-install --no-fund --no-audit \
+    && npm run build
 # --- UI builder - end
 
 # --- Venv builder
