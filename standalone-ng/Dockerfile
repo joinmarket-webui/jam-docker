@@ -222,6 +222,9 @@ RUN chmod +x \
 # Copy nginx configuration
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+RUN backend_version="$(/opt/venv/bin/python -c 'from importlib.metadata import version; print(version("jmcore"))')" \
+    && sed --in-place "s|__BACKEND_VERSION__|${backend_version}|g" /etc/nginx/conf.d/default.conf
+
 # Remove the default nginx site that conflicts with our config
 RUN rm --force /etc/nginx/sites-enabled/default
 
