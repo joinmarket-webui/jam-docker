@@ -153,6 +153,7 @@ COPY --chown=tor:tor torrc /etc/tor/torrc
 
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+RUN sed --in-place "s|__BACKEND_VERSION__|${JM_SERVER_REPO_REF}|g" /etc/nginx/conf.d/default.conf
 
 COPY --chmod=0755 jam-entrypoint.sh /
 
