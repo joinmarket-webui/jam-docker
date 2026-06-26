@@ -51,12 +51,13 @@ WORKDIR /usr/src/jam
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         echo "Importing GPG keys for Jam release verification..." \
-        && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+        && find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
         && if [ "$(git cat-file -t "refs/tags/$JAM_REPO_REF" 2>/dev/null)" = "tag" ]; then \
             echo "Verifying GPG signature for tag: $JAM_REPO_REF" \
             && git verify-tag "$JAM_REPO_REF"; \
         else \
-            echo "Ref $JAM_REPO_REF is not an annotated tag; skipping verify-tag."; \
+            echo "Ref $JAM_REPO_REF is not an annotated tag; Trying to verify commit..." \
+            && git verify-commit $(git rev-parse --verify HEAD); \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
@@ -100,12 +101,13 @@ WORKDIR /build
 RUN git clone "$JM_NG_REPO" . --depth=1 --branch "$JM_NG_REPO_REF" \
     && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
         echo "Importing GPG keys for joinmarket-ng release verification..." \
-        && find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
+        && find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
         && if [ "$(git cat-file -t "refs/tags/$JM_NG_REPO_REF" 2>/dev/null)" = "tag" ]; then \
             echo "Verifying GPG signature for tag: $JM_NG_REPO_REF" \
             && git verify-tag "$JM_NG_REPO_REF"; \
         else \
-            echo "Ref $JM_NG_REPO_REF is not an annotated tag; skipping verify-tag."; \
+            echo "Ref $JM_NG_REPO_REF is not an annotated tag; Trying to verify commit..." \
+            && git verify-commit $(git rev-parse --verify HEAD); \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \

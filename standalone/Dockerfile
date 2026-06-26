@@ -29,6 +29,7 @@ FROM ${NODE_IMAGE} AS node
 # --- Builder base 
 FROM ${ALPINE_IMAGE} AS builder-base
 RUN apk add --no-cache --update git gnupg
+COPY pubkeys/ /pubkeys
 # --- Builder base - end
 
 # --- UI builder 
@@ -42,15 +43,22 @@ COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
-WORKDIR /usr/src/jam
+# Copy GPG public keys from builder-base
+COPY --from=builder-base /pubkeys /pubkeys
 
-COPY pubkeys/ /pubkeys
+WORKDIR /usr/src/jam
 
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
     && (if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
-        find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-        && git verify-tag "$JAM_REPO_REF"; \
+        find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
+        && if [ "$(git cat-file -t "refs/tags/$JAM_REPO_REF" 2>/dev/null)" = "tag" ]; then \
+            echo "Verifying GPG signature for tag: $JAM_REPO_REF" \
+            && git verify-tag "$JAM_REPO_REF"; \
+        else \
+            echo "Ref $JAM_REPO_REF is not an annotated tag; Trying to verify commit..." \
+            && git verify-commit $(git rev-parse --verify HEAD); \
+        fi; \
     fi) \
     && npm clean-install --no-fund --no-audit \
     && npm run build
@@ -64,14 +72,21 @@ ARG SKIP_RELEASE_VERIFICATION
 ARG JM_SERVER_REPO
 ARG JM_SERVER_REPO_REF
 
-WORKDIR /usr/src/joinmarket-clientserver
+# Copy GPG public keys from builder-base
+COPY --from=builder-base /pubkeys /pubkeys
 
-COPY pubkeys/ /pubkeys
+WORKDIR /usr/src/joinmarket-clientserver
 
 RUN git clone "$JM_SERVER_REPO" . --depth=1 --branch "$JM_SERVER_REPO_REF" \
     && (if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
-        find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-        && git verify-tag "$JM_SERVER_REPO_REF"; \
+        find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
+        && if [ "$(git cat-file -t "refs/tags/$JM_SERVER_REPO_REF" 2>/dev/null)" = "tag" ]; then \
+            echo "Verifying GPG signature for tag: $JM_SERVER_REPO_REF" \
+            && git verify-tag "$JM_SERVER_REPO_REF"; \
+        else \
+            echo "Ref $JM_SERVER_REPO_REF is not an annotated tag; Trying to verify commit.." \
+            && git verify-commit $(git rev-parse --verify HEAD); \
+        fi; \
     fi)
 # --- SERVER builder - end
 
