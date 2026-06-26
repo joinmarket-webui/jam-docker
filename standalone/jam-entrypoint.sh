@@ -8,12 +8,12 @@ mkdir --parents "${DATADIR}/"
 mkdir --parents /var/log/jam
 
 # restore the default config
-if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG}" = "true" ]; then
+if [ ! -f "$CONFIG" ] || [ "${RESTORE_DEFAULT_CONFIG,,}" = "true" ]; then
     cp --force "$DEFAULT_CONFIG" "$CONFIG"
 fi
 
 # remove leftover lockfiles from possible unclean shutdowns before startup
-if [ "${REMOVE_LOCK_FILES}" = "true" ]; then
+if [ "${REMOVE_LOCK_FILES,,}" = "true" ]; then
     echo "Remove leftover wallet lockfiles before startup..."
     rm --force --verbose "${DATADIR}"/wallets/.*.jmdat.lock
 fi
@@ -52,7 +52,7 @@ while IFS='=' read -r -d '' envkey parsedval; do
 done < <(env -0)
 
 # ensure a wallet name is present
-jmenv['rpc_wallet_file']=${jmenv['rpc_wallet_file']:-'jm_webui_default'}
+jmenv['rpc_wallet_file']=${jmenv['rpc_wallet_file']:-'jam_clientserver'}
 
 # make sure `max_cj_fee_abs` and `max_cj_fee_rel` are set
 # `max_cj_fee_abs` between 5000 - 10000 sats if not provided
@@ -78,7 +78,7 @@ for key in "${!jmenv[@]}"; do
 done
 
 # wait for a ready file to be created if necessary
-if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
+if [ "${READY_FILE}" ] && [ "${READY_FILE,,}" != "false" ]; then
     echo "Waiting for file $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
     echo "Successfully waited for file $READY_FILE to be created."
@@ -101,7 +101,7 @@ else
 fi
 
 # wait for bitcoind to accept RPC requests if necessary
-if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
+if [ "${WAIT_FOR_BITCOIND,,}" != "false" ]; then
     echo "Waiting for bitcoind to accept RPC requests..."
     # use `getblockchaininfo` command here, as this is the first request JM is
     # performing during initialization
@@ -121,7 +121,7 @@ if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
 fi
 
 # ensure that a wallet exists and is loaded if necessary
-if [ "${ENSURE_WALLET}" = "true" ]; then
+if [ "${ENSURE_WALLET,,}" = "true" ]; then
     wallet_name="${jmenv['rpc_wallet_file']}"
 
     echo "Creating wallet $wallet_name if missing..."
@@ -131,7 +131,7 @@ if [ "${ENSURE_WALLET}" = "true" ]; then
         \"method\":\"createwallet\",\
         \"params\":{\
             \"wallet_name\":\"${wallet_name}\",\
-            \"descriptors\":false,\
+            \"descriptors\":$( [[ "${CREATE_WALLET_PARAMS_DESCRIPTORS,,}" == "false" ]] && echo false || echo true ),\
             \"load_on_startup\":true\
         }\
     }"

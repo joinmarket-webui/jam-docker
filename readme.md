@@ -89,7 +89,8 @@ docker pull ghcr.io/joinmarket-webui/jam-standalone:latest
 The following environment variables control the configuration:
 - `APP_USER` (optional; username used for basic authentication)
 - `APP_PASSWORD` (optional, but required if `APP_USER` is provided; password used for basic authentication)
-- `ENSURE_WALLET` (optional, defaults to `false`; create and load the wallet in bitcoin core on startup)
+- `ENSURE_WALLET` (optional, defaults to `false`; create and load `JM_RPC_WALLET_FILE` (default `jam_clientserver`) in bitcoin core on startup)
+- `CREATE_WALLET_PARAMS_DESCRIPTORS` (optional, defaults to `true`; must be `false` for backend versions `< v0.9.12`)
 - `READY_FILE` (optional; wait for a file to be created before starting all services, e.g. to wait for chain synchronization)
 - `REMOVE_LOCK_FILES` (optional, defaults to `false`; remove leftover lockfiles from possible unclean shutdowns on startup)
 - `RESTORE_DEFAULT_CONFIG` (optional, defaults to `false`; overwrites any existing `joinmarket.cfg` file with a default config)
@@ -98,6 +99,7 @@ The following environment variables control the configuration:
 
 Variables starting with prefix `JM_` will be applied to `joinmarket.cfg` e.g.:
 - `--env JM_GAPLIMIT=200` will set the `gaplimit` config value to `200`
+- `--env JM_RPC_WALLET_FILE="jam_clientserver"` will set the `rpc_wallet_file` config value to `jam_clientserver`
 
 ### RPC authentication
 
@@ -157,9 +159,11 @@ docker run --rm -it \
         --env JM_RPC_USER="jm" \
         --env JM_RPC_PASSWORD="***" \
         --env JM_NETWORK="regtest" \
+        --env JM_RPC_WALLET_FILE="jam_clientserver" \
         --env APP_USER="joinmarket" \
         --env APP_PASSWORD="joinmarket" \
         --env ENSURE_WALLET="true" \
+        --env CREATE_WALLET_PARAMS_DESCRIPTORS="true" \
         --env REMOVE_LOCK_FILES="true" \
         --env RESTORE_DEFAULT_CONFIG="true" \
         --env WAIT_FOR_BITCOIND="true" \
@@ -176,9 +180,11 @@ docker run --rm -it \
         --env JM_RPC_PORT="18443" \
         --env JM_RPC_COOKIE_FILE="/bitcoin/.cookie" \
         --env JM_NETWORK="regtest" \
+        --env JM_RPC_WALLET_FILE="jam_clientserver" \
         --env APP_USER="joinmarket" \
         --env APP_PASSWORD="joinmarket" \
         --env ENSURE_WALLET="true" \
+        --env CREATE_WALLET_PARAMS_DESCRIPTORS="true" \
         --env REMOVE_LOCK_FILES="true" \
         --env RESTORE_DEFAULT_CONFIG="true" \
         --env WAIT_FOR_BITCOIND="true" \
@@ -231,7 +237,7 @@ Wrapper-specific env vars:
 - `REMOVE_LOCK_FILES=true`: remove leftover wallet lockfiles on startup
 - `READY_FILE=/path`: wait for this file before starting services
 - `WAIT_FOR_BITCOIND=false`: skip the bitcoind RPC wait
-- `ENSURE_WALLET=true`: create and load `BITCOIN__RPC_WALLET_FILE` (default `jam`) at startup
+- `ENSURE_WALLET=true`: create and load `BITCOIN__DESCRIPTOR_WALLET_NAME` (default `jam_ng`) at startup
 
 ### Build
 ```sh
