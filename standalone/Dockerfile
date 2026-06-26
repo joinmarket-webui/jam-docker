@@ -104,8 +104,24 @@ LABEL server-version="$JM_SERVER_REPO_REF"
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY --from=dinit /out/usr/bin /usr/bin
-COPY --from=ui-builder /usr/src/jam/build /app
 COPY --from=server-builder /usr/src/joinmarket-clientserver /src
+
+# Copy UI build artifacts from ui-builder
+# Modern Jam (devel) uses Vite and outputs to dist/
+# Legacy Jam (v0.4.1+) uses CRA and outputs to build/
+RUN --mount=type=bind,from=ui-builder,source=/usr/src/jam,target=/tmp/jam \
+    if [ -d /tmp/jam/dist ]; then \
+        echo "Detected Vite build output (dist/)"; \
+        cp --recursive /tmp/jam/dist /app; \
+    elif [ -d /tmp/jam/build ]; then \
+        echo "Detected CRA build output (build/)"; \
+        cp --recursive /tmp/jam/build /app; \
+    else \
+        echo "ERROR: No UI build output found!"; \
+        echo "Checked directories:"; \
+        ls --all -l /tmp/jam/ || true; \
+        exit 1; \
+    fi
 
 RUN addgroup --system tor \
     && adduser --system --disabled-login --home /home/tor --ingroup tor --gecos 'tor user' tor \
@@ -126,7 +142,7 @@ RUN addgroup --system tor \
     # image dependencies
     tini iproute2 procps vim jq \
     # servers dependencies (see `install.sh`)
-    build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libltdl-dev \
+    build-essential automake autoconf pkg-config libtool python3-dev python3-pip python3-setuptools python3-venv libffi-dev libffi8 libltdl-dev \
     # logrotate
     logrotate coreutils \
     # tor

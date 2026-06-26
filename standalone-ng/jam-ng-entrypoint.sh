@@ -32,7 +32,7 @@ mkdir --parents /var/log/jam-ng/obwatcher
 mkdir --parents /var/log/jam-ng/tor
 
 # optional: remove leftover wallet lockfiles from unclean shutdowns
-if [ "${REMOVE_LOCK_FILES}" = "true" ]; then
+if [ "${REMOVE_LOCK_FILES,,}" = "true" ]; then
     echo "Removing leftover wallet lockfiles before startup..."
     rm --force --verbose "${DATADIR}"/wallets/.*.jmdat.lock || true
 fi
@@ -64,7 +64,7 @@ if [ -n "${JAM_UI_PORT##*[!0-9]*}" ]; then
 fi
 
 # wait for a ready file before starting services (e.g. chain sync gate)
-if [ "${READY_FILE}" ] && [ "${READY_FILE}" != "false" ]; then
+if [ "${READY_FILE}" ] && [ "${READY_FILE,,}" != "false" ]; then
     echo "Waiting for file $READY_FILE to be created..."
     while [ ! -f "$READY_FILE" ]; do sleep 1; done
     echo "Successfully waited for file $READY_FILE to be created."
@@ -106,7 +106,7 @@ if [ -n "${rpc_url}" ]; then
              "${rpc_url}"
     }
 
-    if [ "${WAIT_FOR_BITCOIND}" != "false" ]; then
+    if [ "${WAIT_FOR_BITCOIND,,}" != "false" ]; then
         echo "Waiting for bitcoind at ${rpc_url} to accept RPC requests..."
         # generally a non-error response would be enough, but waiting for
         # blocks >= 100 is also needed for regtest environments.
@@ -118,15 +118,15 @@ if [ -n "${rpc_url}" ]; then
         echo "Successfully waited for bitcoind to accept RPC requests."
     fi
 
-    if [ "${ENSURE_WALLET}" = "true" ]; then
-        wallet_name="${BITCOIN__DESCRIPTOR_WALLET_NAME:-jam}"
+    if [ "${ENSURE_WALLET,,}" = "true" ]; then
+        wallet_name="${BITCOIN__DESCRIPTOR_WALLET_NAME:-jam_ng}"
         echo "Creating wallet ${wallet_name} if missing..."
         rpc_call "createwallet" "[\"${wallet_name}\", false, false, \"\", false, true, true]" > /dev/null 2>&1 || true
         echo "Loading wallet ${wallet_name}..."
         rpc_call "loadwallet" "[\"${wallet_name}\", true]" > /dev/null 2>&1 || true
     fi
 else
-    if [ "${WAIT_FOR_BITCOIND}" != "false" ] || [ "${ENSURE_WALLET}" = "true" ]; then
+    if [ "${WAIT_FOR_BITCOIND,,}" != "false" ] || [ "${ENSURE_WALLET,,}" = "true" ]; then
         echo "BITCOIN__RPC_URL is not set; skipping bitcoind wait and wallet management."
     fi
 fi
