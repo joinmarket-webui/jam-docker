@@ -121,7 +121,8 @@ RUN addgroup --system tor \
     nginx \
     # cleanup 
     && apt-get clean \
-    && rm --recursive --force /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
 
 ENV DATADIR=/root/.joinmarket
 ENV CONFIG=${DATADIR}/joinmarket.cfg

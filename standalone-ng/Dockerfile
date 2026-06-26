@@ -75,7 +75,7 @@ ARG SKIP_RELEASE_VERIFICATION
 
 # Install Python, build dependencies, git, and gnupg
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
         python3 \
         python3-venv \
         python3-pip \
@@ -87,7 +87,8 @@ RUN apt-get update \
         libsecp256k1-dev \
         pkg-config \
         cmake \
-    && rm --recursive --force /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
 
 # Copy GPG public keys from builder-base
 COPY --from=builder-base /pubkeys /pubkeys
@@ -134,7 +135,7 @@ ARG S6_OVERLAY_ARMHF_HASH
 
 # Install runtime dependencies (includes python3 so the venv symlinks resolve)
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
         nginx \
         tor \
         curl \
@@ -148,7 +149,8 @@ RUN apt-get update \
         libsodium23 \
         libsecp256k1-1 \
     && apt-get clean \
-    && rm --recursive --force /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
 
 # Install s6-overlay
 # Determine architecture for s6-overlay
