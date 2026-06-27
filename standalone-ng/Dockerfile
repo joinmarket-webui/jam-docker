@@ -22,8 +22,8 @@ ARG NODE_IMAGE=node:${NODE_IMAGE_VERSION}@sha256:${NODE_IMAGE_HASH}
 ARG ALPINE_IMAGE_VERSION=${ALPINE_IMAGE_VERSION:-3.24.1}
 ARG ALPINE_IMAGE_HASH=${ALPINE_IMAGE_HASH:-28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b}
 ARG ALPINE_IMAGE=alpine:${ALPINE_IMAGE_VERSION}@sha256:${ALPINE_IMAGE_HASH}
-ARG DEBIAN_IMAGE_VERSION=${DEBIAN_IMAGE_VERSION:-bookworm-20260623-slim}
-ARG DEBIAN_IMAGE_HASH=${DEBIAN_IMAGE_HASH:-60eac759739651111db372c07be67863818726f754804b8707c90979bda511df}
+ARG DEBIAN_IMAGE_VERSION=${DEBIAN_IMAGE_VERSION:-trixie-20260623-slim}
+ARG DEBIAN_IMAGE_HASH=${DEBIAN_IMAGE_HASH:-28de0877c2189802884ccd20f15ee41c203573bd87bb6b883f5f46362d24c5c2}
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
 # --- Builder base 
@@ -146,7 +146,7 @@ RUN apt-get update \
         python3 \
         python3-venv \
         libsodium23 \
-        libsecp256k1-1 \
+        libsecp256k1-2 \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/* \
     && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
