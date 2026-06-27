@@ -41,9 +41,6 @@ ARG SKIP_RELEASE_VERIFICATION
 # Install git and gnupg for cloning and verification
 RUN apk add --no-cache --update git gnupg
 
-# Copy GPG public keys from builder-base
-COPY --from=builder-base /pubkeys /pubkeys
-
 # Set working directory
 WORKDIR /usr/src/jam
 

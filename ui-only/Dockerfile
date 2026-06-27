@@ -26,6 +26,8 @@ COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
+COPY pubkeys/ /pubkeys
+
 # install build dependencies
 RUN apk add --no-cache --update git gnupg
 
@@ -36,8 +38,6 @@ ARG JAM_REPO
 ARG JAM_REPO_REF
 
 WORKDIR /usr/src/jam
-
-COPY pubkeys/ /pubkeys
 
 # checkout and build project
 RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
