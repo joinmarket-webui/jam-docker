@@ -171,8 +171,8 @@ RUN case "$(uname -m)" in \
     && rm --force s6-overlay-*.tar.xz
 
 # Copy UI build artifacts from ui-builder
-# Modern Jam (devel) uses Vite and outputs to dist/
-# Legacy Jam (v0.4.1+) uses CRA and outputs to build/
+# Modern Jam (>=v2.0.0) uses Vite and outputs to dist/
+# Legacy Jam (<v2.0.0) uses CRA and outputs to build/
 RUN --mount=type=bind,from=ui-builder,source=/usr/src/jam,target=/tmp/jam \
     if [ -d /tmp/jam/dist ]; then \
         echo "Detected Vite build output (dist/)"; \

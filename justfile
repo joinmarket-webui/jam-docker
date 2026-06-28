@@ -40,44 +40,9 @@ docker-build-ui-master *args='':
         --build-arg SKIP_RELEASE_VERIFICATION=true \
         {{args}}
 
-# create "standalone" docker image
-[group("docker")]
-docker-build-standalone jam_repo_ref=env('JAM_REPO_REF') jm_server_repo_ref=env('JM_SERVER_REPO_REF') *args='':
-    @echo "Creating 'standalone' docker image ..."
-    @docker buildx build {{args}} \
-        --label "local" \
-        --build-arg JAM_REPO_REF={{jam_repo_ref}} \
-        --build-arg JM_SERVER_REPO_REF={{jm_server_repo_ref}} \
-        --tag "joinmarket-webui/jam-standalone" ./standalone
-
-# create "standalone" docker image from master
-[group("docker")]
-docker-build-standalone-master *args='':
-    @just docker-build-standalone master master \
-        --build-arg SKIP_RELEASE_VERIFICATION=true \
-        {{args}}
-
-# create "standalone" docker image from master (with secp-check **and** gpg-validation disabled)
-[group("docker")]
-docker-build-standalone-master-fast-insecure *args='':
-    @just docker-build-standalone-master \
-        "--build-arg 'JM_INSTALL_SCRIPT_ARGS=--disable-secp-check\ --no-gpg-validation'" \
-        {{args}}
-
-[group("docker")]
-docker-buildx-standalone-master *args='':
-    @just docker-build-standalone-master \
-        --platform linux/amd64,linux/arm64 \
-        {{args}}
-
-# run shell in "standalone" docker container
-[group("docker")]
-docker-run-shell-standalone:
-    @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone
-
 # create "standalone-ng" docker image (joinmarket-ng backend)
 [group("docker")]
-docker-build-standalone-ng jam_repo_ref=env('JM_NG_UI_REPO_REF') jm_ng_repo_ref=env('JM_NG_REPO_REF') *args='':
+docker-build-standalone-ng jam_repo_ref=env('JAM_REPO_REF') jm_ng_repo_ref=env('JM_NG_REPO_REF') *args='':
     @echo "Creating 'standalone-ng' docker image ..."
     @docker buildx build {{args}} \
         --label "local" \
@@ -88,7 +53,7 @@ docker-build-standalone-ng jam_repo_ref=env('JM_NG_UI_REPO_REF') jm_ng_repo_ref=
 # create "standalone-ng" docker image from main (skip release verification)
 [group("docker")]
 docker-build-standalone-ng-main *args='':
-    @just docker-build-standalone-ng devel main \
+    @just docker-build-standalone-ng master main \
         --build-arg SKIP_RELEASE_VERIFICATION=true \
         {{args}}
 
@@ -118,26 +83,12 @@ docker-image-size:
 docker-lint-ui-only:
     @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/Dockerfile"
 
-[group("docker")]
-docker-lint-standalone:
-    @docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalone/Dockerfile"
-
 # push docker image manually
 [group("docker")]
 docker-push username image_name tag:
     # this exists in case ci actoin fails (e.g. because if resource exhaustion)
     @docker login --username {{username}} --password-stdin ghcr.io
     @docker push ghcr.io/{{image_name}}:{{tag}}
-
-[group("development")]
-extract-default-config:
-    @echo "Starting docker container to extract default configuration..."
-    @docker run --rm --detach --entrypoint="/bin/bash" --name "jam-dev-create-config" -t joinmarket-webui/jam-standalone
-    @docker exec -it jam-dev-create-config python3 /src/scripts/jmwalletd.py || :
-    @echo "Writing config to {{project_dir}}/standalone/default.cfg.."
-    @docker exec -it jam-dev-create-config cat /root/.joinmarket/joinmarket.cfg > standalone/default.cfg
-    @echo "Stopping docker container..."
-    @docker stop jam-dev-create-config
 
 [group("development")]
 probe-directory-node onion_url port='5222':
