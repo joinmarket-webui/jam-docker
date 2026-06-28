@@ -15,17 +15,9 @@ on:
         description: 'ui version/branch (e.g. v0.1.1, master, etc.)'
         required: true
         type: string
-      server_repo_ref:
-        description: 'server version/branch (e.g. v0.9.8, master, etc.)'
-        required: true
-        type: string
       ng_server_repo_ref:
         description: 'ng server version/branch (e.g. main, 0.32.0, etc.)'
         required: true
-        type: string
-      ng_ui_repo_ref:
-        description: 'ng ui version/branch override for standalone-ng (e.g. devel, v2.0.0, etc.); falls back to ui_repo_ref if not set'
-        required: false
         type: string
       image_name_prefix:
         description: 'image name prefix (e.g. joinmarket-webui/jam-)'
@@ -37,10 +29,10 @@ on:
         default: false
         type: boolean
       images_matrix:
-        description: 'the images you want to build as json array ([ "ui-only", "standalone-ng", "standalone" ])'
+        description: 'the images you want to build as json array ([ "ui-only", "standalone-ng" ])'
         required: false
         type: string
-        default: '[ "ui-only", "standalone-ng", "standalone" ]'
+        default: '[ "ui-only", "standalone-ng" ]'
 
 env:
   REGISTRY: ghcr.io
@@ -93,7 +85,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JAM_REPO_REF=${{ matrix.context == 'standalone-ng' && (inputs.ng_ui_repo_ref || inputs.ui_repo_ref) || inputs.ui_repo_ref }}
-            JM_SERVER_REPO_REF=${{ inputs.server_repo_ref }}
+            JAM_REPO_REF=${{ inputs.ui_repo_ref }}
             JM_NG_REPO_REF=${{ inputs.ng_server_repo_ref }}
             SKIP_RELEASE_VERIFICATION=${{ inputs.skip_release_verification }}

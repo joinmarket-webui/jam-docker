@@ -58,6 +58,6 @@ jobs:
           tags: joinmarket-webui/jam-${{ matrix.context }}-ci
           labels: ci
           build-args: |
-            JAM_REPO_REF=devel
+            JAM_REPO_REF=master
             JM_NG_REPO_REF=main
             SKIP_RELEASE_VERIFICATION=true

@@ -11,8 +11,8 @@ jobs:
     outputs:
       ui_repo_url: ${{ steps.dotenv.outputs.jam_repo }}
       ui_repo_ref: ${{ steps.dotenv.outputs.jam_repo_ref }}
-      server_repo_url: ${{ steps.dotenv.outputs.jm_server_repo }}
-      server_repo_ref: ${{ steps.dotenv.outputs.jm_server_repo_ref }}
+      jm_ng_repo_url: ${{ steps.dotenv.outputs.jm_ng_repo }}
+      jm_ng_repo_ref: ${{ steps.dotenv.outputs.jm_ng_repo_ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
@@ -31,10 +31,10 @@ jobs:
       current_tag: ${{ needs.readenv.outputs.ui_repo_ref }}
       env_var_name: 'JAM_REPO_REF'
 
-  check-server:
+  check-joinmarket-ng:
     uses: ./.github/workflows/update-dependency-version.yml
     needs: readenv
     with:
-      repo_url: ${{ needs.readenv.outputs.server_repo_url }}
-      current_tag: ${{ needs.readenv.outputs.server_repo_ref }}
-      env_var_name: 'JM_SERVER_REPO_REF'
+      repo_url: ${{ needs.readenv.outputs.jm_ng_repo_url }}
+      current_tag: ${{ needs.readenv.outputs.jm_ng_repo_ref }}
+      env_var_name: 'JM_NG_REPO_REF'

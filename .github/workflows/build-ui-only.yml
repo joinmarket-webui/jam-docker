@@ -59,6 +59,5 @@ jobs:
           labels: ci
           build-args: |
             JAM_REPO_REF=master
-            JM_SERVER_REPO_REF=master
             SKIP_RELEASE_VERIFICATION=true
             JM_INSTALL_SCRIPT_ARGS=--disable-secp-check --no-gpg-validation
