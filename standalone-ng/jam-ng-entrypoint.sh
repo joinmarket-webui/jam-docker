@@ -117,17 +117,9 @@ if [ -n "${rpc_url}" ]; then
         done
         echo "Successfully waited for bitcoind to accept RPC requests."
     fi
-
-    if [ "${ENSURE_WALLET,,}" = "true" ]; then
-        wallet_name="${BITCOIN__DESCRIPTOR_WALLET_NAME:-jam_ng}"
-        echo "Creating wallet ${wallet_name} if missing..."
-        rpc_call "createwallet" "[\"${wallet_name}\", false, false, \"\", false, true, true]" > /dev/null 2>&1 || true
-        echo "Loading wallet ${wallet_name}..."
-        rpc_call "loadwallet" "[\"${wallet_name}\", true]" > /dev/null 2>&1 || true
-    fi
 else
-    if [ "${WAIT_FOR_BITCOIND,,}" != "false" ] || [ "${ENSURE_WALLET,,}" = "true" ]; then
-        echo "BITCOIN__RPC_URL is not set; skipping bitcoind wait and wallet management."
+    if [ "${WAIT_FOR_BITCOIND,,}" != "false" ]; then
+        echo "BITCOIN__RPC_URL is not set; skip waiting for bitcoind."
     fi
 fi
 

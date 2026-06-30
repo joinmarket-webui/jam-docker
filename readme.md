@@ -116,7 +116,6 @@ Wrapper-specific env vars:
 - `REMOVE_LOCK_FILES=true`: remove leftover wallet lockfiles on startup
 - `READY_FILE=/path`: wait for this file before starting services
 - `WAIT_FOR_BITCOIND=false`: skip the bitcoind RPC wait
-- `ENSURE_WALLET=true`: create and load `BITCOIN__DESCRIPTOR_WALLET_NAME` (default `jam_ng`) at startup
 
 ### Build
 ```sh
