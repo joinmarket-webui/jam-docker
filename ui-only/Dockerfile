@@ -31,7 +31,7 @@ COPY pubkeys/ /pubkeys
 # install build dependencies
 RUN apk add --no-cache --update git gnupg
 
-# --- UI builder 
+# --- UI builder
 FROM builder-base AS ui-builder
 ARG SKIP_RELEASE_VERIFICATION
 ARG JAM_REPO

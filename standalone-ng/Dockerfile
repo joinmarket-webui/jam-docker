@@ -26,20 +26,25 @@ ARG DEBIAN_IMAGE_VERSION=${DEBIAN_IMAGE_VERSION:-trixie-20260623-slim}
 ARG DEBIAN_IMAGE_HASH=${DEBIAN_IMAGE_HASH:-28de0877c2189802884ccd20f15ee41c203573bd87bb6b883f5f46362d24c5c2}
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
-# --- Builder base 
+FROM ${NODE_IMAGE} AS node
+
 FROM ${ALPINE_IMAGE} AS builder-base
-RUN apk add --no-cache --update git gnupg
+
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
 COPY pubkeys/ /pubkeys
-# --- Builder base - end
+
+# install build dependencies
+RUN apk add --no-cache --update git gnupg
 
 # --- UI builder
-FROM ${NODE_IMAGE} AS ui-builder
+FROM builder-base AS ui-builder
 ARG JAM_REPO
 ARG JAM_REPO_REF
 ARG SKIP_RELEASE_VERIFICATION
-
-# Install git and gnupg for cloning and verification
-RUN apk add --no-cache --update git gnupg
 
 # Set working directory
 WORKDIR /usr/src/jam
