@@ -8,41 +8,43 @@ ARG JAM_REPO_REF=master
 ARG JM_NG_REPO=https://github.com/joinmarket-ng/joinmarket-ng
 ARG JM_NG_REPO_REF=main
 
-ARG S6_OVERLAY_VERSION=3.2.3.0
-ARG S6_OVERLAY_NOARCH_HASH=b720f9d9340efc8bb07528b9743813c836e4b02f8693d90241f047998b4c53cf
-ARG S6_OVERLAY_X86_64_HASH=a93f02882c6ed46b21e7adb5c0add86154f01236c93cd82c7d682722e8840563
-ARG S6_OVERLAY_AARCH64_HASH=0952056ff913482163cc30e35b2e944b507ba1025d78f5becbb89367bf344581
-ARG S6_OVERLAY_ARMHF_HASH=1ff4721b2a51e4f4dd9dbfffa47a994f14dbc3048853a83f7fb1c6ce93d59bf4
+ARG S6_OVERLAY_VERSION=${S6_OVERLAY_VERSION:-3.2.3.0}
+ARG S6_OVERLAY_NOARCH_HASH=${S6_OVERLAY_NOARCH_HASH:-b720f9d9340efc8bb07528b9743813c836e4b02f8693d90241f047998b4c53cf}
+ARG S6_OVERLAY_X86_64_HASH=${S6_OVERLAY_X86_64_HASH:-a93f02882c6ed46b21e7adb5c0add86154f01236c93cd82c7d682722e8840563}
+ARG S6_OVERLAY_AARCH64_HASH=${S6_OVERLAY_AARCH64_HASH:-0952056ff913482163cc30e35b2e944b507ba1025d78f5becbb89367bf344581}
+ARG S6_OVERLAY_ARMHF_HASH=${S6_OVERLAY_ARMHF_HASH:-1ff4721b2a51e4f4dd9dbfffa47a994f14dbc3048853a83f7fb1c6ce93d59bf4}
 
 ARG SKIP_RELEASE_VERIFICATION=false
 
 ARG NODE_IMAGE_VERSION=${NODE_IMAGE_VERSION:-26.3.0-alpine3.24}
 ARG NODE_IMAGE_HASH=${NODE_IMAGE_HASH:-9c0e1e52125d6b67d505cf75b4880fcf1290ccea5c480849910e1d57b2cf72b5}
 ARG NODE_IMAGE=node:${NODE_IMAGE_VERSION}@sha256:${NODE_IMAGE_HASH}
-ARG ALPINE_IMAGE_VERSION=3.21.2
-ARG ALPINE_IMAGE_HASH=56fa17d2a7e7f168a043a2712e63aed1f8543aeafdcee47c58dcffe38ed51099
+ARG ALPINE_IMAGE_VERSION=${ALPINE_IMAGE_VERSION:-3.24.1}
+ARG ALPINE_IMAGE_HASH=${ALPINE_IMAGE_HASH:-28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b}
 ARG ALPINE_IMAGE=alpine:${ALPINE_IMAGE_VERSION}@sha256:${ALPINE_IMAGE_HASH}
-ARG DEBIAN_IMAGE_VERSION=bookworm-20250428-slim
-ARG DEBIAN_IMAGE_HASH=4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
+ARG DEBIAN_IMAGE_VERSION=${DEBIAN_IMAGE_VERSION:-trixie-20260623-slim}
+ARG DEBIAN_IMAGE_HASH=${DEBIAN_IMAGE_HASH:-28de0877c2189802884ccd20f15ee41c203573bd87bb6b883f5f46362d24c5c2}
 ARG DEBIAN_IMAGE=debian:${DEBIAN_IMAGE_VERSION}@sha256:${DEBIAN_IMAGE_HASH}
 
-# --- Builder base 
+FROM ${NODE_IMAGE} AS node
+
 FROM ${ALPINE_IMAGE} AS builder-base
-RUN apk add --no-cache --update git gnupg
+
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
 COPY pubkeys/ /pubkeys
-# --- Builder base - end
+
+# install build dependencies
+RUN apk add --no-cache --update git gnupg
 
 # --- UI builder
-FROM ${NODE_IMAGE} AS ui-builder
+FROM builder-base AS ui-builder
 ARG JAM_REPO
 ARG JAM_REPO_REF
 ARG SKIP_RELEASE_VERIFICATION
-
-# Install git and gnupg for cloning and verification
-RUN apk add --no-cache --update git gnupg
-
-# Copy GPG public keys from builder-base
-COPY --from=builder-base /pubkeys /pubkeys
 
 # Set working directory
 WORKDIR /usr/src/jam
@@ -149,7 +151,7 @@ RUN apt-get update \
         python3 \
         python3-venv \
         libsodium23 \
-        libsecp256k1-1 \
+        libsecp256k1-2 \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/* \
     && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
