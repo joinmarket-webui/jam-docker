@@ -93,3 +93,19 @@ docker-push username image_name tag:
 [group("development")]
 probe-directory-node onion_url port='5222':
     @curl --verbose --proxy socks5h://localhost:9050 {{onion_url}}:{{port}}
+
+[group("regtest")]
+docker-compose-up *args='':
+    @docker compose up --detach {{args}}
+
+[group("regtest")]
+docker-compose-down *args='':
+    @docker compose down
+
+[group("regtest")]
+docker-compose-clear *args='':
+    @docker compose down --volumes --remove-orphans {{args}}
+
+[group("regtest")]
+docker-compose-logs *args='':
+    @docker compose logs --follow

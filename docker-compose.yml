@@ -1,0 +1,105 @@
+services:
+  jam-standalone:
+    container_name: jam_docker_jam_standalone
+    image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
+    environment:
+      READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      BITCOIN__RPC_URL: http://bitcoind:43782
+      BITCOIN__RPC_USER: regtest
+      BITCOIN__RPC_PASSWORD: regtest
+      LOGGING__LEVEL: DEBUG
+      NETWORK_CONFIG__NETWORK: testnet
+      NETWORK_CONFIG__BITCOIN_NETWORK: regtest
+      NETWORK_CONFIG__DIRECTORY_SERVERS: node1.onion:5222, node2.onion:5222
+      #TAKER__MINIMUM_MAKERS: 2
+      #TAKER__MAKER_TIMEOUT_SEC: 30
+    ports:
+      - '28080:80'
+    volumes:
+      - 'jam_standalone_datadir:/root/.joinmarket-ng'
+      - 'initializer_datadir:/root/.regtest-initializer'
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoind_regtest_initializer:
+        condition: service_started
+
+  bitcoind:
+    container_name: jam_docker_bitcoind
+    restart: unless-stopped
+    image: polarlightning/bitcoind:29.0@sha256:4521294ac25fdbf1492a8cc5ea987463a5f244b82546d29bbe8451db39f36f3a
+    command:
+      # rpcauth (user=regtest; password=regtest)
+      -rpcauth=regtest:20b58677979ad9d3cf4b78b1d6e85e44$$2ec3e1e1c00c7c58d7aff1d4bf96e4a984ea1af5d676d862fd0faa857a1d4d7c
+      -datadir=/home/bitcoin/data
+      -walletdir=/home/bitcoin/walletdata
+      -regtest=1
+      -server=1
+      -port=39388
+      -rpcport=43782
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+      -whitelist=0.0.0.0/0
+      -maxmempool=500
+      -debug=rpc
+      -logips=0
+      -networkactive=1
+      -dnsseed=0
+      -uacomment=jmdevbitcoindregtest
+      -printpriority=1
+      -logtimemicros=1
+      -zmqpubrawblock=tcp://0.0.0.0:28332
+      -zmqpubrawtx=tcp://0.0.0.0:28333
+      -zmqpubhashblock=tcp://0.0.0.0:28334
+      -dns=0
+      -listenonion=0
+      -deprecatedrpc=create_bdb
+    expose:
+      - 39388 # P2P
+      - 43782 # RPC
+      - 28332 # ZMQ
+      - 28333 # ZMQ
+      - 28334 # ZMQ
+    volumes:
+      - 'bitcoin_datadir:/home/bitcoin/data'
+      - 'bitcoin_wallet_datadir:/home/bitcoin/walletdata'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          '/entrypoint.sh',
+          'bitcoin-cli',
+          '-chain=regtest',
+          '-rpcport=43782',
+          '-datadir=/home/bitcoin/data',
+          '-getinfo',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+      start_interval: 3s
+
+  bitcoind_regtest_initializer:
+    container_name: jam_docker_bitcoind_initializer
+    build:
+      context: ./contrib/docker-compose-deps/bitcoin/regtest-initializer
+      dockerfile: Dockerfile
+    restart: on-failure
+    environment:
+      READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      RPC_HOST: bitcoind
+      RPC_PORT: 43782
+      RPC_USER: regtest
+      RPC_PASSWORD: regtest
+    volumes:
+      - 'initializer_datadir:/root/.regtest-initializer'
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+
+volumes:
+  bitcoin_datadir:
+  bitcoin_wallet_datadir:
+  initializer_datadir:
+  jam_standalone_datadir:
