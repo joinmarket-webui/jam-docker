@@ -14,7 +14,7 @@ services:
       #TAKER__MINIMUM_MAKERS: 2
       #TAKER__MAKER_TIMEOUT_SEC: 30
     ports:
-      - '28080:80'
+      - '48080:80'
     volumes:
       - 'jam_standalone_datadir:/root/.joinmarket-ng'
       - 'initializer_datadir:/root/.regtest-initializer'
@@ -22,6 +22,21 @@ services:
       bitcoind:
         condition: service_healthy
       bitcoind_regtest_initializer:
+        condition: service_started
+
+  jam-ui-only:
+    container_name: jam_docker_jam_ui_only
+    image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    environment:
+      JAM_JMWALLETD_HOST: jam-standalone
+      JAM_JMWALLETD_API_PORT: 28183
+      JAM_JMWALLETD_WEBSOCKET_PORT: 28283
+      JAM_JMOBWATCH_HOST: jam-standalone
+      JAM_JMOBWATCH_PORT: 62601
+    ports:
+      - '49080:80'
+    depends_on:
+      jam-standalone:
         condition: service_started
 
   bitcoind:
