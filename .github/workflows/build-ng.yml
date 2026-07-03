@@ -5,12 +5,10 @@ on:
     branches: [ master, devel ]
     paths:
       - 'standalone-ng/**'
-      - '.env'
   pull_request:
     branches: [ master, devel ]
     paths:
       - 'standalone-ng/**'
-      - '.env'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +22,7 @@ jobs:
          context: [ standalone-ng ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4.0.0
