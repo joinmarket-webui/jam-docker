@@ -16,7 +16,12 @@ jobs:
       ng_server_repo_ref: ${{ steps.dotenv.outputs.jm_ng_repo_ref }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.0
+        with:
+          sparse-checkout: |
+            .env
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
 
       - name: Read .env file
         id: dotenv

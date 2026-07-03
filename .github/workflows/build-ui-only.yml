@@ -5,12 +5,10 @@ on:
     branches: [ master, devel ]
     paths:
       - 'ui-only/**'
-      - '.env'
   pull_request:
     branches: [ master, devel ]
     paths:
       - 'ui-only/**'
-      - '.env'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +22,7 @@ jobs:
          context: [ ui-only ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4.0.0
@@ -60,4 +58,3 @@ jobs:
           build-args: |
             JAM_REPO_REF=master
             SKIP_RELEASE_VERIFICATION=true
-            JM_INSTALL_SCRIPT_ARGS=--disable-secp-check --no-gpg-validation
