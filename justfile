@@ -95,17 +95,17 @@ probe-directory-node onion_url port='5222':
     @curl --verbose --proxy socks5h://localhost:9050 {{onion_url}}:{{port}}
 
 [group("regtest")]
-docker-compose-up *args='':
+regtest-up *args='':
     @docker compose up --detach {{args}}
 
 [group("regtest")]
-docker-compose-down *args='':
-    @docker compose down
+regtest-down *args='':
+    @docker compose down {{args}}
 
 [group("regtest")]
-docker-compose-clear *args='':
-    @docker compose down --volumes --remove-orphans {{args}}
+regtest-clear *args='':
+    @just regtest-down --volumes --remove-orphans {{args}}
 
 [group("regtest")]
-docker-compose-logs *args='':
+regtest-logs *args='':
     @docker compose logs --follow
