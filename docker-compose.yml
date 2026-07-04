@@ -82,6 +82,8 @@ services:
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
       WAIT_FOR_BITCOIND: 'true' # default: true
+      APP_USER: joinmarket # basic auth
+      APP_PASSWORD: joinmarket
       OBWATCH_URL: http://localhost:17000
       ###################################
       # joinmarket-ng config
