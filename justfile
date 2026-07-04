@@ -7,6 +7,9 @@ set dotenv-required
 
 project_dir := justfile_directory()
 
+regtest_bitcoin_container_name := 'jam_docker_bitcoind'
+regtest_bitcoin_container_rpcport := '43782'
+
 # print available targets
 [group("project-agnostic")]
 default:
@@ -96,7 +99,7 @@ probe-directory-node onion_url port='5222':
 
 [group("regtest")]
 regtest-up *args='':
-    @docker compose up --detach {{args}}
+    @docker compose up {{args}}
 
 [group("regtest")]
 regtest-down *args='':
@@ -109,3 +112,18 @@ regtest-clear *args='':
 [group("regtest")]
 regtest-logs *args='':
     @docker compose logs --follow
+
+[group("regtest")]
+regtest-ps *args='':
+    @docker compose ps {{args}}
+
+# Execute a bitcoin-cli command
+[group("regtest")]
+regtest-bitcoind-exec +command:
+  @docker exec -t {{regtest_bitcoin_container_name}} bitcoin-cli -datadir=/home/bitcoin/data -regtest -rpcport={{regtest_bitcoin_container_rpcport}} {{command}}
+
+# Mine to a specified address and return the block hashes.
+[group("regtest")]
+regtest-mine blocks='1' address='bcrt1q6rz28mcfaxtmd6v789l9rrlrusdprr9pz3cppk':
+  @echo "{{address}}"
+  @just regtest-bitcoind-exec generatetoaddress "{{blocks}}" "{{address}}"
