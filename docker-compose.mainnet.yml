@@ -1,0 +1,24 @@
+services:
+  jam-standalone-mainnet:
+    image: ghcr.io/joinmarket-webui/jam-standalone-ng:CHANGEME
+    network_mode: "host"
+    environment:
+      ###################################
+      # joinmarket-ng config
+      # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
+      ###################################
+      BITCOIN__RPC_URL: https://CHANGEME:8332
+      BITCOIN__RPC_USER: CHANGEME
+      BITCOIN__RPC_PASSWORD: CHANGEME
+      LOGGING__LEVEL: INFO
+      NETWORK_CONFIG__NETWORK: mainnet
+      NETWORK_CONFIG__BITCOIN_NETWORK: mainnet
+      # https://github.com/joinmarket-ng/joinmarket-ng/blob/0.33.0/jmcore/src/jmcore/models.py#L48 (last checked: 2026-07-04)
+      # NETWORK_CONFIG__DIRECTORY_SERVERS: satoshi2vcg5e2ept7tjkzlkpomkobqmgtsjzegg6wipnoajadissead.onion:5222,coinjointovy3eq5fjygdwpkbcdx63d7vd4g32mw7y553uj3kjjzkiqd.onion:5222,nakamotourflxwjnjpnrk7yc2nhkf6r62ed4gdfxmmn5f4saw5q5qoyd.onion:5222,odpwaf67rs5226uabcamvypg3y4bngzmfk7255flcdodesqhsvkptaid.onion:5222,jmarketxf5wc4aldf3slm5u6726zsky52bqnfv6qyxe5hnafgly6yuyd.onion:5222,jmrust7bgdbdl6skkvuzhqost4jkikrluj6alemspeifm5hvgqz2qaad.onion:5222,nok55gjlqw6h76zi6gigukoztpx7xgo5r3w5csu362nys5yukzrxpgad.onion:5222
+    ports:
+      - '39080:80'
+    volumes:
+      - 'jam_standalone_mainnet_datadir:/root/.joinmarket-ng'
+
+volumes:
+  jam_standalone_mainnet_datadir:

@@ -128,3 +128,15 @@ regtest-mine blocks='1' address='bcrt1q6rz28mcfaxtmd6v789l9rrlrusdprr9pz3cppk':
   @echo "{{address}}"
   @just regtest-bitcoind-exec generatetoaddress "{{blocks}}" "{{address}}"
   @echo "Note: Coinbase outputs need 100 confirmations before they show up in the user interface."
+
+[group("mainnet")]
+mainnet-up *args='':
+    @docker compose --file docker-compose.mainnet.yml up {{args}}
+
+[group("mainnet")]
+mainnet-down *args='':
+    @docker compose --file docker-compose.mainnet.yml down {{args}}
+
+[group("mainnet")]
+mainnet-clear *args='':
+    @just mainnet-down --volumes --remove-orphans {{args}}
