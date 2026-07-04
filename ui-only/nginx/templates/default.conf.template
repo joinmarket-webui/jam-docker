@@ -1,18 +1,18 @@
 upstream jmwalletd_api_backend {
     zone upstreams 64K;
-    server $JAM_JMWALLETD_API_PROXY;
+    server ${JAM_JMWALLETD_API_PROXY};
     keepalive 16;
 }
 
 upstream jmwalletd_ws_backend {
     zone upstreams;
-    server $JAM_JMWALLETD_WEBSOCKET_PROXY;
+    server ${JAM_JMWALLETD_WEBSOCKET_PROXY};
     keepalive 2;
 }
 
 upstream obwatch_backend {
     zone upstreams;
-    server $JAM_JMOBWATCH_PROXY;
+    server ${JAM_JMOBWATCH_PROXY};
     keepalive 2;
 }
 
@@ -89,7 +89,7 @@ server {
         proxy_read_timeout 600s;
         proxy_send_timeout 600s;
 
-        proxy_pass https://jmwalletd_ws_backend/api/v1/ws;
+        proxy_pass https://jmwalletd_ws_backend${JAM_JMWALLETD_WEBSOCKET_PATH};
     }
 
     location /obwatch/ {
@@ -126,7 +126,7 @@ server {
         proxy_set_header Content-Length "";
 
         # pass to `/session` which will validate the header
-        proxy_pass http://$server_addr:$server_port/api/v1/session;
+        proxy_pass http://${server_addr}:${server_port}/api/v1/session;
     }
 
     location = /jam/api/v0/features {
@@ -140,6 +140,11 @@ server {
         auth_request /jam/internal/auth;
 
         return 501; # Not Implemented
+    }
+
+    location = /jam/api/v0/health {
+        default_type application/json;
+        return 200 '{ "status": "UP" }';
     }
     
 }
