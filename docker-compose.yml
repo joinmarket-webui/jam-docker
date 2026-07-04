@@ -1,20 +1,41 @@
 services:
 
-  jam-ui-only:
-    container_name: jam_docker_jam_ui_only
-    #image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
-    image: joinmarket-webui/jam-local-ui-only:latest # local build
+  jam-ui-only0:
+    container_name: jam_docker_jam_ui_only0
+    image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    #image: joinmarket-webui/jam-local-ui-only:latest # local build
     environment:
       JAM_JMWALLETD_HOST: jam-standalone0
       JAM_JMWALLETD_API_PORT: 28183
-      JAM_JMWALLETD_WEBSOCKET_PORT: 28183
-      JAM_JMWALLETD_WEBSOCKET_PATH: /api/v1/ws
       JAM_JMOBWATCH_HOST: jam-standalone0
       JAM_JMOBWATCH_PORT: 8000
     ports:
       - '41080:80'
     depends_on:
       jam-standalone0:
+        condition: service_started
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --output-document /dev/null http://127.0.0.1:80/jam/api/v0/health || exit 1']
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+      start_interval: 3s
+
+  jam-ui-only1:
+    container_name: jam_docker_jam_ui_only1
+    image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    environment:
+      JAM_JMWALLETD_HOST: jam-standalone1
+      JAM_JMWALLETD_API_PORT: 28183
+      JAM_JMWALLETD_WEBSOCKET_PORT: 28183
+      JAM_JMWALLETD_WEBSOCKET_PATH: /api/v1/ws
+      JAM_JMOBWATCH_HOST: jam-standalone1
+      JAM_JMOBWATCH_PORT: 17123
+    ports:
+      - '41081:80'
+    depends_on:
+      jam-standalone1:
         condition: service_started
     healthcheck:
       test: ['CMD-SHELL', 'wget --output-document /dev/null http://127.0.0.1:80/jam/api/v0/health || exit 1']
@@ -54,7 +75,7 @@ services:
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
       WAIT_FOR_BITCOIND: 'true' # default: true
-      OBWATCH_URL: http://localhost:8001
+      OBWATCH_URL: http://localhost:17123
       ###################################
       # joinmarket-ng config
       # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
@@ -76,11 +97,11 @@ services:
       TUMBLER__MIN_CONFIRMATIONS_BETWEEN_PHASES: 0 # default: 6
       TUMBLER__CONFIRMATION_POLL_INTERVAL: 1 # default: 30.0
       TUMBLER__RETRY_DELAY_SECONDS: 1 # default: 1800.0
-      ORDERBOOK_WATCHER__PORT: 8001
+      ORDERBOOK_WATCHER__PORT: 17123
       ORDERBOOK_WATCHER__UPDATE_INTERVAL: 10 # default: 60
       TUI__LOG_LEVEL: DEBUG # default: WARNING
     ports:
-      - '43080:80'
+      - '42081:80'
     volumes:
       - 'jam_standalone1_datadir:/root/.joinmarket-ng'
       - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
