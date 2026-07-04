@@ -31,7 +31,7 @@ services:
       JAM_JMWALLETD_WEBSOCKET_PORT: 28183
       JAM_JMWALLETD_WEBSOCKET_PATH: /api/v1/ws
       JAM_JMOBWATCH_HOST: jam-standalone1
-      JAM_JMOBWATCH_PORT: 17123
+      JAM_JMOBWATCH_PORT: 17000
     ports:
       - '41081:80'
     depends_on:
@@ -75,7 +75,7 @@ services:
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
       WAIT_FOR_BITCOIND: 'true' # default: true
-      OBWATCH_URL: http://localhost:17123
+      OBWATCH_URL: http://localhost:17000
       ###################################
       # joinmarket-ng config
       # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
@@ -97,7 +97,7 @@ services:
       TUMBLER__MIN_CONFIRMATIONS_BETWEEN_PHASES: 0 # default: 6
       TUMBLER__CONFIRMATION_POLL_INTERVAL: 1 # default: 30.0
       TUMBLER__RETRY_DELAY_SECONDS: 1 # default: 1800.0
-      ORDERBOOK_WATCHER__PORT: 17123
+      ORDERBOOK_WATCHER__HTTP_PORT: 17000
       ORDERBOOK_WATCHER__UPDATE_INTERVAL: 10 # default: 60
       TUI__LOG_LEVEL: DEBUG # default: WARNING
     ports:
