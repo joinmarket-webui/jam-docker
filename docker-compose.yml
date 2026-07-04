@@ -28,13 +28,15 @@ services:
       dockerfile: Dockerfile
       args:
         SKIP_RELEASE_VERIFICATION: true
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     environment:
-      JAM_JMWALLETD_HOST: jam-standalone1
-      JAM_JMWALLETD_API_PORT: 28183
-      JAM_JMWALLETD_WEBSOCKET_PORT: 28183
+      JAM_JMWALLETD_HOST: host.docker.internal
+      JAM_JMWALLETD_API_PORT: 42183
+      JAM_JMWALLETD_WEBSOCKET_PORT: 42183
       JAM_JMWALLETD_WEBSOCKET_PATH: /api/v1/ws
-      JAM_JMOBWATCH_HOST: jam-standalone1
-      JAM_JMOBWATCH_PORT: 17000
+      JAM_JMOBWATCH_HOST: host.docker.internal
+      JAM_JMOBWATCH_PORT: 42017
     ports:
       - '41081:80'
     depends_on:
@@ -54,6 +56,7 @@ services:
     #image: joinmarket-webui/jam-local-standalone-ng:latest # local build
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      JMWALLETD_HOST: 0.0.0.0 # for ui-only container to connect to
       BITCOIN__RPC_URL: http://bitcoind:43782
       BITCOIN__RPC_COOKIE_FILE: /root/.bitcoin_data/regtest/.cookie
       LOGGING__LEVEL: DEBUG
@@ -84,6 +87,7 @@ services:
       WAIT_FOR_BITCOIND: 'true' # default: true
       APP_USER: joinmarket # basic auth
       APP_PASSWORD: joinmarket
+      JMWALLETD_HOST: 0.0.0.0 # for ui-only container to connect to
       OBWATCH_URL: http://localhost:17000
       ###################################
       # joinmarket-ng config
@@ -111,6 +115,8 @@ services:
       TUI__LOG_LEVEL: DEBUG # default: WARNING
     ports:
       - '42081:80'
+      - '42183:28183'
+      - '42017:17000'
     volumes:
       - 'jam_standalone1_datadir:/root/.joinmarket-ng'
       - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'

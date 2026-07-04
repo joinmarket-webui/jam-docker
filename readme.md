@@ -24,6 +24,30 @@ The following environment variables control the configuration:
 - `JAM_JMOBWATCH_HOST` (optional; ob-watcher host; if not set `JAM_JMWALLETD_HOST` will be used)
 - `JAM_JMOBWATCH_PORT` (required; ob-watcher port)
 
+### Run
+```sh
+docker run --rm -it \
+        --add-host host.docker.internal:host-gateway \
+        --env JAM_JMWALLETD_HOST="host.docker.internal" \
+        --env JAM_JMWALLETD_API_PORT="28183" \
+        --env JAM_JMWALLETD_WEBSOCKET_PORT="28183" \
+        --env JAM_JMOBWATCH_PORT="62601" \
+        --publish "127.0.0.1:8080:80" \
+        joinmarket-webui/jam-ui-only
+```
+
+or (using the host network)
+
+```sh
+docker run --rm -it \
+        --network host \
+        --env JAM_JMWALLETD_HOST="localhost" \
+        --env JAM_JMWALLETD_API_PORT="28183" \
+        --env JAM_JMWALLETD_WEBSOCKET_PORT="28183" \
+        --env JAM_JMOBWATCH_PORT="62601" \
+        joinmarket-webui/jam-ui-only
+```
+
 ### Building Notes
 Building a specific release:
 ```sh
@@ -48,30 +72,6 @@ docker build --label "local" \
 ### Inspecting the Container
 ```sh
 docker run --rm --entrypoint="/bin/ash" -it joinmarket-webui/jam-ui-only
-```
-
-### Run
-```sh
-docker run --rm -it \
-        --add-host host.docker.internal:host-gateway \
-        --env JAM_JMWALLETD_HOST="host.docker.internal" \
-        --env JAM_JMWALLETD_API_PORT="28183" \
-        --env JAM_JMWALLETD_WEBSOCKET_PORT="28283" \
-        --env JAM_JMOBWATCH_PORT="62601" \
-        --publish "127.0.0.1:8080:80" \
-        joinmarket-webui/jam-ui-only
-```
-
-or (using the host network)
-
-```sh
-docker run --rm -it \
-        --network host \
-        --env JAM_JMWALLETD_HOST="localhost" \
-        --env JAM_JMWALLETD_API_PORT="28183" \
-        --env JAM_JMWALLETD_WEBSOCKET_PORT="28283" \
-        --env JAM_JMOBWATCH_PORT="62601" \
-        joinmarket-webui/jam-ui-only
 ```
 
 ### Lint
