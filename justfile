@@ -34,7 +34,7 @@ docker-build-ui jam_repo_ref=env('JAM_REPO_REF') *args='':
     @docker build {{args}} \
         --label "local" \
         --build-arg JAM_REPO_REF={{jam_repo_ref}} \
-        --tag "joinmarket-webui/jam-ui-only" ./ui-only
+        --tag "joinmarket-webui/jam-local-ui-only" ./ui-only
 
 # create "ui" docker image from master
 [group("docker")]
@@ -51,7 +51,7 @@ docker-build-standalone-ng jam_repo_ref=env('JAM_REPO_REF') jm_ng_repo_ref=env('
         --label "local" \
         --build-arg JAM_REPO_REF={{jam_repo_ref}} \
         --build-arg JM_NG_REPO_REF={{jm_ng_repo_ref}} \
-        --tag "joinmarket-webui/jam-standalone-ng" ./standalone-ng
+        --tag "joinmarket-webui/jam-local-standalone-ng" ./standalone-ng
 
 # create "standalone-ng" docker image from main (skip release verification)
 [group("docker")]
@@ -63,7 +63,7 @@ docker-build-standalone-ng-main *args='':
 # run shell in "standalone-ng" docker container
 [group("docker")]
 docker-run-shell-standalone-ng:
-    @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-standalone-ng
+    @docker run --rm --entrypoint="/bin/bash" -it joinmarket-webui/jam-local-standalone-ng
 
 [group("docker")]
 docker-lint-standalone-ng:
@@ -127,3 +127,4 @@ regtest-bitcoind-exec +command:
 regtest-mine blocks='1' address='bcrt1q6rz28mcfaxtmd6v789l9rrlrusdprr9pz3cppk':
   @echo "{{address}}"
   @just regtest-bitcoind-exec generatetoaddress "{{blocks}}" "{{address}}"
+  @echo "Note: Coinbase outputs need 100 confirmations before they show up in the user interface."
