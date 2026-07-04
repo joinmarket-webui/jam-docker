@@ -62,6 +62,10 @@ if [ -n "${JAM_UI_PORT##*[!0-9]*}" ]; then
     sed --in-place "s/listen 80;/listen ${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
     sed --in-place "s/listen \[::\]:80;/listen [::]:${JAM_UI_PORT};/g" /etc/nginx/conf.d/default.conf
 fi
+if [ -n "${ORDERBOOK_WATCHER__HTTP_PORT##*[!0-9]*}" ]; then
+    echo "Proxy obwatcher requests to 127.0.0.1:${ORDERBOOK_WATCHER__HTTP_PORT}."
+    sed --in-place "s/server 127.0.0.1:8000;/server 127.0.0.1:${ORDERBOOK_WATCHER__HTTP_PORT};/g" /etc/nginx/conf.d/default.conf
+fi
 
 # wait for a ready file before starting services (e.g. chain sync gate)
 if [ "${READY_FILE}" ] && [ "${READY_FILE,,}" != "false" ]; then
