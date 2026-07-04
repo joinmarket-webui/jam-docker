@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 BLOCKS=${1:-101} # default to mine a single block
-ADDRESS=${2:-bcrt1qrnz0thqslhxu86th069r9j6y7ldkgs2tzgf5wx} # default to a "random" address
+ADDRESS=${2:-bcrt1q6rz28mcfaxtmd6v789l9rrlrusdprr9pz3cppk} # default to first address of "abandon [...] about" address
 
 echo "Mining ${BLOCKS} blocks to address ${ADDRESS}..."
 payload="{\

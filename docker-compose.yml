@@ -1,42 +1,73 @@
 services:
-  jam-standalone:
-    container_name: jam_docker_jam_standalone
-    image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
-    environment:
-      READY_FILE: /root/.regtest-initializer/btc_fully_synched
-      BITCOIN__RPC_URL: http://bitcoind:43782
-      BITCOIN__RPC_USER: regtest
-      BITCOIN__RPC_PASSWORD: regtest
-      LOGGING__LEVEL: DEBUG
-      NETWORK_CONFIG__NETWORK: testnet
-      NETWORK_CONFIG__BITCOIN_NETWORK: regtest
-      NETWORK_CONFIG__DIRECTORY_SERVERS: node1.onion:5222, node2.onion:5222
-      #TAKER__MINIMUM_MAKERS: 2
-      #TAKER__MAKER_TIMEOUT_SEC: 30
-    ports:
-      - '48080:80'
-    volumes:
-      - 'jam_standalone_datadir:/root/.joinmarket-ng'
-      - 'initializer_datadir:/root/.regtest-initializer'
-    depends_on:
-      bitcoind:
-        condition: service_healthy
-      bitcoind_regtest_initializer:
-        condition: service_started
 
   jam-ui-only:
     container_name: jam_docker_jam_ui_only
     image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
     environment:
-      JAM_JMWALLETD_HOST: jam-standalone
+      JAM_JMWALLETD_HOST: jam-standalone0
       JAM_JMWALLETD_API_PORT: 28183
-      JAM_JMWALLETD_WEBSOCKET_PORT: 28283
-      JAM_JMOBWATCH_HOST: jam-standalone
-      JAM_JMOBWATCH_PORT: 62601
+      JAM_JMWALLETD_WEBSOCKET_PORT: 28183
+      JAM_JMOBWATCH_HOST: jam-standalone0
+      JAM_JMOBWATCH_PORT: 8000
     ports:
-      - '49080:80'
+      - '41080:80'
     depends_on:
-      jam-standalone:
+      jam-standalone0:
+        condition: service_started
+
+  jam-standalone0:
+    container_name: jam_docker_jam_standalone0
+    image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
+    environment:
+      READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      WAIT_FOR_BITCOIND: 'true' # default: true
+      BITCOIN__RPC_URL: http://bitcoind:43782
+      BITCOIN__RPC_USER: regtest
+      BITCOIN__RPC_PASSWORD: regtest
+      #BITCOIN__RPC_COOKIE_FILE: /path/to/.cookie
+      LOGGING__LEVEL: DEBUG
+      NETWORK_CONFIG__NETWORK: testnet
+      NETWORK_CONFIG__BITCOIN_NETWORK: regtest
+      NETWORK_CONFIG__DIRECTORY_SERVERS: node1.onion:5222, node2.onion:5222
+      #MAKER__MIN_SIZE: 100000
+      MAKER__MIN_CONFIRMATIONS: 5 # default: 0
+      #TAKER__MINIMUM_MAKERS: 2
+      #TAKER__MAKER_TIMEOUT_SEC: 30
+      TAKER__BONDLESS_REQUIRE_ZERO_FEE: 'false' # default: true
+    ports:
+      - '42080:80'
+    volumes:
+      - 'jam_standalone0_datadir:/root/.joinmarket-ng'
+      - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoind-regtest-initializer:
+        condition: service_started
+
+  jam-standalone1:
+    container_name: jam_docker_jam_standalone1
+    image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
+    environment:
+      READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      BITCOIN__RPC_URL: http://bitcoind:43782
+      #BITCOIN__RPC_USER: regtest
+      #BITCOIN__RPC_PASSWORD: regtest
+      BITCOIN__RPC_COOKIE_FILE: /root/.bitcoin_data/regtest/.cookie
+      LOGGING__LEVEL: DEBUG
+      NETWORK_CONFIG__NETWORK: testnet
+      NETWORK_CONFIG__BITCOIN_NETWORK: regtest
+      NETWORK_CONFIG__DIRECTORY_SERVERS: node3.onion:5222, node4.onion:5222
+    ports:
+      - '43080:80'
+    volumes:
+      - 'jam_standalone1_datadir:/root/.joinmarket-ng'
+      - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
+      - 'bitcoin_datadir:/root/.bitcoin_data' # mount bitcoind dir to access .cookie file
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoind-regtest-initializer:
         condition: service_started
 
   bitcoind:
@@ -95,7 +126,7 @@ services:
       start_period: 60s
       start_interval: 3s
 
-  bitcoind_regtest_initializer:
+  bitcoind-regtest-initializer:
     container_name: jam_docker_bitcoind_initializer
     build:
       context: ./contrib/docker-compose-deps/bitcoin/regtest-initializer
@@ -108,7 +139,7 @@ services:
       RPC_USER: regtest
       RPC_PASSWORD: regtest
     volumes:
-      - 'initializer_datadir:/root/.regtest-initializer'
+      - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
     depends_on:
       bitcoind:
         condition: service_healthy
@@ -116,5 +147,6 @@ services:
 volumes:
   bitcoin_datadir:
   bitcoin_wallet_datadir:
-  initializer_datadir:
-  jam_standalone_datadir:
+  bitcoin_regtest_initializer_datadir:
+  jam_standalone0_datadir:
+  jam_standalone1_datadir:
