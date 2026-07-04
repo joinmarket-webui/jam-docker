@@ -3,7 +3,6 @@ services:
   jam-ui-only0:
     container_name: jam_docker_jam_ui_only0
     image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
-    #image: joinmarket-webui/jam-local-ui-only:latest # local build
     environment:
       JAM_JMWALLETD_HOST: jam-standalone0
       JAM_JMWALLETD_API_PORT: 28183
@@ -24,7 +23,11 @@ services:
 
   jam-ui-only1:
     container_name: jam_docker_jam_ui_only1
-    image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    build:
+      context: ./ui-only
+      dockerfile: Dockerfile
+      args:
+        SKIP_RELEASE_VERIFICATION: true
     environment:
       JAM_JMWALLETD_HOST: jam-standalone1
       JAM_JMWALLETD_API_PORT: 28183
@@ -71,7 +74,11 @@ services:
 
   jam-standalone1:
     container_name: jam_docker_jam_standalone1
-    image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
+    build:
+      context: ./standalone-ng
+      dockerfile: Dockerfile
+      args:
+        SKIP_RELEASE_VERIFICATION: true
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
       WAIT_FOR_BITCOIND: 'true' # default: true
