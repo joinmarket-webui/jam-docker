@@ -3,6 +3,7 @@ services:
   jam-ui-only:
     container_name: jam_docker_jam_ui_only
     image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    #image: joinmarket-webui/jam-local-ui-only:latest # local build
     environment:
       JAM_JMWALLETD_HOST: jam-standalone0
       JAM_JMWALLETD_API_PORT: 28183
@@ -18,22 +19,15 @@ services:
   jam-standalone0:
     container_name: jam_docker_jam_standalone0
     image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
+    #image: joinmarket-webui/jam-local-standalone-ng:latest # local build
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
-      WAIT_FOR_BITCOIND: 'true' # default: true
       BITCOIN__RPC_URL: http://bitcoind:43782
-      BITCOIN__RPC_USER: regtest
-      BITCOIN__RPC_PASSWORD: regtest
-      #BITCOIN__RPC_COOKIE_FILE: /path/to/.cookie
+      BITCOIN__RPC_COOKIE_FILE: /root/.bitcoin_data/regtest/.cookie
       LOGGING__LEVEL: DEBUG
       NETWORK_CONFIG__NETWORK: testnet
       NETWORK_CONFIG__BITCOIN_NETWORK: regtest
       NETWORK_CONFIG__DIRECTORY_SERVERS: node1.onion:5222, node2.onion:5222
-      #MAKER__MIN_SIZE: 100000
-      MAKER__MIN_CONFIRMATIONS: 5 # default: 0
-      #TAKER__MINIMUM_MAKERS: 2
-      #TAKER__MAKER_TIMEOUT_SEC: 30
-      TAKER__BONDLESS_REQUIRE_ZERO_FEE: 'false' # default: true
     ports:
       - '42080:80'
     volumes:
@@ -50,14 +44,32 @@ services:
     image: ghcr.io/joinmarket-webui/jam-dev-standalone-ng:master
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
+      WAIT_FOR_BITCOIND: 'true' # default: true
+      OBWATCH_URL: http://localhost:8001
+      ###################################
+      # joinmarket-ng config
+      # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
+      ###################################
       BITCOIN__RPC_URL: http://bitcoind:43782
-      #BITCOIN__RPC_USER: regtest
-      #BITCOIN__RPC_PASSWORD: regtest
-      BITCOIN__RPC_COOKIE_FILE: /root/.bitcoin_data/regtest/.cookie
+      BITCOIN__RPC_USER: regtest
+      BITCOIN__RPC_PASSWORD: regtest
+      #BITCOIN__RPC_COOKIE_FILE: /root/.bitcoin_data/regtest/.cookie
       LOGGING__LEVEL: DEBUG
       NETWORK_CONFIG__NETWORK: testnet
       NETWORK_CONFIG__BITCOIN_NETWORK: regtest
       NETWORK_CONFIG__DIRECTORY_SERVERS: node3.onion:5222, node4.onion:5222
+      MAKER__MIN_SIZE: 30000 # default: 100000
+      MAKER__MIN_CONFIRMATIONS: 1 # default: 0
+      MAKER__MERGE_ALGORITHM: 'greedy' # default: 'default'
+      TAKER__MINIMUM_MAKERS: 2 # default: 4
+      TAKER__MAKER_TIMEOUT_SEC: 30  # default: 60
+      TAKER__BONDLESS_REQUIRE_ZERO_FEE: 'false' # default: true
+      TUMBLER__MIN_CONFIRMATIONS_BETWEEN_PHASES: 0 # default: 6
+      TUMBLER__CONFIRMATION_POLL_INTERVAL: 1 # default: 30.0
+      TUMBLER__RETRY_DELAY_SECONDS: 1 # default: 1800.0
+      ORDERBOOK_WATCHER__PORT: 8001
+      ORDERBOOK_WATCHER__UPDATE_INTERVAL: 10 # default: 60
+      TUI__LOG_LEVEL: DEBUG # default: WARNING
     ports:
       - '43080:80'
     volumes:
