@@ -19,8 +19,8 @@ docker pull ghcr.io/joinmarket-webui/jam-ui-only:latest
 The following environment variables control the configuration:
 - `JAM_JMWALLETD_HOST` (required; jmwalletd hostname)
 - `JAM_JMWALLETD_API_PORT` (required; jmwalletd api port)
-- `JAM_JMWALLETD_WEBSOCKET_PORT` (required; jmwalletd websocket port)
-- `JAM_JMWALLETD_WEBSOCKET_PATH` (optional; defaults to `/api/v1/ws`)
+- `JAM_JMWALLETD_WEBSOCKET_PORT` (optional; jmwalletd websocket port; if not set `JAM_JMWALLETD_API_PORT` will be used)
+- `JAM_JMWALLETD_WEBSOCKET_PATH` (optional; path to websocket endpoint; defaults to `/api/v1/ws`)
 - `JAM_JMOBWATCH_HOST` (optional; ob-watcher host; if not set `JAM_JMWALLETD_HOST` will be used)
 - `JAM_JMOBWATCH_PORT` (required; ob-watcher port)
 
