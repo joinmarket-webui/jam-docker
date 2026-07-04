@@ -2,12 +2,13 @@ services:
 
   jam-ui-only:
     container_name: jam_docker_jam_ui_only
-    image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
-    #image: joinmarket-webui/jam-local-ui-only:latest # local build
+    #image: ghcr.io/joinmarket-webui/jam-dev-ui-only:master
+    image: joinmarket-webui/jam-local-ui-only:latest # local build
     environment:
       JAM_JMWALLETD_HOST: jam-standalone0
       JAM_JMWALLETD_API_PORT: 28183
       JAM_JMWALLETD_WEBSOCKET_PORT: 28183
+      JAM_JMWALLETD_WEBSOCKET_PATH: /api/v1/ws
       JAM_JMOBWATCH_HOST: jam-standalone0
       JAM_JMOBWATCH_PORT: 8000
     ports:
@@ -15,6 +16,13 @@ services:
     depends_on:
       jam-standalone0:
         condition: service_started
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --output-document /dev/null http://127.0.0.1:80/jam/api/v0/health || exit 1']
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+      start_interval: 3s
 
   jam-standalone0:
     container_name: jam_docker_jam_standalone0
@@ -33,6 +41,7 @@ services:
     volumes:
       - 'jam_standalone0_datadir:/root/.joinmarket-ng'
       - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
+      - 'bitcoin_datadir:/root/.bitcoin_data' # mount bitcoind dir to access .cookie file
     depends_on:
       bitcoind:
         condition: service_healthy
@@ -75,7 +84,6 @@ services:
     volumes:
       - 'jam_standalone1_datadir:/root/.joinmarket-ng'
       - 'bitcoin_regtest_initializer_datadir:/root/.regtest-initializer'
-      - 'bitcoin_datadir:/root/.bitcoin_data' # mount bitcoind dir to access .cookie file
     depends_on:
       bitcoind:
         condition: service_healthy
