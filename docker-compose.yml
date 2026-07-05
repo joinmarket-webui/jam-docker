@@ -63,6 +63,7 @@ services:
       NETWORK_CONFIG__NETWORK: testnet
       NETWORK_CONFIG__BITCOIN_NETWORK: regtest
       NETWORK_CONFIG__DIRECTORY_SERVERS: node1.onion:5222, node2.onion:5222
+      ORDERBOOK_WATCHER__HTTP_HOST: 0.0.0.0 # for ui-only container to connect to
     ports:
       - '42080:80'
     volumes:
@@ -110,6 +111,7 @@ services:
       TUMBLER__MIN_CONFIRMATIONS_BETWEEN_PHASES: 0 # default: 6
       TUMBLER__CONFIRMATION_POLL_INTERVAL: 1 # default: 30.0
       TUMBLER__RETRY_DELAY_SECONDS: 1 # default: 1800.0
+      ORDERBOOK_WATCHER__HTTP_HOST: 0.0.0.0 # for ui-only container to connect to
       ORDERBOOK_WATCHER__HTTP_PORT: 17000
       ORDERBOOK_WATCHER__UPDATE_INTERVAL: 10 # default: 60
       TUI__LOG_LEVEL: DEBUG # default: WARNING

@@ -5,7 +5,7 @@ services:
     environment:
       ###################################
       # joinmarket-ng config
-      # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template
+      # see: https://github.com/joinmarket-ng/joinmarket-ng/blob/0.33.0/jmcore/src/jmcore/data/config.toml.template
       ###################################
       BITCOIN__RPC_URL: https://CHANGEME:8332
       BITCOIN__RPC_USER: CHANGEME

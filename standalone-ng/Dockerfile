@@ -202,7 +202,9 @@ ENV TOR__SOCKS_PORT=9050
 ENV TOR__CONTROL_HOST=127.0.0.1
 ENV TOR__CONTROL_PORT=9051
 ENV TOR__COOKIE_PATH=/var/lib/tor/control_auth_cookie
-ENV OBWATCH_URL=http://127.0.0.1:8000
+ENV ORDERBOOK_WATCHER__HTTP_HOST=127.0.0.1
+ENV ORDERBOOK_WATCHER__HTTP_PORT=8000
+ENV OBWATCH_URL=http://${ORDERBOOK_WATCHER__HTTP_HOST}:${ORDERBOOK_WATCHER__HTTP_PORT}
 
 # Copy upstream service definitions from joinmarket-ng repository
 COPY --from=venv-builder /build/jmwalletd/rootfs/etc/s6-overlay /etc/s6-overlay
