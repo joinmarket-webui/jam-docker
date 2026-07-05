@@ -47,7 +47,7 @@ docker-build-ui-master *args='':
 [group("docker")]
 docker-build-standalone-ng jam_repo_ref=env('JAM_REPO_REF') jm_ng_repo_ref=env('JM_NG_REPO_REF') *args='':
     @echo "Creating 'standalone-ng' docker image ..."
-    @docker buildx build {{args}} \
+    @docker buildx build --load {{args}} \
         --label "local" \
         --build-arg JAM_REPO_REF={{jam_repo_ref}} \
         --build-arg JM_NG_REPO_REF={{jm_ng_repo_ref}} \
@@ -73,7 +73,7 @@ docker-lint-standalone-ng:
 [group("docker")]
 docker-build-contrib-dinit *args='':
     @echo "Creating 'dinit' docker image ..."
-    @docker buildx build {{args}} \
+    @docker buildx build --load {{args}} \
         --label "local" \
         --tag "joinmarket-webui/jam-contrib-dinit" ./contrib/dinit
 
