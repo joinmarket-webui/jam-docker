@@ -97,6 +97,11 @@ docker-push username image_name tag:
 probe-directory-node onion_url port='5222':
     @curl --verbose --proxy socks5h://localhost:9050 {{onion_url}}:{{port}}
 
+
+[group("regtest")]
+regtest-build *args='':
+    @docker compose build --pull {{args}}
+
 [group("regtest")]
 regtest-up *args='':
     @docker compose up {{args}}

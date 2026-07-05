@@ -27,6 +27,7 @@ services:
       context: ./ui-only
       dockerfile: Dockerfile
       args:
+        JAM_REPO_REF: devel
         SKIP_RELEASE_VERIFICATION: true
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -82,6 +83,8 @@ services:
       context: ./standalone-ng
       dockerfile: Dockerfile
       args:
+        JAM_REPO_REF: devel
+        JM_NG_REPO_REF: main
         SKIP_RELEASE_VERIFICATION: true
     environment:
       READY_FILE: /root/.regtest-initializer/btc_fully_synched
