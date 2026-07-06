@@ -105,6 +105,12 @@ services:
       NETWORK_CONFIG__NETWORK: testnet
       NETWORK_CONFIG__BITCOIN_NETWORK: regtest
       NETWORK_CONFIG__DIRECTORY_SERVERS: node3.onion:5222, node4.onion:5222
+      WALLET__MIXDEPTH_COUNT: 5 # default: 5
+      WALLET__GAP_LIMIT: 6 # default: 20
+      WALLET__SCAN_RANGE: 1000 # default: 1000
+      WALLET__SMART_SCAN: true # default: true  # Enable smart scan for fast startup
+      WALLET__BACKGROUND_FULL_SCAN: true # default: true # Run full rescan in background after smart scan
+      WALLET__SCAN_LOOKBACK_BLOCKS: 100 # default: 52560 # Blocks to look back during initial smart scan
       MAKER__MIN_SIZE: 30000 # default: 100000
       MAKER__MIN_CONFIRMATIONS: 1 # default: 0
       MAKER__MERGE_ALGORITHM: 'greedy' # default: 'default'
