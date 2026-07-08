@@ -229,6 +229,7 @@ RUN chmod +x \
 
 # Copy nginx configuration
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
+COPY nginx/snippets/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 RUN sed --in-place "s|__BACKEND_VERSION__|${JM_NG_REPO_REF}|g" /etc/nginx/conf.d/default.conf
 
