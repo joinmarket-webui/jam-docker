@@ -8,13 +8,13 @@ ARG JAM_REPO_REF=master
 ARG JM_NG_REPO=https://github.com/joinmarket-ng/joinmarket-ng
 ARG JM_NG_REPO_REF=main
 
+ARG SKIP_RELEASE_VERIFICATION=false
+
 ARG S6_OVERLAY_VERSION=3.2.3.0
 ARG S6_OVERLAY_NOARCH_HASH=b720f9d9340efc8bb07528b9743813c836e4b02f8693d90241f047998b4c53cf
 ARG S6_OVERLAY_X86_64_HASH=a93f02882c6ed46b21e7adb5c0add86154f01236c93cd82c7d682722e8840563
 ARG S6_OVERLAY_AARCH64_HASH=0952056ff913482163cc30e35b2e944b507ba1025d78f5becbb89367bf344581
 ARG S6_OVERLAY_ARMHF_HASH=1ff4721b2a51e4f4dd9dbfffa47a994f14dbc3048853a83f7fb1c6ce93d59bf4
-
-ARG SKIP_RELEASE_VERIFICATION=false
 
 ARG NODE_IMAGE_VERSION=26.3.0-alpine3.24
 ARG NODE_IMAGE_HASH=9c0e1e52125d6b67d505cf75b4880fcf1290ccea5c480849910e1d57b2cf72b5
@@ -50,16 +50,16 @@ ARG SKIP_RELEASE_VERIFICATION
 WORKDIR /usr/src/jam
 
 # Clone Jam repository and verify GPG signature
-RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
-    && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
+RUN git clone "${JAM_REPO}" . --depth=1 --branch "${JAM_REPO_REF}" \
+    && if [ "${SKIP_RELEASE_VERIFICATION}" != "true" ]; then \
         echo "Importing GPG keys for Jam release verification..." \
         && find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
-        && if [ "$(git cat-file -t "refs/tags/$JAM_REPO_REF" 2>/dev/null)" = "tag" ]; then \
-            echo "Verifying GPG signature for tag: $JAM_REPO_REF" \
-            && git verify-tag "$JAM_REPO_REF"; \
+        && if [ "$(git cat-file -t "refs/tags/${JAM_REPO_REF}" 2>/dev/null)" = "tag" ]; then \
+            echo "Verifying GPG signature for tag: '${JAM_REPO_REF}'" \
+            && git verify-tag "${JAM_REPO_REF}"; \
         else \
-            echo "Ref $JAM_REPO_REF is not an annotated tag; Trying to verify commit..." \
-            && git verify-commit $(git rev-parse --verify HEAD); \
+            echo "Ref '${JAM_REPO_REF}' is not an annotated tag; Trying to verify commit..." \
+            && git verify-commit "$(git rev-parse --verify HEAD)"; \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
@@ -100,16 +100,16 @@ COPY --from=builder-base /pubkeys /pubkeys
 WORKDIR /build
 
 # Clone joinmarket-ng repository and verify GPG signature
-RUN git clone "$JM_NG_REPO" . --depth=1 --branch "$JM_NG_REPO_REF" \
-    && if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
+RUN git clone "${JM_NG_REPO}" . --depth=1 --branch "${JM_NG_REPO_REF}" \
+    && if [ "${SKIP_RELEASE_VERIFICATION}" != "true" ]; then \
         echo "Importing GPG keys for joinmarket-ng release verification..." \
         && find /pubkeys -type f -iname '*.asc' -exec gpg --import "{}" + \
-        && if [ "$(git cat-file -t "refs/tags/$JM_NG_REPO_REF" 2>/dev/null)" = "tag" ]; then \
-            echo "Verifying GPG signature for tag: $JM_NG_REPO_REF" \
-            && git verify-tag "$JM_NG_REPO_REF"; \
+        && if [ "$(git cat-file -t "refs/tags/${JM_NG_REPO_REF}" 2>/dev/null)" = "tag" ]; then \
+            echo "Verifying GPG signature for tag: '${JM_NG_REPO_REF}'" \
+            && git verify-tag "${JM_NG_REPO_REF}"; \
         else \
-            echo "Ref $JM_NG_REPO_REF is not an annotated tag; Trying to verify commit..." \
-            && git verify-commit $(git rev-parse --verify HEAD); \
+            echo "Ref '${JM_NG_REPO_REF}' is not an annotated tag; Trying to verify commit..." \
+            && git verify-commit "$(git rev-parse --verify HEAD)"; \
         fi; \
     else \
         echo "Skipping GPG release verification (SKIP_RELEASE_VERIFICATION=true)"; \
@@ -136,6 +136,13 @@ ARG S6_OVERLAY_NOARCH_HASH
 ARG S6_OVERLAY_X86_64_HASH
 ARG S6_OVERLAY_AARCH64_HASH
 ARG S6_OVERLAY_ARMHF_HASH
+
+# Set Docker labels
+LABEL maintainer="${MAINTAINER}"
+LABEL ui-version="${JAM_REPO_REF}"
+LABEL server-version="${JM_NG_REPO_REF}"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install runtime dependencies (includes python3 so the venv symlinks resolve)
 RUN apt-get update \
@@ -169,7 +176,7 @@ RUN case "$(uname -m)" in \
     && echo "${S6_OVERLAY_NOARCH_HASH}  s6-overlay-noarch.tar.xz" | sha256sum -c - \
     && echo "${S6_HASH}  s6-overlay-${S6_ARCH}.tar.xz" | sha256sum -c - \
     && tar --directory / --extract --xz --preserve-permissions --file s6-overlay-noarch.tar.xz \
-    && tar --directory / --extract --xz --preserve-permissions --file s6-overlay-${S6_ARCH}.tar.xz \
+    && tar --directory / --extract --xz --preserve-permissions --file "s6-overlay-${S6_ARCH}.tar.xz" \
     && rm --force s6-overlay-*.tar.xz
 
 # Copy UI build artifacts from ui-builder
@@ -231,10 +238,10 @@ RUN chmod +x \
 COPY nginx/snippets/proxy-params.conf /etc/nginx/snippets/proxy-params.conf
 COPY nginx/snippets/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
-RUN sed --in-place "s|__BACKEND_VERSION__|${JM_NG_REPO_REF}|g" /etc/nginx/conf.d/default.conf
 
-# Remove the default nginx site that conflicts with our config
-RUN rm --force /etc/nginx/sites-enabled/default
+RUN sed --in-place "s|__BACKEND_VERSION__|${JM_NG_REPO_REF}|g" /etc/nginx/conf.d/default.conf \
+  # Remove the default nginx site that conflicts with our config
+  && rm --force /etc/nginx/sites-enabled/default
 
 # Copy logrotate configuration
 COPY --chmod=0644 logrotate/ /etc/logrotate.d/
@@ -256,13 +263,7 @@ RUN mkdir --parents /var/log/jam-ng/jmwalletd \
     && chown root:root /var/lib/tor \
     && chmod 700 /var/lib/tor
 
-# Expose HTTP port
 EXPOSE 80
-
-# Set Docker labels
-LABEL maintainer="${MAINTAINER}"
-LABEL ui-version="${JAM_REPO_REF}"
-LABEL server-version="${JM_NG_REPO_REF}"
 
 # Set entrypoint
 ENTRYPOINT ["/usr/local/bin/jam-ng-entrypoint.sh"]
