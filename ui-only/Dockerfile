@@ -40,10 +40,10 @@ ARG JAM_REPO_REF
 WORKDIR /usr/src/jam
 
 # checkout and build project
-RUN git clone "$JAM_REPO" . --depth=1 --branch "$JAM_REPO_REF" \
-    && (if [ "$SKIP_RELEASE_VERIFICATION" != "true" ]; then \
+RUN git clone "${JAM_REPO}" . --depth=1 --branch "${JAM_REPO_REF}" \
+    && (if [ "${SKIP_RELEASE_VERIFICATION}" != "true" ]; then \
         find /pubkeys -iname '*.asc' -exec gpg --import "{}" \; \
-        && git verify-tag "$JAM_REPO_REF"; \
+        && git verify-tag "${JAM_REPO_REF}"; \
     fi) \
     && npm clean-install --no-fund --no-audit \
     && npm run build
@@ -57,8 +57,8 @@ FROM runtime
 ARG MAINTAINER
 ARG JAM_REPO_REF
 
-LABEL maintainer="$MAINTAINER"
-LABEL ui-version="$JAM_REPO_REF"
+LABEL maintainer="${MAINTAINER}"
+LABEL ui-version="${JAM_REPO_REF}"
 
 WORKDIR /
 
@@ -89,6 +89,8 @@ COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.tem
 COPY --chmod=0755 jam-entrypoint.sh /
 
 ENTRYPOINT  [ "/jam-entrypoint.sh" ]
+
+EXPOSE 80
 
 # the default parameters to ENTRYPOINT (unless overruled on the command line)
 CMD ["nginx", "-g", "daemon off;"]
