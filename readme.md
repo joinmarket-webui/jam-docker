@@ -183,7 +183,4 @@ docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./standalo
 ## Resources
 - Jam (GitHub): https://github.com/joinmarket-webui/jam
 - JoinMarket NG (GitHub): https://github.com/joinmarket-ng/joinmarket-ng
-- Umbrel (GitHub): https://github.com/getumbrel/umbrel
-- Citadel (GitHub): https://github.com/runcitadel/citadel
----
-- OCI Image Annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md
+- JoinMarket NG (Docs): https://joinmarket-ng.github.io/joinmarket-ng/
