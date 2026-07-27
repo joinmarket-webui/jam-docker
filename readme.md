@@ -110,7 +110,10 @@ docker run --rm -it \
 ```
 
 #### Configuration
-Configuration follows the convention: environment variables take precedence and use the `SECTION__KEY` (double underscore) form, for example:
+The upstream `config.toml.template` is the canonical list of settings. Every
+nested `[section] key` can be supplied as an environment variable by uppercasing
+both names and joining them with a double underscore: `SECTION__KEY`.
+Environment variables take precedence, for example:
 
 ```
 BITCOIN__RPC_URL=http://bitcoin:8332
@@ -123,8 +126,9 @@ TAKER__MAX_CJ_FEE_ABS=10000
 TAKER__MAX_CJ_FEE_REL=0.0003
 ```
 
-Anything not covered by env vars can be set by mounting a custom `config.toml` into `$JOINMARKET_DATA_DIR/config.toml`
-(default`/root/.joinmarket-ng/config.toml`). The wrapper does not generate this file. 
+Top-level and non-settings options can be set by mounting a custom `config.toml`
+into `$JOINMARKET_DATA_DIR/config.toml` (default `/root/.joinmarket-ng/config.toml`).
+The wrapper does not generate this file.
 See the upstream [`config.toml.template`](https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/data/config.toml.template)
 and [`settings.py`](https://github.com/joinmarket-ng/joinmarket-ng/blob/main/jmcore/src/jmcore/settings.py) for the full list of supported keys.
 
@@ -142,7 +146,7 @@ docker run --rm -it \
   --env WALLET__GAP_LIMIT="21" \
   --env WALLET__SCAN_RANGE="1000" \
   --env WALLET__SMART_SCAN="true" \
-  --env WALLET__BACKGROUND_FULL_SCAN="true" \
+  --env WALLET__BACKGROUND_FULL_RESCAN="true" \
   --env WALLET__SCAN_LOOKBACK_BLOCKS="52560" \
   [...]
   --publish "127.0.0.1:8080:80" \
