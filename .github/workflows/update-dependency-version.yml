@@ -21,7 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
     
       # Parse the repo url (e.g. "https://github.com/bitcoin/bips") and extract:
       # - the full repo name (e.g. "bitcoin/bips")
