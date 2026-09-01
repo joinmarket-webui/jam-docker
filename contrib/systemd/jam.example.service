@@ -1,0 +1,62 @@
+[Unit]
+Description=Jam for JoinMarket
+
+After=docker.service
+Requires=docker.service
+
+After=bitcoind.service
+Wants=bitcoind.service
+
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Process management
+####################
+Type=oneshot
+RemainAfterExit=yes
+
+# Use the Docker Compose binary that matches your installation
+ExecStart=/usr/bin/docker compose --file /path/to/you/app/docker-compose.yml up --detach
+ExecStop=/usr/bin/docker compose --file /path/to/you/app/docker-compose.yml down
+
+# Directory creation and permissions
+####################################
+
+# Run as jam:jam
+User=jam
+
+# Optional: give the service a reasonable timeout
+TimeoutStopSec=600
+
+# Limit the number of open file descriptors (Docker can spawn many sockets).
+LimitNOFILE=16384
+
+# Hardening measures
+####################
+
+# Provide a private /tmp and /var/tmp.
+PrivateTmp=true
+
+# Mount /usr, /boot/ and /etc read-only for the process.
+ProtectSystem=full
+
+# Deny access to /home, /root and /run/user
+ProtectHome=true
+
+# Disallow the process and all of its children to gain
+# new privileges through execve().
+NoNewPrivileges=true
+
+# Use a new /dev namespace only populated with API pseudo devices
+# such as /dev/null, /dev/zero and /dev/random.
+PrivateDevices=true
+
+# Deny the creation of writable and executable memory mappings.
+MemoryDenyWriteExecute=true
+
+# Restrict ABIs to help ensure MemoryDenyWriteExecute is enforced
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
