@@ -7,6 +7,7 @@ set dotenv-required
 
 project_dir := justfile_directory()
 
+regtest_docker_file := 'docker-compose.regtest.yml'
 regtest_bitcoin_container_name := 'jam_docker_bitcoind'
 regtest_bitcoin_container_rpcport := '43782'
 
@@ -100,15 +101,15 @@ probe-directory-node onion_url port='5222':
 
 [group("regtest")]
 regtest-build *args='':
-    @docker compose build --pull {{args}}
+    @docker compose --file {{regtest_docker_file}} build --pull {{args}}
 
 [group("regtest")]
 regtest-up *args='':
-    @docker compose up {{args}}
+    @docker compose --file {{regtest_docker_file}} up {{args}}
 
 [group("regtest")]
 regtest-down *args='':
-    @docker compose down {{args}}
+    @docker compose --file {{regtest_docker_file}} down {{args}}
 
 [group("regtest")]
 regtest-clear *args='':
@@ -116,11 +117,11 @@ regtest-clear *args='':
 
 [group("regtest")]
 regtest-logs *args='':
-    @docker compose logs --follow
+    @docker compose --file {{regtest_docker_file}} logs --follow
 
 [group("regtest")]
 regtest-ps *args='':
-    @docker compose ps {{args}}
+    @docker compose --file {{regtest_docker_file}} ps {{args}}
 
 # Execute a bitcoin-cli command
 [group("regtest")]
