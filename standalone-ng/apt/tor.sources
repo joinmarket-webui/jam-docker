@@ -2,4 +2,4 @@ Types: deb
 URIs: https://deb.torproject.org/torproject.org/
 Suites: trixie
 Components: main
-Signed-By: /usr/share/keyrings/tor-repository.asc
+Signed-By: /usr/share/keyrings/deb.torproject.org-keyring.gpg
