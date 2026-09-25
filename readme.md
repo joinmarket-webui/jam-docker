@@ -85,9 +85,8 @@ docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/
 Bundles [Jam](https://github.com/joinmarket-webui/jam) with [JoinMarket NG](https://github.com/joinmarket-ng/joinmarket-ng) as backend.
 
 Tor is installed from the [Tor Project's signed Debian repository](https://support.torproject.org/little-t-tor/getting-started/installing/)
-and pinned to `0.4.9.13-1~d13.trixie+1` for both `amd64` and `arm64`.
-This includes the [Tor 0.4.9.13 security fixes](https://www.openwall.com/lists/oss-security/2026/09/24/2)
-tracked in [#219](https://github.com/joinmarket-webui/jam-docker/issues/219).
+for both `amd64` and `arm64`, using the latest available package when the
+installation step runs.
 Existing containers must be recreated with a rebuilt image to receive the update.
 
 ### Usage Notes
@@ -183,7 +182,6 @@ docker build --label "local" \
 - `JAM_REPO_REF` (ui git ref; defaults to `master`)
 - `JM_NG_REPO` (backend git repo; defaults to `https://github.com/joinmarket-ng/joinmarket-ng`)
 - `JM_NG_REPO_REF` (backend git ref; defaults to `main`)
-- `TOR_VERSION` (exact Debian package version of Tor; defaults to `0.4.9.13-1~d13.trixie+1`)
 
 ### Lint
 ```sh

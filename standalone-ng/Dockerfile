@@ -10,9 +10,6 @@ ARG JM_NG_REPO_REF=main
 
 ARG SKIP_RELEASE_VERIFICATION=false
 
-# Security release: https://github.com/joinmarket-webui/jam-docker/issues/219
-ARG TOR_VERSION=0.4.9.13-1~d13.trixie+1
-
 ARG S6_OVERLAY_VERSION=3.2.3.2
 ARG S6_OVERLAY_NOARCH_HASH=5379750ed30a84bbd2e2dd74847ba6b5bd29cd0b2e3ea2ec58049b57eb2eda12
 ARG S6_OVERLAY_X86_64_HASH=e6befcc96a437a3831386ecfc51808c5d3e939dc5fe3c02ae9284599e8aa2408
@@ -135,7 +132,6 @@ ARG MAINTAINER
 ARG JAM_REPO_REF
 ARG JM_NG_REPO_REF
 ARG S6_OVERLAY_VERSION
-ARG TOR_VERSION
 ARG S6_OVERLAY_NOARCH_HASH
 ARG S6_OVERLAY_X86_64_HASH
 ARG S6_OVERLAY_AARCH64_HASH
@@ -174,7 +170,7 @@ COPY apt/tor.sources /etc/apt/sources.list.d/tor.sources
 
 RUN apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
-        tor="${TOR_VERSION}" \
+        tor \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/* \
     && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
