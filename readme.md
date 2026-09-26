@@ -171,6 +171,8 @@ docker build --label "local" \
   --tag "joinmarket-webui/jam-standalone-ng" ./standalone-ng
 ```
 
+Tor is installed from the [Tor Project's signed Debian repository](https://support.torproject.org/little-t-tor/getting-started/installing/), using the latest available package when the installation step runs.
+
 #### Build args
 - `SKIP_RELEASE_VERIFICATION` (optional, defaults to `false`; enable skipping release verification)
 - `JAM_REPO` (ui git repo; defaults to `https://github.com/joinmarket-webui/jam`)

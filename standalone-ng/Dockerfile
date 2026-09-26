@@ -148,8 +148,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
         nginx \
-        tor \
         curl \
+        gnupg \
         xz-utils \
         procps \
         logrotate \
@@ -159,6 +159,19 @@ RUN apt-get update \
         python3-venv \
         libsodium23 \
         libsecp256k1-2 \
+    && apt-get clean \
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
+
+COPY apt/tor/tor.sources /etc/apt/sources.list.d/tor.sources
+COPY apt/tor/tor-repository.asc /tmp/tor-repository.asc
+
+RUN gpg --batch --dearmor --output /usr/share/keyrings/deb.torproject.org-keyring.gpg /tmp/tor-repository.asc \
+    && rm --force /tmp/tor-repository.asc \
+    && apt-get update \
+    && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
+        tor \
+        deb.torproject.org-keyring \
     && apt-get clean \
     && rm --recursive --force /var/lib/apt/lists/* \
     && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
