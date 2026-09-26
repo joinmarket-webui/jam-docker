@@ -163,16 +163,12 @@ RUN apt-get update \
     && rm --recursive --force /var/lib/apt/lists/* \
     && rm --recursive --force /var/log/dpkg.log /var/log/apt/*
 
-# Enable the Tor Project's signed repository after installing ca-certificates.
-# Archive key fingerprint: A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
-# https://support.torproject.org/little-t-tor/getting-started/installing/
-RUN curl --fail --silent --show-error --location \
-        https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc \
-    | gpg --batch --dearmor --output /usr/share/keyrings/deb.torproject.org-keyring.gpg
+COPY apt/tor/tor.sources /etc/apt/sources.list.d/tor.sources
+COPY apt/tor/tor-repository.asc /tmp/tor-repository.asc
 
-COPY apt/tor.sources /etc/apt/sources.list.d/tor.sources
-
-RUN apt-get update \
+RUN gpg --batch --dearmor --output /usr/share/keyrings/deb.torproject.org-keyring.gpg /tmp/tor-repository.asc \
+    && rm --force /tmp/tor-repository.asc \
+    && apt-get update \
     && apt-get install --quiet --no-install-recommends --no-install-suggests --yes \
         tor \
         deb.torproject.org-keyring \
