@@ -84,11 +84,6 @@ docker run --rm -i hadolint/hadolint:latest-alpine hadolint "$@" - < "./ui-only/
 ## standalone-ng
 Bundles [Jam](https://github.com/joinmarket-webui/jam) with [JoinMarket NG](https://github.com/joinmarket-ng/joinmarket-ng) as backend.
 
-Tor is installed from the [Tor Project's signed Debian repository](https://support.torproject.org/little-t-tor/getting-started/installing/)
-for both `amd64` and `arm64`, using the latest available package when the
-installation step runs.
-Existing containers must be recreated with a rebuilt image to receive the update.
-
 ### Usage Notes
 ```sh
 docker pull ghcr.io/joinmarket-webui/jam-standalone-ng:latest
@@ -175,6 +170,8 @@ docker build --label "local" \
   --build-arg JM_NG_REPO_REF=main \
   --tag "joinmarket-webui/jam-standalone-ng" ./standalone-ng
 ```
+
+Tor is installed from the [Tor Project's signed Debian repository](https://support.torproject.org/little-t-tor/getting-started/installing/), using the latest available package when the installation step runs.
 
 #### Build args
 - `SKIP_RELEASE_VERIFICATION` (optional, defaults to `false`; enable skipping release verification)
